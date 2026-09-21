@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - -std=c89
+    - -Wdeclaration-after-statement
+    - -Werror=declaration-after-statement
+    - -pedantic-errors
