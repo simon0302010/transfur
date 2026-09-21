@@ -4,7 +4,11 @@ CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statem
 
 TARGET = build/transfur
 
-SRC = src/main.c
+SRC = \
+	src/main.c \
+	src/gui/gui.c \
+
+
 OBJ = $(SRC:src/%.c=build/%.o)
 
 $(TARGET): $(OBJ)
