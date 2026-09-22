@@ -6,7 +6,7 @@ The logic is worth improving when adding support for embedded systems later on.
 #include "gui.h"
 
 #if defined(__linux__)
-#include "gui_linux.c"
+#include "linux/gui_linux.c"
 
 #elif defined(_WIN32)
 #include "gui_windows.c"
