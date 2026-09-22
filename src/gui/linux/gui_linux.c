@@ -137,8 +137,7 @@ static void calculator(struct nk_context *ctx)
     nk_end(ctx);
 }
 
-
-int create_window(const char *title)
+int run_gui(const char *title)
 {
     long dt;
     long started;
@@ -218,6 +217,9 @@ int create_window(const char *title)
             nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
         }
         nk_end(ctx);
+
+        /* Other code here */
+
         if (nk_window_is_hidden(ctx, title)) break;
         /* Draw */
         XClearWindow(xw.dpy, xw.win);
