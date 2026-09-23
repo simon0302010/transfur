@@ -68,7 +68,7 @@ static void sleep_for(long t)
     while(-1 == nanosleep(&req, &req));
 }
 
-int run_gui_nuklear(const char *title, void (*gui)(struct nk_context *ctx))
+int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_context *ctx))
 {
     long dt;
     long started;
@@ -132,7 +132,7 @@ int run_gui_nuklear(const char *title, void (*gui)(struct nk_context *ctx))
         nk_input_end(ctx);
 
         /* Runs the GUI code */
-        gui(ctx);
+        gui(title, ctx);
 
         if (nk_window_is_hidden(ctx, title)) break;
         /* Draw */
