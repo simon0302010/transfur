@@ -9,7 +9,7 @@ Needs to implement all functions defined in `gui.h`
 #include "linux/nuklear_linux.c"
 
 #elif defined(_WIN32)
-#include "windows_macos/nuklear_windows_macos.c"
+#include "windows/nuklear_windows.c"
 
 #elif defined(__APPLE__)
 #include "macos/nuklear_macos.c"
