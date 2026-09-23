@@ -3,9 +3,6 @@ Source file for Linux GUI code.
 Needs to implement all functions defined in `gui.h`
 */
 
-#include <X11/X.h>
-#define _POSIX_C_SOURCE 199309L
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,12 +19,11 @@ Needs to implement all functions defined in `gui.h`
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_IMPLEMENTATION
 #define NK_XLIB_IMPLEMENTATION
-#include "../nuklear/nuklear.h"
+#include "../nuklear.h"
 #include "nuklear_xlib.h"
+#include "../../gui.h"
 
 #define DTIME           20
-#define WINDOW_WIDTH    800
-#define WINDOW_HEIGHT   600
 
 typedef struct XWindow XWindow;
 struct XWindow {
@@ -45,8 +41,7 @@ struct XWindow {
     Atom wm_delete_window;
 };
 
-static void
-die(const char *fmt, ...)
+static void die(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -56,16 +51,14 @@ die(const char *fmt, ...)
     exit(EXIT_FAILURE);
 }
 
-static long
-timestamp(void)
+static long timestamp(void)
 {
     struct timeval tv;
     if (gettimeofday(&tv, NULL) < 0) return 0;
     return (long)((long)tv.tv_sec * 1000 + (long)tv.tv_usec/1000);
 }
 
-static void
-sleep_for(long t)
+static void sleep_for(long t)
 {
     struct timespec req;
     const time_t sec = (int)(t/1000);
@@ -75,69 +68,7 @@ sleep_for(long t)
     while(-1 == nanosleep(&req, &req));
 }
 
-static void calculator(struct nk_context *ctx)
-{
-    if (nk_begin(ctx, "Calculator", nk_rect(10, 10, 180, 250),
-        NK_WINDOW_BORDER|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_MOVABLE))
-    {
-        static int set = 0, prev = 0, op = 0;
-        static const char numbers[] = "789456123";
-        static const char ops[] = "+-*/";
-        static double a = 0, b = 0;
-        static double *current = &a;
-
-        size_t i = 0;
-        int solve = 0;
-        {int len; char buffer[256];
-        nk_layout_row_dynamic(ctx, 35, 1);
-        len = sprintf(buffer, "%.2f", *current);
-        nk_edit_string(ctx, NK_EDIT_SIMPLE, buffer, &len, 255, nk_filter_float);
-        buffer[len] = 0;
-        *current = atof(buffer);}
-
-        nk_layout_row_dynamic(ctx, 35, 4);
-        for (i = 0; i < 16; ++i) {
-            if (i >= 12 && i < 15) {
-                if (i > 12) continue;
-                if (nk_button_label(ctx, "C")) {
-                    a = b = op = 0; current = &a; set = 0;
-                } if (nk_button_label(ctx, "0")) {
-                    *current = *current*10.0f; set = 0;
-                } if (nk_button_label(ctx, "=")) {
-                    solve = 1; prev = op; op = 0;
-                }
-            } else if (((i+1) % 4)) {
-                if (nk_button_text(ctx, &numbers[(i/4)*3+i%4], 1)) {
-                    *current = *current * 10.0f + numbers[(i/4)*3+i%4] - '0';
-                    set = 0;
-                }
-            } else if (nk_button_text(ctx, &ops[i/4], 1)) {
-                if (!set) {
-                    if (current != &b) {
-                        current = &b;
-                    } else {
-                        prev = op;
-                        solve = 1;
-                    }
-                }
-                op = ops[i/4];
-                set = 1;
-            }
-        }
-        if (solve) {
-            if (prev == '+') a = a + b;
-            if (prev == '-') a = a - b;
-            if (prev == '*') a = a * b;
-            if (prev == '/') a = a / b;
-            current = &a;
-            if (set) current = &b;
-            b = 0; set = 0;
-        }
-    }
-    nk_end(ctx);
-}
-
-int run_gui(const char *title)
+int run_gui_nuklear(const char *title, void (*gui)(struct nk_context *ctx))
 {
     long dt;
     long started;
@@ -200,25 +131,8 @@ int run_gui(const char *title)
         }
         nk_input_end(ctx);
 
-        /* GUI */
-        if (nk_begin(ctx, title, nk_rect(0, 0, xw.width, xw.height), NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_BACKGROUND))
-        {
-            enum {EASY, HARD};
-            static int op = EASY;
-            static int property = 20;
-
-            nk_layout_row_static(ctx, 30, 80, 1);
-            if (nk_button_label(ctx, "button"))
-                fprintf(stdout, "button pressed\n");
-            nk_layout_row_dynamic(ctx, 30, 2);
-            if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
-            nk_layout_row_dynamic(ctx, 25, 1);
-            nk_property_int(ctx, "Compression:", 0, &property, 100, 10, 1);
-        }
-        nk_end(ctx);
-
-        /* Other code here */
+        /* Runs the GUI code */
+        gui(ctx);
 
         if (nk_window_is_hidden(ctx, title)) break;
         /* Draw */

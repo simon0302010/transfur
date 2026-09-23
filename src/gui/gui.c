@@ -6,13 +6,13 @@ The logic is worth improving when adding support for embedded systems later on.
 #include "gui.h"
 
 #if defined(__linux__)
-#include "linux/gui_linux.c"
+#include "nuklear/gui_nuklear.c"
 
 #elif defined(_WIN32)
-#include "gui_windows.c"
+#include "nuklear/gui_nuklear.c"
 
 #elif defined(__APPLE__)
-#include "gui_macos.c"
+#include "nuklear/gui_nuklear.c"
 
 #else
 #error "Unsupported platform"

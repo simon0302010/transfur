@@ -3,7 +3,7 @@
 #include "gui/gui.h"
 
 int main(void) {
-        if (create_window("Transfur") != 0)
+        if (run_gui("Transfur") != 0)
                 perror("gui_init");
 
         return 0;

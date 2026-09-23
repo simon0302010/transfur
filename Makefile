@@ -6,6 +6,7 @@ ifeq ($(OS),Windows_NT)
   # Nothing for Windows
 else ifeq ($(shell uname -s),Linux)
   LDLIBS += -lX11
+  CFLAGS += -D_POSIX_C_SOURCE=199309L
 else ifeq ($(shell uname -s),Darwin)
   # Nothing for macOS
 endif
