@@ -18,10 +18,9 @@ Needs to implement all functions defined in `gui.h`
 #error "Unsupported platform"
 #endif
 
-static void calculator(const char *title, struct nk_context *ctx)
+static void calculator(const char *title, struct nk_context *ctx, int width, int height)
 {
-    if (nk_begin(ctx, title, nk_rect(10, 10, 180, 250),
-        NK_WINDOW_BORDER|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_MOVABLE))
+    if (nk_begin(ctx, title, nk_rect(0, 0, width, height), 0))
     {
         static int set = 0, prev = 0, op = 0;
         static const char numbers[] = "789456123";

@@ -3,6 +3,7 @@ Source file for Linux GUI code.
 Needs to implement all functions defined in `gui.h`
 */
 
+#include <X11/X.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +69,7 @@ static void sleep_for(long t)
     while(-1 == nanosleep(&req, &req));
 }
 
-int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_context *ctx))
+int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_context *ctx, int width, int height))
 {
     long dt;
     long started;
@@ -90,7 +91,7 @@ int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_
         ExposureMask | KeyPressMask | KeyReleaseMask |
         ButtonPress | ButtonReleaseMask| ButtonMotionMask |
         Button1MotionMask | Button3MotionMask | Button4MotionMask | Button5MotionMask|
-        PointerMotionMask | KeymapStateMask;
+        PointerMotionMask | KeymapStateMask | StructureNotifyMask;
     xw.win = XCreateWindow(xw.dpy, xw.root, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0,
         XDefaultDepth(xw.dpy, xw.screen), InputOutput,
         xw.vis, CWEventMask | CWColormap, &xw.swa);
@@ -123,8 +124,6 @@ int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_
             if (evt.type == ConfigureNotify) {
                 xw.width = (unsigned int)evt.xconfigure.width;
                 xw.height = (unsigned int)evt.xconfigure.height;
-
-                nk_window_set_bounds(ctx, title, nk_rect(0, 0, (float)xw.width, (float)xw.height));
             }
             if (XFilterEvent(&evt, xw.win)) continue;
             nk_xlib_handle_event(xw.dpy, xw.screen, xw.win, &evt);
@@ -132,7 +131,7 @@ int run_gui_nuklear(const char *title, void (*gui)(const char *title, struct nk_
         nk_input_end(ctx);
 
         /* Runs the GUI code */
-        gui(title, ctx);
+        gui(title, ctx, xw.width, xw.height);
 
         if (nk_window_is_hidden(ctx, title)) break;
         /* Draw */
