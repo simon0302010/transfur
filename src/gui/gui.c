@@ -1,6 +1,7 @@
 /*
-This file decides what source file to include based on the operating system it is being compiled for.
-The logic is worth improving when adding support for embedded systems later on.
+This file decides what source file to include based on the operating system it
+is being compiled for. The logic is worth improving when adding support for
+embedded systems later on.
 */
 
 #include "gui.h"

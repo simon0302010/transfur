@@ -3,12 +3,13 @@ CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statem
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
-  # Nothing for Windows
+	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lm
 else ifeq ($(shell uname -s),Linux)
-  LDLIBS += -lX11
-  CFLAGS += -D_POSIX_C_SOURCE=199309L
+	LDLIBS += -lX11
+	CFLAGS += -D_POSIX_C_SOURCE=199309
 else ifeq ($(shell uname -s),Darwin)
-  # Nothing for macOS
+	CFLAGS += $(shell pkg-config --cflags sdl2)
+	LDLIBS = $(shell pkg-config --libs sdl2) -lm
 endif
 
 TARGET = build/transfur

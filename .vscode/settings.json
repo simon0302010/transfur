@@ -1,7 +1,9 @@
 {
         "[c]": {
                 "editor.tabSize": 8,
-                "editor.insertSpaces": true
+                "editor.insertSpaces": true,
+                "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+                "editor.formatOnSave": true
         },
         "files.associations": {
                 "*.c": "c",
