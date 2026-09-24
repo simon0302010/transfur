@@ -8,9 +8,9 @@
 
 /*
 Holds a list of all interface types.
-Must be passed to the
+Must be passed to `init_conn` in interfaces.c.
 */
-enum interface { if_lan, if_serial, if_usb, if_file };
+enum interface { if_empty, if_lan, if_serial, if_usb, if_file };
 
 /* `char` types are being used to guarantee 8-bit values. */
 struct chunk {
