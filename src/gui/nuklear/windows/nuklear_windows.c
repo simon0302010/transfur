@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 /* nuklear - 1.32.0 - public domain */
 #include <stdlib.h>
 #define COBJMACROS
@@ -267,3 +269,5 @@ int run_gui_nuklear(const char *title,
         UnregisterClassW(wc.lpszClassName, wc.hInstance);
         return 0;
 }
+
+#endif

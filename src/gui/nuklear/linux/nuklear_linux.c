@@ -1,7 +1,4 @@
-/*
-Source file for Linux GUI code.
-Needs to implement all functions defined in `gui.h`
-*/
+#ifdef __linux__
 
 #include <X11/X.h>
 #include <assert.h>
@@ -162,3 +159,5 @@ cleanup:
         XCloseDisplay(xw.dpy);
         return 0;
 }
+
+#endif

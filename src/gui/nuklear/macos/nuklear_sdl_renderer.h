@@ -1,3 +1,5 @@
+#ifdef __APPLE__
+
 #include "../nuklear.h"
 
 #ifndef NK_SDL_RENDERER_H_
@@ -504,3 +506,5 @@ void nk_sdl_shutdown(void) {
 }
 
 #endif /* NK_SDL_RENDERER_IMPLEMENTATION */
+
+#endif

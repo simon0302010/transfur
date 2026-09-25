@@ -1,3 +1,5 @@
+#ifdef __APPLE__
+
 /* nuklear - 1.32.0 - public domain */
 #include <assert.h>
 #include <limits.h>
@@ -160,3 +162,5 @@ cleanup:
         SDL_Quit();
         return 0;
 }
+
+#endif

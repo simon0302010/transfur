@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 /*
  * Nuklear - v1.40.8 - public domain
  * no warrenty implied; use at your own risk.
@@ -1272,4 +1274,6 @@ NK_API void nk_xlib_render(Drawable screen, struct nk_color clear) {
         nk_clear(ctx);
         nk_xsurf_blit(screen, surf, surf->w, surf->h);
 }
+#endif
+
 #endif

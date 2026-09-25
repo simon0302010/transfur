@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 /*
  * Nuklear - 1.32.0 - public domain
  * no warrenty implied; use at your own risk.
@@ -712,5 +714,7 @@ void nk_d3d9_shutdown(void) {
         nk_buffer_free(&d3d9.cmds);
         nk_free(&d3d9.ctx);
 }
+
+#endif
 
 #endif

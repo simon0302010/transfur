@@ -5,14 +5,16 @@ Needs to implement all functions defined in `gui.h`
 
 #include <stdio.h>
 
+#include "../gui.h"
+
 #if defined(__linux__)
-#include "linux/nuklear_linux.c"
+#include "linux/nuklear_linux.h"
 
 #elif defined(_WIN32)
-#include "windows/nuklear_windows.c"
+#include "windows/nuklear_windows.h"
 
 #elif defined(__APPLE__)
-#include "macos/nuklear_macos.c"
+#include "macos/nuklear_macos.h"
 
 #else
 #error "Unsupported platform"
