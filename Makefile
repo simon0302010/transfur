@@ -3,7 +3,8 @@ CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statem
 LDLIBS = -lm
 
 TARGET = build/transfur
-SRC = src/main.c
+SRC = src/main.c \
+	src/interfaces/interfaces.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)

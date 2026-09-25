@@ -81,4 +81,8 @@ error.
 */
 int recv_chunk(const int *conn, struct chunk *chunk);
 
+const char *get_receiver_text(enum interface interface);
+
+const char *get_sender_text(enum interface interface);
+
 #endif

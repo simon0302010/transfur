@@ -111,3 +111,29 @@ int recv_chunk(const int *conn, struct chunk *chunk) {
 
         return 1;
 }
+
+const char *get_receiver_text(enum interface interface) {
+        switch (interface) {
+        case if_empty:
+                return "No receiving interface";
+        case if_file:
+                return "Read from file";
+        case if_lan:
+                return "Receive over LAN";
+        case if_serial:
+                return "Receive over serial";
+        }
+}
+
+const char *get_sender_text(enum interface interface) {
+        switch (interface) {
+        case if_empty:
+                return "No sending interface";
+        case if_file:
+                return "Write to file";
+        case if_lan:
+                return "Send over LAN";
+        case if_serial:
+                return "Send over serial";
+        }
+}
