@@ -15,20 +15,16 @@ enum interface { if_empty, if_lan, if_serial, if_file };
 /* `char` types are being used to guarantee 8-bit values. */
 struct chunk {
         /*
+        All interfaces except `file` interfaces can completely ignore this.
+
         Transmission chunk types:
 
         0: A regular chunk containing binary data
 
-        1: Transfer finish message. `data` is expected to stay empty. A `file`
-        interface is supposed to consume this while other interfaces pass it on.
+        1: Transfer done
 
-        2: Request to clear buffer on the last `file` interface in the chain. A
-        `file` interface is supposed to consume this while other interfaces pass
-        it on.
-
-        3: Ping message. Any receive interface is supposed to sent the entire
-        chunk back. The first receiver consumes this and sends a chunk back.
-        Sender must be waiting for chunks when sending this to get the response.
+        2: Request to clear output file on the last receiving `file` interface
+        in the chain.
 
         Contains an unsigned 8-bit integer.
         */
@@ -84,21 +80,5 @@ Returns `0` if the chunk transfer succeeded or any other code based on the
 error.
 */
 int recv_chunk(const int *conn, struct chunk *chunk);
-
-/*
-Clears the receive buffer on the ending `file` interface.
-The last device in a chain is supposed to have a `file` interface for the last
-sender to save the received data into a file. Call this before starting a new
-transfer. Automatically called after `finish_transfer` is called.
-*/
-int clear_recv_buffer(const int *conn);
-
-/*
-Sends the finish transfer message along the chain.
-The ending `file` interface is supposed to use this signal to save its buffer
-into the configured file. Called when the first sender is looking to finish the
-transfer.
-*/
-int finish_transfer(const int *conn);
 
 #endif
