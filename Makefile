@@ -4,7 +4,10 @@ LDLIBS = -lm
 
 TARGET = build/transfur
 SRC = src/main.c \
-	src/interfaces/interfaces.c
+	src/interfaces/interfaces.c \
+	src/interfaces/file/file.c \
+	src/interfaces/lan/lan.c \
+	src/interfaces/serial/serial.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)

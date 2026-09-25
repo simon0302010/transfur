@@ -9,3 +9,11 @@ counterparts for other ways to transfer data are expected to work on any
 operating system. If this cannnot be guaranteed, it must be clearly stated in
 the README and not compiled for systems with lacking support.
 */
+
+#include "../interfaces.h"
+
+int init_conn_lan(void *conn, const char *ip) { return 0; }
+
+int send_chunk_lan(void *conn, const struct chunk *chunk) { return 0; }
+
+int recv_chunk_lan(void *conn, struct chunk *chunk) { return 0; }
