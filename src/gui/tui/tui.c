@@ -7,7 +7,7 @@ void renderContent(struct Renderable renderables[], size_t count) {
         for (i = 0; i < count; i++) {
                 switch (renderables[i].type) {
                         case TEXT:
-                                printf("%s", renderables[i].content);
+                                printf("%s\n", renderables[i].content);
                                 break;
                         case RENDERABLE_GROUP:
                                 renderContent(renderables[i].content, renderables[i].content_size);
