@@ -34,7 +34,7 @@ int init_conn_file(struct FileConnection *conn, const char *file_path) {
 }
 
 int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
-        FILE *file = fopen(conn, "a");
+        FILE *file = fopen(conn->file_path, "a");
 
         unsigned long size = sizeof(chunk->data);
 
@@ -48,7 +48,7 @@ int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
 }
 
 int recv_chunk_file(void *conn, struct chunk *chunk) {
-        FILE *file = fopen(conn, "r");
+        FILE *file = fopen(conn->file_path, "r");
 
         /* TODO: Account for existing chunks within the file (perhaps that can be saved in conn) */
 
