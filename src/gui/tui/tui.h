@@ -16,3 +16,4 @@ void renderContent(struct Renderable renderable[], size_t count);
 
 struct Renderable createText(int length, char *content);
 
+struct Renderable createGroup(struct Renderable *children, size_t count)

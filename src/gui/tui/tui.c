@@ -28,3 +28,15 @@ struct Renderable createText(int length, char *content) {
 
         return newText;
 }
+
+struct Renderable createGroup(struct Renderable *children, size_t count) {
+        struct Renderable newGroup;
+
+        newGroup.type = RENDERABLE_GROUP;
+
+        newGroup.content_size = count;
+
+        newGroup.content = children;
+
+        return newGroup;
+}
