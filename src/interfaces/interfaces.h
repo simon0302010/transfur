@@ -32,12 +32,14 @@ struct chunk {
 
         /*
         Length of `data`.
-        Contains an unsigned 32-bit integer in big endian order, most significant byte first.
+        Contains an unsigned 32-bit integer in big endian order, most
+        significant byte first.
         */
         unsigned char length[4];
 
         /*
-        Contains the chunk data with a max size of CHUNK_SIZE in big endian order, most significant byte first
+        Contains the chunk data with a max size of CHUNK_SIZE in big endian
+        order, most significant byte first
         */
         unsigned char data[CHUNK_SIZE];
 
@@ -84,5 +86,11 @@ int recv_chunk(const int *conn, struct chunk *chunk);
 const char *get_receiver_text(enum interface interface);
 
 const char *get_sender_text(enum interface interface);
+
+/*
+Retrives the supported interfaces for the current OS.
+Terminated by `if_empty`.
+*/
+const enum interface *get_supported_interfaces(void);
 
 #endif

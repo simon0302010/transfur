@@ -7,7 +7,6 @@ Needs to implement all functions defined in `gui.h`
 #include "../gui.h"
 
 #include "../nuklear/nuklear.h"
-#include <stdio.h>
 
 #if defined(__linux__)
 #include "linux/nuklear_linux.h"
@@ -15,7 +14,7 @@ Needs to implement all functions defined in `gui.h`
 #elif defined(_WIN32)
 #include "windows/nuklear_windows.h"
 
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && defined(__MACH__)
 #include "macos/nuklear_macos.h"
 
 #else
@@ -94,16 +93,18 @@ static void calculator(const char *title, struct nk_context *ctx, int width,
 
                 if (nk_menu_begin_label(ctx, get_sender_text(sender),
                                         NK_TEXT_CENTERED, nk_vec2(180, 120))) {
+                        int i;
+                        const enum interface *supported =
+                            get_supported_interfaces();
+
                         nk_layout_row_dynamic(ctx, 30, 1);
-                        if (nk_menu_item_label(ctx, get_sender_text(if_file),
-                                               NK_TEXT_LEFT))
-                                sender = if_file;
-                        if (nk_menu_item_label(ctx, get_sender_text(if_lan),
-                                               NK_TEXT_LEFT))
-                                sender = if_lan;
-                        if (nk_menu_item_label(ctx, get_sender_text(if_serial),
-                                               NK_TEXT_LEFT))
-                                sender = if_serial;
+
+                        for (i = 0; supported[i] != if_empty; i++) {
+                                if (nk_menu_item_label(
+                                        ctx, get_sender_text(supported[i]),
+                                        NK_TEXT_LEFT))
+                                        sender = supported[i];
+                        }
                         nk_menu_end(ctx);
                 }
 
