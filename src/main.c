@@ -5,19 +5,19 @@
 #include "gui/tui/tui.h"
 
 int main(void) {
-        struct Renderable myContent[2];
-        struct ProgressBarOptions myOptions;
+        struct renderable my_content[2];
+        struct progress_bar_options my_options;
         int progress = 50;
         char title[5] = "hEllo";
 
-        myContent[0] = createText(5, "Hello");
+        my_content[0] = create_text(5, "Hello");
 
-        myOptions.progress = &progress;
-        myOptions.title = title;
+        my_options.progress = &progress;
+        my_options.title = title;
 
-        myContent[1] = createProgressBar(&myOptions, sizeof(myOptions));
+        my_content[1] = create_progress_bar(&my_options, sizeof(my_options));
 
-        renderContent(myContent, 2);
+        render_content(my_content, 2);
 
         /*
         if (run_gui("Transfur") != 0)

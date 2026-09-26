@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-void renderContent(struct Renderable renderables[], size_t count) {
+void render_content(struct renderable renderables[], size_t count) {
         int i;
         for (i = 0; i < count; i++) {
                 switch (renderables[i].type) {
@@ -10,10 +10,10 @@ void renderContent(struct Renderable renderables[], size_t count) {
                                 printf("%s\n", renderables[i].content);
                                 break;
                         case RENDERABLE_GROUP:
-                                renderContent(renderables[i].content, renderables[i].content_size);
+                                render_content(renderables[i].content, renderables[i].content_size);
                                 break;
                         case PROGRESS_BAR: {
-                                struct ProgressBarOptions *options = renderables[i].content;
+                                struct progress_bar_options *options = renderables[i].content;
 
                                 /* TODO: Make it an actual bar */
                                 printf("PROGRESS (%s): %d\n", options->title, *(options->progress));
@@ -25,38 +25,38 @@ void renderContent(struct Renderable renderables[], size_t count) {
 }
 
 
-struct Renderable createText(int length, char *content) {
-        struct Renderable newText;
+struct renderable create_text(int length, char *content) {
+        struct renderable new_text;
 
-        newText.type = TEXT;
+        new_text.type = TEXT;
 
-        newText.content_size = length + 1;
+        new_text.content_size = length + 1;
 
-        newText.content = content;
+        new_text.content = content;
 
-        return newText;
+        return new_text;
 }
 
-struct Renderable createGroup(struct Renderable *children, size_t count) {
-        struct Renderable newGroup;
+struct renderable create_group(struct renderable *children, size_t count) {
+        struct renderable new_group;
 
-        newGroup.type = RENDERABLE_GROUP;
+        new_group.type = RENDERABLE_GROUP;
 
-        newGroup.content_size = count;
+        new_group.content_size = count;
 
-        newGroup.content = children;
+        new_group.content = children;
 
-        return newGroup;
+        return new_group;
 }
 
-struct Renderable createProgressBar(struct ProgressBarOptions *options, size_t size) {
-        struct Renderable newProgressBar;
+struct renderable create_progress_bar(struct progress_bar_options *options, size_t size) {
+        struct renderable new_progress_bar;
 
-        newProgressBar.type = PROGRESS_BAR;
+        new_progress_bar.type = PROGRESS_BAR;
 
-        newProgressBar.content_size = size;
+        new_progress_bar.content_size = size;
 
-        newProgressBar.content = options;
+        new_progress_bar.content = options;
 
-        return newProgressBar;
+        return new_progress_bar;
 }
