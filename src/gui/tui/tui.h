@@ -13,7 +13,7 @@ struct renderable {
 };
 
 struct progress_bar_options {
-        int *progress; /* out of 100 */
+        float *progress;
         char *title;
 };
 

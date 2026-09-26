@@ -7,7 +7,7 @@
 int main(void) {
         struct renderable my_content[2];
         struct progress_bar_options my_options;
-        int progress = 50;
+        float progress = 0.54;
         char title[5] = "hEllo";
 
         my_content[0] = create_text(5, "Hello");
