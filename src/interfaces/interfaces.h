@@ -32,12 +32,12 @@ struct chunk {
 
         /*
         Length of `data`.
-        Contains an unsigned 32-bit integer
+        Contains an unsigned 32-bit integer in big endian order, most significant byte first.
         */
         unsigned char length[4];
 
         /*
-        Contains the chunk data with a max size of CHUNK_SIZE.
+        Contains the chunk data with a max size of CHUNK_SIZE in big endian order, most significant byte first
         */
         unsigned char data[CHUNK_SIZE];
 
