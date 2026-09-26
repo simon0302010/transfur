@@ -47,12 +47,17 @@ int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
         return 0;
 }
 
-int recv_chunk_file(void *conn, struct chunk *chunk) {
+int recv_chunk_file(struct FileConnection *conn, struct chunk *chunk) {
         FILE *file = fopen(conn->file_path, "r");
 
-        /* TODO: Account for existing chunks within the file (perhaps that can be saved in conn) */
-
+        int position = 0;
         unsigned long size;
+
+        while (position < conn->position) {
+                fread(&size, sizeof(unsigned long), 1, file);
+
+                fseek(file, size, SEEK_CUR);
+        }
 
         fread(&size, sizeof(unsigned long), 1, file);
 
