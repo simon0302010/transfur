@@ -13,28 +13,52 @@ The receive function of the `file` interface reads from a file while the send
 function writes to a file. Only the receiving file interface is meant to process
 chunk types 1 and 2.
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "../interfaces.h"
 
-struct FileConnection {
-        unsigned long position;
-        char file_path[512 - sizeof(unsigned long)];
+/* File path limit */
+#define FILE_PATH_LIMIT 480
+
+struct file_state {
+        unsigned long offset;
+        char path[FILE_PATH_LIMIT];
 };
 
-int init_conn_file(struct FileConnection *conn, const char *file_path) {
+typedef char file_state_fits[sizeof(struct file_state) <= 512 ? 1 : -1];
 
-        conn->position = 0; /* TODO: Update with any existing chunks ignored */
+static void put_be32(unsigned char *dst, unsigned long v) {
+        dst[0] = (unsigned char)(v >> 24);
+        dst[1] = (unsigned char)(v >> 16);
+        dst[2] = (unsigned char)(v >> 8);
+        dst[3] = (unsigned char)(v >> 0);
+}
 
-        strncpy(conn->file_path, file_path, sizeof(conn->file_path));
+int init_conn_file(void *conn, const char *file_path) {
+        struct file_state *st;
+        size_t len;
+
+        len = strlen(file_path);
+        if (len == 0 || len >= FILE_PATH_LIMIT) {
+                return 1;
+        }
+
+        st = (struct file_state *)conn;
+        st->offset = 0;
+        memcpy(st->path, file_path, len + 1);
 
         return 0;
 }
 
+<<<<<<< HEAD
 int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
         FILE *file = fopen(conn->file_path, "a");
+=======
+int send_chunk_file(void *conn, const struct chunk *chunk) {
+        struct file_state *st = (struct file_state *)conn;
+        FILE *file = fopen(st->path, "a");
+>>>>>>> 96e433e (feat: rewrite file.c but better (at 3am gone wrong very emotional watch till the end))
 
         unsigned long size = sizeof(chunk->data);
 
@@ -47,6 +71,7 @@ int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
         return 0;
 }
 
+<<<<<<< HEAD
 int recv_chunk_file(struct FileConnection *conn, struct chunk *chunk) {
         FILE *file = fopen(conn->file_path, "r");
 
@@ -62,8 +87,27 @@ int recv_chunk_file(struct FileConnection *conn, struct chunk *chunk) {
         fread(&size, sizeof(unsigned long), 1, file);
 
         fread(chunk->data, size, 1, file);
+=======
+int recv_chunk_file(void *conn, struct chunk *chunk) {
+        struct file_state *st;
+        FILE *file;
+        size_t got;
 
+        st = (struct file_state *)conn;
+>>>>>>> 96e433e (feat: rewrite file.c but better (at 3am gone wrong very emotional watch till the end))
+
+        file = fopen(st->path, "r");
+        fseek(file, (long)st->offset, SEEK_SET);
+
+        got = fread(chunk->data, 1, sizeof chunk->data, file);
         fclose(file);
+
+        put_be32(chunk->length, (unsigned long)got);
+        st->offset += (unsigned long)got;
+
+        if (got == 0) {
+                chunk->type = 1;
+        }
 
         return 0;
 }
