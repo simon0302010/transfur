@@ -3,6 +3,7 @@
 
 #include "../interfaces.h"
 #include <stdio.h>
+#include <string.h>
 
 /*
 This must be called once per connection and intelligently build a
