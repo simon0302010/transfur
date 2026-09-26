@@ -12,10 +12,18 @@ void renderContent(struct Renderable renderables[], size_t count) {
                         case RENDERABLE_GROUP:
                                 renderContent(renderables[i].content, renderables[i].content_size);
                                 break;
+                        case PROGRESS_BAR: {
+                                struct ProgressBarOptions *options = renderables[i].content;
+
+                                /* TODO: Make it an actual bar */
+                                printf("PROGRESS (%s): %d\n", options->title, *(options->progress));
+
+                                break;
+                        }
                 }
         }
 }
-        
+
 
 struct Renderable createText(int length, char *content) {
         struct Renderable newText;
@@ -39,4 +47,16 @@ struct Renderable createGroup(struct Renderable *children, size_t count) {
         newGroup.content = children;
 
         return newGroup;
+}
+
+struct Renderable createProgressBar(struct ProgressBarOptions *options, size_t size) {
+        struct Renderable newProgressBar;
+
+        newProgressBar.type = PROGRESS_BAR;
+
+        newProgressBar.content_size = size;
+
+        newProgressBar.content = options;
+
+        return newProgressBar;
 }
