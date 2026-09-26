@@ -25,11 +25,10 @@ struct FileConnection {
 };
 
 int init_conn_file(struct FileConnection *conn, const char *file_path) {
-        char* conn_file_path = (char*)conn + sizeof(unsigned long);
 
         conn->position = 0; /* TODO: Update with any existing chunks ignored */
 
-        strncpy(conn_file_path, file_path, 512 - sizeof(unsigned long) - 1);
+        strncpy(conn->file_path, file_path, sizeof(conn->file_path));
 
         return 0;
 }
