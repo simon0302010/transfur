@@ -612,4 +612,3 @@ int recv_chunk_lan(void *conn, struct chunk *chunk) {
         }
 }
 
-#endif
