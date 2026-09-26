@@ -19,13 +19,22 @@ chunk types 1 and 2.
 
 #include "../interfaces.h"
 
-int init_conn_file(void *conn, const char *file_path) {
-        strncpy(conn, file_path, 512 - 1);
+struct FileConnection {
+        unsigned long position;
+        char file_path[512 - sizeof(unsigned long)];
+};
+
+int init_conn_file(struct FileConnection *conn, const char *file_path) {
+        char* conn_file_path = (char*)conn + sizeof(unsigned long);
+
+        conn->position = 0; /* TODO: Update with any existing chunks ignored */
+
+        strncpy(conn_file_path, file_path, 512 - sizeof(unsigned long) - 1);
 
         return 0;
 }
 
-int send_chunk_file(void *conn, const struct chunk *chunk) {
+int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
         FILE *file = fopen(conn, "a");
 
         unsigned long size = sizeof(chunk->data);
