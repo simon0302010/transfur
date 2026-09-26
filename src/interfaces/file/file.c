@@ -51,14 +51,9 @@ int init_conn_file(void *conn, const char *file_path) {
         return 0;
 }
 
-<<<<<<< HEAD
-int send_chunk_file(struct FileConnection *conn, const struct chunk *chunk) {
-        FILE *file = fopen(conn->file_path, "a");
-=======
 int send_chunk_file(void *conn, const struct chunk *chunk) {
         struct file_state *st = (struct file_state *)conn;
         FILE *file = fopen(st->path, "a");
->>>>>>> 96e433e (feat: rewrite file.c but better (at 3am gone wrong very emotional watch till the end))
 
         unsigned long size = sizeof(chunk->data);
 
@@ -71,30 +66,12 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
         return 0;
 }
 
-<<<<<<< HEAD
-int recv_chunk_file(struct FileConnection *conn, struct chunk *chunk) {
-        FILE *file = fopen(conn->file_path, "r");
-
-        int position = 0;
-        unsigned long size;
-
-        while (position < conn->position) {
-                fread(&size, sizeof(unsigned long), 1, file);
-
-                fseek(file, size, SEEK_CUR);
-        }
-
-        fread(&size, sizeof(unsigned long), 1, file);
-
-        fread(chunk->data, size, 1, file);
-=======
 int recv_chunk_file(void *conn, struct chunk *chunk) {
         struct file_state *st;
         FILE *file;
         size_t got;
 
         st = (struct file_state *)conn;
->>>>>>> 96e433e (feat: rewrite file.c but better (at 3am gone wrong very emotional watch till the end))
 
         file = fopen(st->path, "r");
         fseek(file, (long)st->offset, SEEK_SET);
