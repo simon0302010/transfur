@@ -5,7 +5,7 @@
 
 #define LAN_OK 0
 #define LAN_ERR_ARG 1           /* NULL pointer or malformed chunk */
-#define LAN_ERR_OPTIONSS 2      /* not a valid options string */
+#define LAN_ERR_OPTIONS 2      /* not a valid options string */
 #define LAN_ERR_STATE 3         /* init_conn_lan never succeeded on this slot */
 #define LAN_ERR_SOCKET 4        /* socket() failed */
 #define LAN_ERR_BIND 5          /* bind() filed */
