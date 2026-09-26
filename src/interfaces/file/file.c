@@ -28,7 +28,11 @@ int init_conn_file(void *conn, const char *file_path) {
 int send_chunk_file(void *conn, const struct chunk *chunk) {
         FILE *file = fopen(conn, "a");
 
-        fwrite(chunk->data, sizeof(chunk->data), 1, file);
+        unsigned long size = sizeof(chunk->data);
+
+        fwrite(chunk->data, sizeof(unsigned long), 1, file);
+
+        fwrite(chunk->data, size, 1, file);
 
         fclose(file);
 
@@ -38,10 +42,13 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
 int recv_chunk_file(void *conn, struct chunk *chunk) {
         FILE *file = fopen(conn, "r");
 
-        /* TODO: replace 0 with actual size perhaps we add a header to the file
-         * that lists chunk size also, this doesn't account for existing chunks
-         * within the file perhaps that can be saved in conn */
-        fread(chunk->data, sizeof(chunk->data), 1, file);
+        /* TODO: Account for existing chunks within the file (perhaps that can be saved in conn) */
+
+        unsigned long size;
+
+        fread(&size, sizeof(unsigned long), 1, file);
+
+        fread(chunk->data, size, 1, file);
 
         fclose(file);
 
