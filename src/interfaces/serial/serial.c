@@ -9,10 +9,12 @@ counterparts for other ways to transfer data are expected to work on any
 operating system. If this cannnot be guaranteed, it must be clearly stated in
 the README and not compiled for systems with lacking support.
 
-Windows/Apple are not implemented yet.
+Apple is not implemented yet.
 
 The connection options are:
 - "<path>:<baud>" >>> open the serial device at the given baud rate, if it is not provided, BAUD_RATE will be used.
+On windows the path is a port name such as "COM3" or "\\\\.\\COM10"; the
+"\\\\.\\" prefix is added automatically when missing.
 */
 
 #include <string.h>
@@ -25,25 +27,30 @@ The connection options are:
 #include <termios.h>
 #include <unistd.h>
 
-/* TODO: move to interfaces.h later */
-#define CHUNK_TYPE_DATA 0
-#define CHUNK_TYPE_PING 3
+typedef int serial_handle;
 
-#define SERIAL_HDR_SIZE 17
+#elif defined(_WIN32)
 
-/*
-Connection state
-- fd >>> connected socket
-- inited >>> becomes 1 after init_conn_serial succeeded
-- ping_outstanding >>> becomes 1 between sending a ping and recieving a reply
-*/
-struct serial_state {
-        int fd;
-        unsigned char inited;
-        unsigned char ping_outstanding;
-};
+#include <windows.h>
 
-typedef char serial_state_fits_in_slot[sizeof(struct serial_state) <= 512 ? 1 : -1];
+typedef HANDLE serial_handle;
+
+#endif
+
+#if defined(__linux__) || defined(_WIN32)
+
+#if defined(__linux__)
+static speed_t lookup_baud(unsigned long v);
+#elif defined(_WIN32)
+static unsigned long lookup_baud(unsigned long v);
+#endif
+static int serial_port_open(const char *path, unsigned long baud,
+                            serial_handle *out);
+static long serial_port_send(serial_handle fd, const unsigned char *buf,
+                             size_t len);
+static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len);
+
+#if defined(__linux__)
 
 /* Map baud rate to termios constant*/
 static speed_t lookup_baud(unsigned long v) {
@@ -87,6 +94,216 @@ static speed_t lookup_baud(unsigned long v) {
 
         return 0;
 }
+
+static int serial_port_open(const char *path, unsigned long baud,
+                            serial_handle *out) {
+        speed_t speed;
+        struct termios tty;
+        int fd;
+
+        fd = open(path, O_RDWR | O_NOCTTY);
+        if (fd < 0) {
+                return SERIAL_ERR_OPEN;
+        }
+
+        memset(&tty, 0, sizeof tty);
+        tty.c_iflag = 0;
+        tty.c_oflag = 0;
+        tty.c_cflag = CS8 | CREAD | CLOCAL;
+        tty.c_lflag = 0;
+        tty.c_cc[VMIN] = 1;
+        tty.c_cc[VTIME] = 0;
+
+        speed = lookup_baud(baud);
+
+        /* I completely understand what this does. This is not foreshadowing. */
+        if (cfsetispeed(&tty, speed) != 0 || cfsetospeed(&tty, speed) != 0 || tcsetattr(fd, TCSANOW, &tty) != 0) {
+                close(fd);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        if (tcflush(fd, TCIOFLUSH) != 0) {
+                close(fd);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        *out = fd;
+        return SERIAL_OK;
+}
+
+/* Send bytes to port, retry on EINTR */
+static long serial_port_send(serial_handle fd, const unsigned char *buf,
+                             size_t len) {
+        ssize_t n;
+
+        do {
+                n = write(fd, buf, len);
+        } while (n < 0 && errno == EINTR);
+
+        return (long)n;
+}
+
+/* Read bytes from port, hang up shows up as EIO */
+static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
+        ssize_t n;
+
+        do {
+                n = read(fd, buf, len);
+        } while (n < 0 && errno == EINTR);
+
+        if (n < 0 && errno == EIO) {
+                return 0;
+        }
+
+        return (long)n;
+}
+
+#elif defined(_WIN32)
+
+/* Validate baud rate, the value itself goes into DCB.BaudRate as-is */
+static unsigned long lookup_baud(unsigned long v) {
+        static const unsigned long table[] = {
+                50UL, 75UL, 110UL, 134UL, 150UL, 200UL, 300UL, 600UL,
+                1200UL, 1800UL, 2400UL, 4800UL, 9600UL, 19200UL, 38400UL,
+                57600UL, 115200UL, 230400UL, 460800UL, 500000UL, 576000UL,
+                921600UL, 1000000UL, 1152000UL
+        };
+        size_t i;
+
+        for (i = 0; i < sizeof table / sizeof table[0]; i++) {
+                if (table[i] == v) {
+                        return v;
+                }
+        }
+
+        return 0;
+}
+
+static int serial_port_open(const char *path, unsigned long baud,
+                            serial_handle *out) {
+        COMMTIMEOUTS timeouts;
+        char full[264];
+        size_t plen;
+        DCB dcb;
+        HANDLE h;
+
+        /* \\.\ lets CreateFileA reach COM10 and above */
+        if (strncmp(path, "\\\\.\\", 4) == 0) {
+                plen = strlen(path);
+                if (plen >= sizeof full) {
+                        return SERIAL_ERR_OPTIONS;
+                }
+                memcpy(full, path, plen + 1);
+        } else {
+                plen = strlen(path);
+                if (plen + 4 >= sizeof full) {
+                        return SERIAL_ERR_OPTIONS;
+                }
+                memcpy(full, "\\\\.\\", 4);
+                memcpy(full + 4, path, plen + 1);
+        }
+
+        h = CreateFileA(full, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                        OPEN_EXISTING, 0, NULL);
+        if (h == INVALID_HANDLE_VALUE) {
+                return SERIAL_ERR_OPEN;
+        }
+
+        memset(&dcb, 0, sizeof dcb);
+        dcb.DCBlength = sizeof dcb;
+        if (GetCommState(h, &dcb) == 0) {
+                CloseHandle(h);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        dcb.BaudRate = (DWORD)baud;
+        dcb.ByteSize = 8;
+        dcb.Parity = NOPARITY;
+        dcb.StopBits = ONESTOPBIT;
+        dcb.fBinary = TRUE;
+        dcb.fOutxCtsFlow = FALSE;
+        dcb.fOutxDsrFlow = FALSE;
+        dcb.fOutX = FALSE;
+        dcb.fInX = FALSE;
+        dcb.fDtrControl = DTR_CONTROL_ENABLE;
+        dcb.fRtsControl = RTS_CONTROL_ENABLE;
+        dcb.fAbortOnError = TRUE;
+
+        if (SetCommState(h, &dcb) == 0) {
+                CloseHandle(h);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        /* All zero time-outs: block until the full count arrives, like VMIN=1 */
+        memset(&timeouts, 0, sizeof timeouts);
+        if (SetCommTimeouts(h, &timeouts) == 0) {
+                CloseHandle(h);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        if (PurgeComm(h, PURGE_TXCLEAR | PURGE_RXCLEAR) == 0) {
+                CloseHandle(h);
+                return SERIAL_ERR_CONFIG;
+        }
+
+        *out = h;
+        return SERIAL_OK;
+}
+
+static long serial_port_send(serial_handle fd, const unsigned char *buf,
+                             size_t len) {
+        DWORD written;
+
+        written = 0;
+        if (WriteFile(fd, buf, (DWORD)len, &written, NULL) == 0) {
+                return -1;
+        }
+
+        return (long)written;
+}
+
+static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
+        DWORD error;
+        DWORD got;
+        BOOL ok;
+
+        got = 0;
+        ok = ReadFile(fd, buf, (DWORD)len, &got, NULL);
+        if (ok == 0) {
+                error = GetLastError();
+                if (error == ERROR_DEVICE_NOT_CONNECTED ||
+                    error == ERROR_BAD_COMMAND ||
+                    error == ERROR_INVALID_HANDLE) {
+                        /* the adapter went away */
+                        return 0;
+                }
+                return -1;
+        }
+
+        return (long)got;
+}
+
+#endif
+
+/* TODO: move to interfaces.h later */
+#define CHUNK_TYPE_DATA 0
+#define CHUNK_TYPE_PING 3
+
+#define SERIAL_HDR_SIZE 17
+
+/*
+Connection state
+- fd >>> connected socket
+- inited >>> becomes 1 after init_conn_serial succeeded
+- ping_outstanding >>> becomes 1 between sending a ping and recieving a reply
+*/
+struct serial_state {
+        serial_handle fd;
+        unsigned char inited;
+        unsigned char ping_outstanding;
+};
+
+typedef char serial_state_fits_in_slot[sizeof(struct serial_state) <= 512 ? 1 : -1];
 
 /* Split options from <path>[:<baud>] */
 static int parse_serial_options(const char *options, char *path, size_t path_size, unsigned long *baud) {
@@ -146,18 +363,14 @@ static int parse_serial_options(const char *options, char *path, size_t path_siz
         return 0;
 }
 
-/* Send bytes to peer, retry on EINTR */
-static int send_all(int fd, const unsigned char *buf, size_t len) {
+/* Send bytes to peer */
+static int send_all(serial_handle fd, const unsigned char *buf, size_t len) {
         size_t sent;
-        ssize_t n;
+        long n;
 
         sent = 0;
         while (sent < len) {
-                n = write(fd, buf + sent, len - sent);
-                if (n < 0 && errno == EINTR) {
-                        continue;
-                }
-
+                n = serial_port_send(fd, buf + sent, len - sent);
                 if (n <= 0) {
                         return SERIAL_ERR_SEND;
                 }
@@ -168,20 +381,14 @@ static int send_all(int fd, const unsigned char *buf, size_t len) {
 }
 
 /* Read bytes from peer */
-static int recv_all(int fd, unsigned char *buf, size_t len) {
+static int recv_all(serial_handle fd, unsigned char *buf, size_t len) {
         size_t got;
-        ssize_t n;
+        long n;
 
         got = 0;
         while (got < len) {
-                n = read(fd, buf + got, len - got);
-                if (n < 0 && errno == EINTR) {
-                        continue;
-                }
+                n = serial_port_recv(fd, buf + got, len - got);
                 if (n < 0) {
-                        if (errno == EIO) {
-                                return SERIAL_ERR_CLOSED;
-                        }
                         return SERIAL_ERR_RECV;
                 }
                 if (n == 0) {
@@ -206,7 +413,7 @@ static unsigned long get_u32(const unsigned char *src) {
 }
 
 /* just read the function name 💔💔💔💔💔 */
-static int write_frame(int fd, const struct chunk *c) {
+static int write_frame(serial_handle fd, const struct chunk *c) {
         unsigned char hdr[SERIAL_HDR_SIZE];
         unsigned long len;
         size_t dlen;
@@ -238,7 +445,7 @@ static int write_frame(int fd, const struct chunk *c) {
         return SERIAL_OK;
 }
 
-static int read_frame(int fd, struct chunk *c) {
+static int read_frame(serial_handle fd, struct chunk *c) {
         unsigned char hdr[SERIAL_HDR_SIZE];
         unsigned long len;
         int r;
@@ -274,11 +481,10 @@ static int read_frame(int fd, struct chunk *c) {
 
 int init_conn_serial(void *conn, const char *options) {
         struct serial_state *st;
+        serial_handle fd;
         char path[256];
         unsigned long baud;
-        speed_t speed;
-        struct termios tty;
-        int fd;
+        int r;
 
         if (conn == NULL) {
                 return SERIAL_ERR_ARG;
@@ -293,30 +499,9 @@ int init_conn_serial(void *conn, const char *options) {
                 return SERIAL_ERR_OPTIONS;
         }
 
-        speed = lookup_baud(baud);
-
-        fd = open(path, O_RDWR | O_NOCTTY);
-        if (fd < 0) {
-                return SERIAL_ERR_OPEN;
-        }
-
-        memset(&tty, 0, sizeof tty);
-        tty.c_iflag = 0;
-        tty.c_oflag = 0;
-        tty.c_cflag = CS8 | CREAD | CLOCAL;
-        tty.c_lflag = 0;
-        tty.c_cc[VMIN] = 1;
-        tty.c_cc[VTIME] = 0;
-
-        /* I completely understand what this does. This is not foreshadowing. */
-        if (cfsetispeed(&tty, speed) != 0 || cfsetospeed(&tty, speed) != 0 || tcsetattr(fd, TCSANOW, &tty) != 0) {
-                close(fd);
-                return SERIAL_ERR_CONFIG;
-        }
-
-        if (tcflush(fd, TCIOFLUSH) != 0) {
-                close(fd);
-                return SERIAL_ERR_CONFIG;
+        r = serial_port_open(path, baud, &fd);
+        if (r != SERIAL_OK) {
+                return r;
         }
 
         st->fd = fd;
@@ -385,7 +570,7 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
 }
 
 #else
-/* windows/apple stubs */
+/* apple stubs */
 
 int init_conn_serial(void *conn, const char *port) {
         (void)conn;
