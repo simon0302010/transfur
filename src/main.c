@@ -20,6 +20,8 @@ int main(void) {
 
         loading_bar_options.title = "Loading...";
         loading_bar_options.offset = 0;
+        loading_bar_options.speed = 6.0f;
+        loading_bar_options.accumulator = 0.0f;
 
         my_content[2] = create_loading_bar(&loading_bar_options,
                                            sizeof(loading_bar_options));

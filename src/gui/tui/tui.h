@@ -20,6 +20,8 @@ struct progress_bar_options {
 struct loading_bar_options {
         char *title;
         size_t offset;
+        float speed;
+        float accumulator;
 };
 
 struct text_input_options {
@@ -29,6 +31,8 @@ struct text_input_options {
         size_t cursor;
         int is_focused;
 };
+
+void update_content(struct renderable renderables[], size_t count, double dt);
 
 void render_content(struct renderable renderables[], size_t count);
 

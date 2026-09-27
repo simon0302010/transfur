@@ -9,6 +9,7 @@ SRC = src/main.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/serial/serial.c \
 	src/gui/tui/raw.c \
+	src/gui/tui/timer.c \
 	src/gui/tui/tui.c \
 	src/misc/sleep.c
 OBJ = $(SRC:src/%.c=build/%.o)

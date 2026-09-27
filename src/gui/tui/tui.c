@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <poll.h>
 #include "raw.h"
+#include "timer.h"
 
 /* #define WIDTH_OVERRIDE 0 */
 #define USE_ANSI
@@ -142,7 +143,7 @@ void render_content(struct renderable renderables[], size_t count) {
 
                         free(loading_bar);
 
-                        options->offset = (options->offset + 1) % charset_size;
+                        /* offset updated in update_content */
 
                         break;
                 }
@@ -157,24 +158,76 @@ void render_content(struct renderable renderables[], size_t count) {
         }
 }
 
+void update_content(struct renderable renderables[], size_t count, double dt) {
+        size_t i;
+        const short charset_size = 6;
+        for (i = 0; i < count; i++) {
+                switch (renderables[i].type) {
+                case LOADING_BAR: {
+                        struct loading_bar_options *options = renderables[i].content;
+                        float step_interval;
+                        if (options->speed <= 0.0f) {
+                                break;
+                        }
+                        step_interval = 1.0f / options->speed;
+                        options->accumulator += (float)dt;
+                        while (options->accumulator >= step_interval) {
+                                options->offset = (options->offset + 1) % charset_size;
+                                options->accumulator -= step_interval;
+                        }
+                        break;
+                }
+                case RENDERABLE_GROUP:
+                        update_content(renderables[i].content,
+                                       renderables[i].content_size, dt);
+                        break;
+                default:
+                        break;
+                }
+        }
+}
+
+
 void run_tui(struct renderable renderables[], size_t count) {
         bool running = true;
         int ret;
         char ch;
         struct pollfd pfd;
+        int timeout_ms;
+        double current_time;
+        double prev_time;
+        double dt;
+        double elapsed;
+        const double target_fps = 30.0;
+        const double target_frame_duration = 1.0 / target_fps;
         
         enable_raw_mode();
 
         pfd.fd = STDIN_FILENO;
         pfd.events = POLLIN;
 
+        prev_time = get_time_seconds();
+
         while (running) {
+                current_time = get_time_seconds();
+                dt = current_time - prev_time;
+                prev_time = current_time;
+
+                update_content(renderables, count, dt);
+
                 printf("\x1b[H"); /* TODO: double check this is supported on all systems */
                 fflush(stdout);
 
                 render_content(renderables, count);
 
-                ret = poll(&pfd, 1, 50);
+                elapsed = get_time_seconds() - current_time;
+                if (elapsed < target_frame_duration) {
+                        timeout_ms = (int)((target_frame_duration - elapsed) * 1000.0);
+                } else {
+                        timeout_ms = 0;
+                }
+
+                ret = poll(&pfd, 1, timeout_ms);
                 if (ret > 0 && (pfd.revents & POLLIN)) {
                         if (read(STDIN_FILENO, &ch, 1) > 0) {
                                 if (ch == 'q' || ch == 27) {
