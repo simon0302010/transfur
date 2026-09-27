@@ -24,10 +24,7 @@ int main(void) {
         my_content[2] = create_loading_bar(&loading_bar_options,
                                            sizeof(loading_bar_options));
 
-        for (;;) {
-                render_content(my_content, 3);
-                sleep_ms(100);
-        }
+        run_tui(my_content, 3);
 
         /*
         if (run_gui("Transfur") != 0)

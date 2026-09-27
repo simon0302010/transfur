@@ -2,6 +2,7 @@
 #define TUI_H
 
 #include <stddef.h>
+#include "raw.h"
 
 enum renderable_type { RENDERABLE_GROUP, TEXT, PROGRESS_BAR, TEXT_INPUT, LOADING_BAR };
 
@@ -29,7 +30,9 @@ struct text_input_options {
         int is_focused;
 };
 
-void render_content(struct renderable renderable[], size_t count);
+void render_content(struct renderable renderables[], size_t count);
+
+void run_tui(struct renderable renderables[], size_t count);
 
 struct renderable create_text(int length, char *content);
 

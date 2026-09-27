@@ -5,6 +5,9 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <poll.h>
+#include "raw.h"
 
 /* #define WIDTH_OVERRIDE 0 */
 #define USE_ANSI
@@ -152,6 +155,30 @@ void render_content(struct renderable renderables[], size_t count) {
                 }
                 }
         }
+}
+
+void run_tui(struct renderable renderables[], size_t count) {
+        bool running = true;
+        int ret;
+        char ch;
+        struct pollfd pfd;
+        
+        enable_raw_mode();
+
+        while (running) {
+                render_content(renderables, count);
+
+                ret = poll(&pfd, 1, 50);
+                if (ret > 0 && (pfd.revents & POLLIN)) {
+                        if (read(STDIN_FILENO, &ch, 1) > 0) {
+                                if (ch == 'q' || ch == 27) {
+                                        running = false;
+                                }
+                        }
+                }
+        }
+
+        disable_raw_mode();
 }
 
 struct renderable create_text(int length, char *content) {
