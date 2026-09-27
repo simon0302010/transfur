@@ -11,7 +11,8 @@ SRC = src/main.c \
 	src/gui/tui/raw.c \
 	src/gui/tui/timer.c \
 	src/gui/tui/tui.c \
-	src/misc/sleep.c
+	src/misc/sleep.c \
+	src/gui/basic_wrapper/basic_wrapper.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)
@@ -26,6 +27,9 @@ else ifeq ($(shell uname -s),Darwin)
 	CFLAGS += $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lm
 endif
+
+CFLAGS += $(shell pkg-config --cflags sdl3)
+LDLIBS += $(shell pkg-config --libs sdl3)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
