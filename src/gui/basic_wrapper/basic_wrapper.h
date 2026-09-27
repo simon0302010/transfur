@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 struct color {
         int r;
         int g;
@@ -20,7 +22,7 @@ struct basic_event {
         int mouse_button;
         int key_code;
         char ch;
-}
+};
 
 int basic_init(const char *title, int width, int height);
 
