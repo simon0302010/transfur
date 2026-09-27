@@ -18,7 +18,9 @@ SRC = src/main.c \
 	src/gui/tui/timer.c \
 	src/gui/tui/tui.c \
 	src/misc/sleep.c \
-	src/gui/basic_wrapper/basic_wrapper.c
+	src/gui/basic_wrapper/basic_wrapper.c \
+	src/gui/basic/basic.c \
+	src/gui/basic/text.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)

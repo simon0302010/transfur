@@ -1,5 +1,9 @@
 #include <stdbool.h>
 
+#ifndef BASIC_WRAPPER_H
+#define BASIC_WRAPPER_H
+
+
 struct color {
         int r;
         int g;
@@ -43,3 +47,5 @@ void basic_set_pixel(int x, int y, struct color color);
 void basic_draw_rect(int x, int y, int w, int h, struct color color);
 
 void basic_fill_rect(int x, int y, int w, int h, struct color color);
+
+#endif

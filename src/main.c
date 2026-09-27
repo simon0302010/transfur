@@ -3,8 +3,14 @@
 
 #include "gui/tui/tui.h"
 #include "misc/sleep.h"
+#include "gui/basic/basic.h"
 
 int main(void) {
+        struct basic_renderable renderables[1];
+
+        run_basic("Transfur", 600, 400, renderables, 0);
+
+        /*
         struct renderable my_content[4];
         struct progress_bar_options my_options;
         struct loading_bar_options loading_bar_options;
@@ -38,6 +44,7 @@ int main(void) {
         my_content[3] = create_text_input(&text_input_options, sizeof(text_input_options));
 
         run_tui(my_content, 4);
+        */
 
         /*
         if (run_gui("Transfur") != 0)
