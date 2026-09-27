@@ -298,7 +298,7 @@ static long lan_socket_recv(lan_sock socket, unsigned char *buf, size_t len) {
 
         do {
                 n = recv(socket, (char *)buf, (int)len, 0);
-        } while (n == SOCKET_ERROR && WSA_GetLastError() == WSAEINTR)
+        } while (n == SOCKET_ERROR && WSA_GetLastError() == WSAEINTR);
 
             return (long)n;
 }
