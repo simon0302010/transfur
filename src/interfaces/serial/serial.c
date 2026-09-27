@@ -41,7 +41,7 @@ struct serial_state {
         int fd;
         unsigned char inited;
         unsigned char ping_outstanding
-}
+};
 
 typedef char serial_state_fits_in_slot[sizeof(struct serial_state) <= 512 ? 1 : -1];
 
