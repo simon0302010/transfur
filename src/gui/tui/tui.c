@@ -33,6 +33,7 @@ void render_content(struct renderable renderables[], size_t count) {
                 switch (renderables[i].type) {
                 case TEXT:
                         printf("%s\n", (char *)renderables[i].content);
+                        fflush(stdout);
                         break;
                 case RENDERABLE_GROUP:
                         render_content(renderables[i].content,
@@ -95,6 +96,8 @@ void render_content(struct renderable renderables[], size_t count) {
 #ifdef USE_ANSI
                         printf(ANSI_COLOR_RESET);
 #endif
+
+                        fflush(stdout);
 
                         break;
                 }
