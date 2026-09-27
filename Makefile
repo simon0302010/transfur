@@ -2,7 +2,13 @@ CC = gcc
 CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors
 LDLIBS = -lm
 
-TARGET = build/transfur
+ifeq ($(OS),Windows_NT)
+	OS_NAME := windows
+else 
+	OS_NAME := $(shell uname -s)
+endif
+
+TARGET = build/$(OS_NAME)/transfur
 SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
