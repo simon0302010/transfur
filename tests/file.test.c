@@ -71,7 +71,7 @@ int main(void) {
 
         remove(TEST_PATH);
 
-        if (failed) {
+        if (!failed) {
                 printf("write/read test pass yay");
         } else {
                 printf("oh fuck it didn't work what");

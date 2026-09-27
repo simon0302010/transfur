@@ -8,12 +8,13 @@ SRC = src/main.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/serial/serial.c \
-	src/gui/tui/tui.c
+	src/gui/tui/tui.c \
+	src/misc/sleep.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
-	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lm
+	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c
 	LDLIBS += -lX11
