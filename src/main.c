@@ -8,7 +8,7 @@
 int main(void) {
         struct basic_renderable renderables[1];
 
-        run_basic("Transfur", 600, 400, renderables, 0);
+        run_basic("Transfur", 1000, 400, renderables, 0);
 
         /*
         struct renderable my_content[4];
