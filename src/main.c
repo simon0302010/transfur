@@ -5,11 +5,13 @@
 #include "misc/sleep.h"
 
 int main(void) {
-        struct renderable my_content[3];
+        struct renderable my_content[4];
         struct progress_bar_options my_options;
         struct loading_bar_options loading_bar_options;
+        struct text_input_options text_input_options;
         float progress = 0.54;
-        char title[5] = "hEllo";
+        char title[] = "hEllo";
+        char text_buffer[50] = "";
 
         my_content[0] = create_text(5, "Hello");
 
@@ -26,7 +28,16 @@ int main(void) {
         my_content[2] = create_loading_bar(&loading_bar_options,
                                            sizeof(loading_bar_options));
 
-        run_tui(my_content, 3);
+                                        
+        text_input_options.buffer = text_buffer;
+        text_input_options.cursor = 0;
+        text_input_options.is_focused = false;
+        text_input_options.label = title;
+        text_input_options.max_len = 50;
+
+        my_content[3] = create_text_input(&text_input_options, sizeof(text_input_options));
+
+        run_tui(my_content, 4);
 
         /*
         if (run_gui("Transfur") != 0)

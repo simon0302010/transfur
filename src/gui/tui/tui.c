@@ -259,6 +259,40 @@ static struct tui_event read_key_event(void) {
         return event;
 }
 
+bool renderable_handle_event(struct tui_event event, struct renderable renderable) {
+        if (renderable.type == TEXT_INPUT) {
+                struct text_input_options *options = (struct text_input_options *)renderable.content;
+                size_t len;
+
+                len = strlen(options->buffer);
+
+                switch (event.key) {
+                        case KEY_CHAR:
+                                /* TODO: Acocount for cursor position */
+                                /* TODO: account for max len option */
+                                options->buffer[len] = event.ch;
+                                options->buffer[len+1] = '\0';
+                                break;
+                        case KEY_BACKSPACE:
+                                /* TODO: Acocount for cursor position */
+                                options->buffer[len-1] = '\0';
+                                break;
+
+                        case KEY_DELETE: /* TODO: handle the below */
+                                break;
+                        case KEY_ARROW_LEFT:
+                                break;
+                        case KEY_ARROW_RIGHT:
+                                break;
+                        default:
+                                return false;
+                                break;
+                }
+                return true;
+        }
+        return false;
+}
+
 void run_tui(struct renderable renderables[], size_t count) {
         bool running = true;
         int ret;
@@ -335,7 +369,9 @@ void run_tui(struct renderable renderables[], size_t count) {
                         }
 
                         /* TODO: send to focused widget */
-                        if (!handled) {}
+                        if (!handled && focus_index >= 0 && focus_index < (int)count) {
+                                handled = renderable_handle_event(event, renderables[focus_index]);
+                        }
 
                         /* quit keys */
                         if (!handled) {
