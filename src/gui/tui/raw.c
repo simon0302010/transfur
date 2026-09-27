@@ -17,11 +17,10 @@ void enable_raw_mode(void) {
         atexit(disable_raw_mode);
 
         raw = original_termios;
-        
-        /* Disables ctrl+c / ctrl+z
+
         raw.c_lflag &= ~(ECHO | ICANON);
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-        */
+
         printf("\x1b[?25l");
         fflush(stdout);
 }

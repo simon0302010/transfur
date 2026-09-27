@@ -165,6 +165,9 @@ void run_tui(struct renderable renderables[], size_t count) {
         
         enable_raw_mode();
 
+        pfd.fd = STDIN_FILENO;
+        pfd.events = POLLIN;
+
         while (running) {
                 printf("\x1b[H"); /* TODO: double check this is supported on all systems */
                 fflush(stdout);
