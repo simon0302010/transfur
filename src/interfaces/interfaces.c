@@ -143,7 +143,7 @@ const enum interface *get_supported_interfaces(void) {
         static const enum interface interfaces[] = {if_file, if_lan, if_serial,
                                                     if_empty};
 #elif defined(_WIN32)
-        static const enum interface interfaces[] = {if_file, if_empty};
+        static const enum interface interfaces[] = {if_file, if_lan, if_empty};
 #elif defined(__APPLE__) && defined(__MACH__)
         static const enum interface interfaces[] = {if_file, if_empty};
 #else
