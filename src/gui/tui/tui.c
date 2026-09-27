@@ -74,6 +74,7 @@ void render_content(struct renderable renderables[], size_t count) {
                                 #endif
 
                                 break;
+                        }
                         case TEXT_INPUT: {
                                 struct text_input_options *options = renderables[i].content;
                                 
