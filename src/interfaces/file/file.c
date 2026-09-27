@@ -35,6 +35,10 @@ static void put_be32(unsigned char *dst, unsigned long v) {
         dst[3] = (unsigned char)(v >> 0);
 }
 
+static unsigned long get_be32(const unsigned char *src) {
+        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) | ((unsigned long)src[2] << 8) | (unsigned long)src[3];
+}
+
 int init_conn_file(void *conn, const char *file_path) {
         struct file_state *st;
         size_t len;
@@ -52,16 +56,26 @@ int init_conn_file(void *conn, const char *file_path) {
 }
 
 int send_chunk_file(void *conn, const struct chunk *chunk) {
-        struct file_state *st = (struct file_state *)conn;
-        FILE *file = fopen(st->path, "a");
+        struct file_state *st;
+        FILE *file;
+        unsigned long len;
+        size_t wrote;
 
-        unsigned long size = sizeof(chunk->data);
+        st = (struct file_state *)conn;
+        len = get_be32(chunk->length);
+        if (len > (unsigned long)CHUNK_SIZE) {
+                return 1;
+        }
 
-        fwrite(chunk->data, sizeof(unsigned long), 1, file);
+        file = fopen(st->path, "a");
+        if (file == NULL) {
+                return 1;
+        }
 
-        fwrite(chunk->data, size, 1, file);
-
-        fclose(file);
+        wrote = fwrite(chunk->data, 1, (size_t)len, file);
+        if (fclose(file) != 0 || wrote != (size_t)len) {
+                return 1;
+        }
 
         return 0;
 }
@@ -74,6 +88,9 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
         st = (struct file_state *)conn;
 
         file = fopen(st->path, "r");
+        if (file == NULL) {
+                return 1;
+        }
         fseek(file, (long)st->offset, SEEK_SET);
 
         got = fread(chunk->data, 1, sizeof chunk->data, file);
