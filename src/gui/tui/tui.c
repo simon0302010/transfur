@@ -74,6 +74,12 @@ void render_content(struct renderable renderables[], size_t count) {
                                 #endif
 
                                 break;
+                        case TEXT_INPUT: {
+                                struct text_input_options *options = renderables[i].content;
+                                
+                                printf("%s [ ... ]", options->label);
+
+                                break;
                         }
                 }
         }
@@ -114,4 +120,16 @@ struct renderable create_progress_bar(struct progress_bar_options *options, size
         new_progress_bar.content = options;
 
         return new_progress_bar;
+}
+
+struct renderable create_text_input(struct text_input_options *options, size_t size) {
+        struct renderable new_text_input;
+
+        new_text_input.type = TEXT_INPUT;
+
+        new_text_input.content_size = size;
+
+        new_text_input.content = options;
+
+        return new_text_input;
 }
