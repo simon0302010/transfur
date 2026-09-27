@@ -40,34 +40,38 @@ void render_content(struct renderable renderables[], size_t count) {
                         break;
                 case PROGRESS_BAR: {
                         /*
-                        TODO: Make it fill the entire width of the terminal or a
-                        custom width.
                         TODO: Add alignment of options and multiple renderables
                         in a row.
                         */
 
                         struct progress_bar_options *options =
                             renderables[i].content;
-                        /*
-                                title + pipes (3) + spaces (3) + XXX% (4)
-                                TODO: handle XX% or X%
-                        */
-                        int heading_chars = renderables[i].content_size -
-                                            sizeof(int) + 3 + 3 + 4;
-                        int progress_chars =
+                        int heading_chars;
+                        int progress_chars;
+                        int remaining_width;
+                        char progress_string[8];
+
+                        /* Turns XX% into a string */
+                        sprintf(progress_string, "%i%%",
+                                (int)(*(options->progress) * 100));
+
+                        /* Calculate the widths now that we have progress_string
+                         */
+                        heading_chars = strlen(options->title) +
+                                        strlen(progress_string) + 4;
+                        progress_chars =
                             (*(options->progress)) * (width - heading_chars);
-                        int remaining_width =
+                        remaining_width =
                             width - heading_chars - progress_chars;
 
 #ifdef USE_ANSI
-                        printf("%s|%s%s%s|%s%d%%%s|%s", ANSI_COLOR_CYAN,
+                        printf("%s|%s%s%s|%s%s%s|%s", ANSI_COLOR_CYAN,
                                ANSI_COLOR_YELLOW, options->title,
                                ANSI_COLOR_CYAN, ANSI_COLOR_MAGENTA,
-                               (int)(*(options->progress) * 100),
-                               ANSI_COLOR_CYAN, ANSI_COLOR_GREEN);
+                               progress_string, ANSI_COLOR_CYAN,
+                               ANSI_COLOR_GREEN);
 #else
-                        printf("|%s|%d%%|", options->title,
-                               (int)(*(options->progress) * 100));
+                        printf("|%s|%s|", options->title, progress_string);
 #endif
 
                         for (; progress_chars > 0; progress_chars--) {
