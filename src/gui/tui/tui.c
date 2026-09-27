@@ -166,6 +166,9 @@ void run_tui(struct renderable renderables[], size_t count) {
         enable_raw_mode();
 
         while (running) {
+                printf("\x1b[H"); /* TODO: double check this is supported on all systems */
+                fflush(stdout);
+
                 render_content(renderables, count);
 
                 ret = poll(&pfd, 1, 50);
