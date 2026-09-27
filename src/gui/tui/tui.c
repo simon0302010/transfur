@@ -1,6 +1,8 @@
 #include "tui.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -30,7 +32,7 @@ void render_content(struct renderable renderables[], size_t count) {
         for (i = 0; i < count; i++) {
                 switch (renderables[i].type) {
                 case TEXT:
-                        printf("%s\n", renderables[i].content);
+                        printf("%s\n", (char *)renderables[i].content);
                         break;
                 case RENDERABLE_GROUP:
                         render_content(renderables[i].content,
@@ -58,13 +60,13 @@ void render_content(struct renderable renderables[], size_t count) {
                             width - heading_chars - progress_chars;
 
 #ifdef USE_ANSI
-                        printf("%s%s%s|%s%d%%%s|%s", ANSI_COLOR_YELLOW,
-                               options->title, ANSI_COLOR_CYAN,
-                               ANSI_COLOR_MAGENTA,
+                        printf("%s|%s%s%s|%s%d%%%s|%s", ANSI_COLOR_CYAN,
+                               ANSI_COLOR_YELLOW, options->title,
+                               ANSI_COLOR_CYAN, ANSI_COLOR_MAGENTA,
                                (int)(*(options->progress) * 100),
                                ANSI_COLOR_CYAN, ANSI_COLOR_GREEN);
 #else
-                        printf("%s|%d%%|", options->title,
+                        printf("|%s|%d%%|", options->title,
                                (int)(*(options->progress) * 100));
 #endif
 
@@ -89,6 +91,46 @@ void render_content(struct renderable renderables[], size_t count) {
 #ifdef USE_ANSI
                         printf(ANSI_COLOR_RESET);
 #endif
+
+                        break;
+                }
+                case LOADING_BAR: {
+                        struct loading_bar_options *options =
+                            renderables[i].content;
+
+                        short i;
+                        short charset_size = 6;
+                        const char charset[6] = {'%', '$', '&', '-', '-', '-'};
+                        size_t title_width = strlen(options->title);
+                        int bar_width = width - (int)title_width - 3;
+                        char *loading_bar;
+
+                        if (bar_width <= 0)
+                                break;
+
+                        loading_bar = malloc((size_t)bar_width + 1);
+                        if (!loading_bar)
+                                break;
+
+                        for (i = 0; i < bar_width; i++)
+                                loading_bar[i] = charset[(i + options->offset) %
+                                                         charset_size];
+
+                        loading_bar[bar_width] = '\0';
+
+#ifdef USE_ANSI
+                        printf("%s|%s%s%s|%s%s%s|%s\n", ANSI_COLOR_CYAN,
+                               ANSI_COLOR_YELLOW, options->title,
+                               ANSI_COLOR_CYAN, ANSI_COLOR_GREEN, loading_bar,
+                               ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
+#else
+                        printf("|%s|%s|\n", options->title, loading_bar);
+#endif
+                        fflush(stdout);
+
+                        free(loading_bar);
+
+                        options->offset = (options->offset + 1) % charset_size;
 
                         break;
                 }
@@ -131,4 +173,17 @@ struct renderable create_progress_bar(struct progress_bar_options *options,
         new_progress_bar.content = options;
 
         return new_progress_bar;
+}
+
+struct renderable create_loading_bar(struct loading_bar_options *options,
+                                     size_t size) {
+        struct renderable new_loading_bar;
+
+        new_loading_bar.type = LOADING_BAR;
+
+        new_loading_bar.content_size = size;
+
+        new_loading_bar.content = options;
+
+        return new_loading_bar;
 }
