@@ -193,6 +193,71 @@ void update_content(struct renderable renderables[], size_t count, double dt) {
         }
 }
 
+static struct tui_event read_key_event(void) {
+        struct tui_event event;
+        char ch;
+
+        event.key = KEY_NONE;
+        event.ch = '\0';
+
+        if (read(STDIN_FILENO, &ch, 1) <= 0) {
+                return event;
+        }
+
+        if (ch == '\r' || ch == '\n') {
+                event.key = KEY_ENTER;
+        } else if (ch == '\t') {
+                event.key = KEY_TAB;
+        } else if (ch == 127 || ch == '\b') {
+                event.key = KEY_BACKSPACE;
+        } else if (ch == 27) {
+                /* esc or an ANSI sequence */
+                struct pollfd pfd;
+                char seq[3];
+
+                pfd.fd = STDIN_FILENO;
+                pfd.events = POLLIN;
+
+                if (poll(&pfd, 1, 25) > 0 && (pfd.revents & POLLIN)) {
+                        if (read(STDIN_FILENO, &seq[0], 1) > 0 && seq[0] == '[') {
+                                /* this is an ansi sequence */
+                                if (read(STDIN_FILENO, &seq[1], 1) > 0) {
+                                        switch (seq[1]) {
+                                                case 'A':
+                                                        event.key = KEY_ARROW_UP;
+                                                        break;
+                                                case 'B':
+                                                        event.key = KEY_ARROW_DOWN;
+                                                        break;
+                                                case 'C':
+                                                        event.key = KEY_ARROW_RIGHT;
+                                                        break;
+                                                case 'D':
+                                                        event.key = KEY_ARROW_LEFT;
+                                                        break;
+                                                case 'Z':
+                                                        event.key = KEY_SHIFT_TAB;
+                                                        break;
+                                                case '3':
+                                                        if (read(STDIN_FILENO, &seq[2], 1) > 0 && seq[2] == '~') {
+                                                                event.key = KEY_DELETE;
+                                                        }
+                                                        break;
+                                                default:
+                                                        break;
+                                                }
+                                        }
+                                }
+                } else {
+                        event.key = KEY_ESC;
+                }
+        } else if ((unsigned char)ch >= 32 && (unsigned char)ch <= 126) {
+                event.key = KEY_CHAR;
+                event.ch = ch;
+        }
+
+        return event;
+}
 
 void run_tui(struct renderable renderables[], size_t count) {
         bool running = true;
@@ -207,6 +272,12 @@ void run_tui(struct renderable renderables[], size_t count) {
         const double target_fps = 30.0;
         const double target_frame_duration = 1.0 / target_fps;
         
+        /* if -1, nothing is focused */
+        int focus_index = -1;
+        struct tui_event event;
+        bool handled;
+        size_t i;
+
         enable_raw_mode();
 
         pfd.fd = STDIN_FILENO;
@@ -235,11 +306,8 @@ void run_tui(struct renderable renderables[], size_t count) {
 
                 ret = poll(&pfd, 1, timeout_ms);
                 if (ret > 0 && (pfd.revents & POLLIN)) {
-                        if (read(STDIN_FILENO, &ch, 1) > 0) {
-                                if (ch == 'q' || ch == 27) {
-                                        running = false;
-                                }
-                        }
+                        event = read_key_event(); /* TODO: implement */
+                        handled = false;
                 }
         }
 

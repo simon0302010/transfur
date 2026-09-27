@@ -5,6 +5,15 @@
 #include "raw.h"
 #include <stdbool.h>
 
+enum tui_key {
+        KEY_NONE, KEY_CHAR, KEY_ENTER, KEY_BACKSPACE, KEY_TAB, KEY_SHIFT_TAB, KEY_ESC, KEY_ARROW_UP, KEY_ARROW_DOWN, KEY_ARROW_RIGHT, KEY_ARROW_LEFT, KEY_DELETE
+};
+
+struct tui_event {
+        enum tui_key key;
+        char ch;
+};
+
 enum renderable_type { RENDERABLE_GROUP, TEXT, PROGRESS_BAR, TEXT_INPUT, LOADING_BAR };
 
 struct renderable {
@@ -32,6 +41,12 @@ struct text_input_options {
         size_t cursor;
         bool is_focused;
 };
+
+/* when a key event occurs
+   we ask the focused widget if it is willing to handle the event
+   if this returns false, the widget doesn't care about that event
+*/
+bool renderable_handle_event(struct tui_event event, struct renderable renderable);
 
 void update_content(struct renderable renderables[], size_t count, double dt);
 
