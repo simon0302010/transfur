@@ -308,6 +308,41 @@ void run_tui(struct renderable renderables[], size_t count) {
                 if (ret > 0 && (pfd.revents & POLLIN)) {
                         event = read_key_event(); /* TODO: implement */
                         handled = false;
+
+                        /* navigation keys */
+                        if (event.key == KEY_TAB || event.key == KEY_SHIFT_TAB) {
+                                int direction = (event.key == KEY_TAB);
+                                int new_focus = focus_index;
+
+                                for (i = 0; i < count; i++) {
+                                        new_focus = (new_focus + direction + (int)count) % (int)count;
+
+                                        /* make sure this is foucsable */
+                                        if (renderables[new_focus].type == TEXT_INPUT) break;
+                                }
+
+                                /* modify options to set the new one as focused and old one as unfocused */
+                                if (renderables[focus_index].type == TEXT_INPUT) {
+                                        ((struct text_input_options *)renderables[focus_index].content)->is_focused = false;
+                                        
+                                }
+                                focus_index = new_focus;
+                                if (renderables[new_focus].type == TEXT_INPUT) {
+                                        ((struct text_input_options *)renderables[focus_index].content)->is_focused = true;
+                                }
+
+                                handled = true;
+                        }
+
+                        /* TODO: send to focused widget */
+                        if (!handled) {}
+
+                        /* quit keys */
+                        if (!handled) {
+                                if (event.key == KEY_ESC || (event.key == KEY_CHAR && event.ch == 'q')) {
+                                        running = false;
+                                }
+                        }
                 }
         }
 
