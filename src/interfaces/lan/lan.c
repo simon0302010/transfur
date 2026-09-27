@@ -287,11 +287,7 @@ static long lan_socket_send(lan_sock socket, const unsigned char *buf,
 
         do {
                 n = send(socket, (const char *)buf, (int)len, 0);
-<<<<<<< HEAD
-        } while (n == SOCKET_ERROR && WSA_GetLastError() == WSAEINTR);
-=======
         } while (n == SOCKET_ERROR &&  WSAGetLastError() == WSAEINTR);
->>>>>>> a63cfdc (fix(lan): incorrect function name)
 
         return (long)n;
 }
