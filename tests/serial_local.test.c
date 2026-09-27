@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         int is_send;
 
         if (argc < 3 || argc > 4 || (strcmp(argv[1], "send") != 0 && strcmp(argv[1], "recv") != 0)) {
-                fprintf(stderr, "usage: %s send|rev <device>[:baud] [file]\n", argv[0]);
+                fprintf(stderr, "usage: %s send|recv <device>[:baud] [file]\n", argv[0]);
                 return 2;
         }
 
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
                 chunk.type = T_DONE;
                 r = send_chunk_serial(sslot, &chunk);
                 if (r != SERIAL_OK) {
-                        fprintf(stderr, "send_chunk_file (end marker) failed\n");
+                        fprintf(stderr, "send_chunk_serial (end marker) failed\n");
                         return 1;
                 }
                 printf("send: sent %lu bytes in %d chunks from %s\n", total, chunks, path);
@@ -117,16 +117,16 @@ int main(int argc, char **argv) {
                 memset(&chunk, 0, sizeof chunk);
                 r = recv_chunk_serial(sslot, &chunk);
                 if (r != SERIAL_OK) {
-                        fprintf(stderr, "waiting for reply failed");
+                        fprintf(stderr, "waiting for reply failed\n");
                         return 1;
                 }
-                if (chunk.type != T_DATA || get_be32(chunk.length) != (unsigned long)strlen(REPLY) || memcmp(chunk.data, REPLY, strlen(reply)) != 0){
+                if (chunk.type != T_DATA || get_be32(chunk.length) != (unsigned long)strlen(REPLY) || memcmp(chunk.data, REPLY, strlen(REPLY)) != 0){
                         fprintf(stderr, "send: unexpected reply (type=%d len=%lu)\n", chunk.type, get_be32(chunk.length));
                         return 1;
                 }
                 printf("send: got reply \"%s\"\n", REPLY);
                 alarm(0);
-                printf("works yay\n")
+                printf("works yay\n");
                 return 0;
         }
 
@@ -146,6 +146,7 @@ int main(int argc, char **argv) {
                 r = recv_chunk_serial(sslot, &chunk);
                 if (r != SERIAL_OK) {
                         fprintf(stderr, "recv_chunk_serial failed\n");
+                        return 1;
                 }
                 if (chunk.type == T_DONE) {
                         break;
