@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "raw.h"
+#include <stdbool.h>
 
 enum renderable_type { RENDERABLE_GROUP, TEXT, PROGRESS_BAR, TEXT_INPUT, LOADING_BAR };
 
@@ -29,7 +30,7 @@ struct text_input_options {
         char *buffer;
         size_t max_len;
         size_t cursor;
-        int is_focused;
+        bool is_focused;
 };
 
 void update_content(struct renderable renderables[], size_t count, double dt);

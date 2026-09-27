@@ -150,7 +150,13 @@ void render_content(struct renderable renderables[], size_t count) {
                 case TEXT_INPUT: {
                                 struct text_input_options *options = renderables[i].content;
                                 
-                                printf("%s [ ... ]", options->label);
+                                if (options->is_focused) {
+                                        /* TODO: Account for cursor position */
+                                        printf("%s [%s_]", options->label, options->buffer);
+
+                                } else {
+                                        printf("%s [%s]", options->label, options->buffer);
+                                }
                                 
                                 break;
                 }
