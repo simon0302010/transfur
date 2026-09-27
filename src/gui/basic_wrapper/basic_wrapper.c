@@ -1,5 +1,6 @@
 #include "basic_wrapper.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 
@@ -78,7 +79,51 @@ double basic_get_time(void) {
 bool basic_poll_event(struct basic_event *event) {
         SDL_Event sdl_event;
 
-        /* TODO: Add event handling */
+        event->type = BASIC_EVENT_NONE;
+        event->mouse_x = 0;
+        event->mouse_y = 0;
+        event->mouse_button = 0;
+        event->key_code = 0;
+        event->ch = '\0';
 
-        return false;
+        if (!SDL_PollEvent(&sdl_event)) return false;
+
+        switch (sdl_event.type) {
+                case SDL_EVENT_QUIT:
+                        event->type = BASIC_EVENT_QUIT;
+                        break;
+                
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                        event->type = BASIC_EVENT_MOUSE_DOWN;
+                        event->mouse_x = (int)sdl_event.button.x;
+                        event->mouse_y = (int)sdl_event.button.y;
+                        event->mouse_button = (int)sdl_event.button.button;
+                        break;
+                
+                case SDL_EVENT_MOUSE_BUTTON_UP:
+                        event->type = BASIC_EVENT_MOUSE_UP;
+                        event->mouse_x = (int)sdl_event.button.x;
+                        event->mouse_y = (int)sdl_event.button.y;
+                        event->mouse_button = (int)sdl_event.button.button;
+                        break;
+
+                case SDL_EVENT_MOUSE_MOTION:
+                        event->type = BASIC_EVENT_MOUSE_MOVE;
+                        event->mouse_x = (int)sdl_event.button.x;
+                        event->mouse_y = (int)sdl_event.button.y;
+                        break;
+
+                case SDL_EVENT_KEY_DOWN:
+                        event->type = BASIC_EVENT_KEY_DOWN;
+                        event->key_code = (int)sdl_event.key.key;
+                        if (sdl_event.key.key >= 32 && sdl_event.key.key <= 126) {
+                                event->ch = (char)sdl_event.key.key;
+                        }
+                        break;
+
+                default:
+                        break;
+        }
+
+        return true;
 }
