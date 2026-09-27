@@ -8,7 +8,7 @@ counterparts for other ways to transfer data are expected to work on any
 operating system. If this cannnot be guaranteed, it must be clearly stated in
 the README and not compiled for systems with lacking support.
 
-Windows/Apple is not implemented yet.
+Apple is not implemented yet.
 
 The connection options are:
 - "l:<port>" >>> listen to port on all local addresses and wait for peer to connect
@@ -36,12 +36,13 @@ typedef int lan_sock;
 #define LAN_INVALID_SOCK (-1)
 
 #elif defined(_WIN32)
-/* unimplemented stub */
-typedef unsigned long lan_sock;
+#include <winsock2.h>
+typedef SOCKET lan_sock;
 
-#define LAN_INVALID_SOCK ((lan_sock)-1)
+#define LAN_INVALID_SOCK INVALID_SOCKET
 
 #endif
+
 static int lan_net_init(void);
 static lan_sock lan_socket_open(void);
 static int lan_socket_close(lan_sock socket);
@@ -170,51 +171,115 @@ static void lan_socket_nosigpipe(lan_sock socket) {
 
 #elif defined(_WIN32)
 
-/* Windows Stubs */
+/* winsock does not have SIGPIPE so nosigpipe is just a no-op */
+static int wsa_started = 0;
+
 static int lan_net_init(void) {
-        return LAN_ERR_PLATFORM;
+        WSADATA data;
+        int r;
+
+        /* Did it already start? */
+        if (wsa_started != 0) {
+                return 0;
+        }
+
+        r = WSAStartup(MAKEWORD(2, 2), &data);
+        if (r != 0) {
+                return LAN_ERR_PLATFORM;
+        }
+
+        wsa_started = 1;
+        return 0;
 }
 
 static lan_sock lan_socket_open(void) {
-        return LAN_ERR_PLATFORM;
+        lan_sock fd;
+
+        fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (fd == INVALID_SOCKET) {
+                return LAN_INVALID_SOCK;
+        }
+
+        return fd;
 }
 
 static int lan_socket_close(lan_sock socket) {
-        return LAN_ERR_PLATFORM;
+        return closesocket(socket) == 0 ? 0 : -1;
 }
 
+/* Reuse socket instantly without waiting TIME_WAIT */
 static int lan_socket_reuseaddr(lan_sock socket) {
-        return LAN_ERR_PLATFORM;
+        int on = 1;
+
+        return setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, (int)sizeof on) == 0 ? 0 : -1;
 }
 
+/* Bind a listening socket, ip = 0  binds to all addresses */
 static int lan_socket_bind(lan_sock socket, unsigned long ip, unsigned short port) {
-        return LAN_ERR_PLATFORM;
+        struct sockaddr_in socket_address;
 
+        memset(&socket_address, 0, sizeof socket_address);
+        socket_address.sin_family = AF_INET;
+        socket_address.sin_port = htons(port);
+        socket_address.sin_addr.s_addr = htonl(ip);
+
+        return bind(socket, (struct sockaddr *)&socket_address, (int)sizeof socket_address) == 0 ? 0 : -1;
 }
 
+/* Mark socket as listening */
 static int lan_socket_listen(lan_sock socket) {
-        return LAN_ERR_PLATFORM;
+        return listen(socket, MAX_CONN) == 0 ? 0 : -1;
 }
 
+/* Wait for perr to connect and return socket */
 static lan_sock lan_socket_accept(lan_sock socket) {
-        return LAN_ERR_PLATFORM;
+        lan_sock fd;
+
+        fd = accept(socket, NULL, NULL);
+        if (fd == INVALID_SOCKET) {
+                return LAN_INVALID_SOCK;
+        }
+
+        return fd;
 }
 
+/* Connect to peer, ip and port are in host byte order */
 static int lan_socket_connect(lan_sock socket, unsigned long ip, unsigned short port) {
-        return LAN_ERR_PLATFORM;
+        struct sockaddr_in socket_address;
+
+        memset(&socket_address, 0, sizeof socket_address);
+        socket_address.sin_family = AF_INET;
+        socket_address.sin_port = htons(port);
+        socket_address.sin_addr.s_addr = htonl(ip);
+
+        return connect(socket, (struct sockaddr *)&socket_address, (int)sizeof socket_address) == 0 ? 0 : -1;
 }
 
+/* Send bytes to peer */
 static long lan_socket_send(lan_sock socket, const unsigned char *buf, size_t len) {
-        return LAN_ERR_PLATFORM;
+        int n;
+
+        do {
+                n = send(socket, (const char *)buf, (int)len, 0);
+        } while (n == SOCKET_ERROR &&  WSA_GetLastError() == WSAEINTR);
+
+        return (long)n;
 }
 
+/* Recieve bytes from peer */
 static long lan_socket_recv(lan_sock socket, unsigned char *buf, size_t len) {
-        return LAN_ERR_PLATFORM;
+        int n;
+
+        do {
+                n = recv(socket, (char *)buf, (int)len, 0);
+        } while (n == SOCKET_ERROR && WSA_GetLastError() == WSAEINTR)
+
+        return (long)n;
 }
 
+/* winsock has no SIGPIPE */
 static void lan_socket_nosigpipe(lan_sock socket) {
-        return LAN_ERR_PLATFORM;
-
+        (void)socket;
 }
 
 #endif
