@@ -1,13 +1,16 @@
 # transfur
+
 A cross platform file transfer software
 
 Our goal is to be able to transfer information from any system to any other system with ease, regardless of system, speed, and age.  
 
 ## User Interfaces
 We currently have a cross-platform GUI tested and working on Linux (WSL2 and Native) powered by Nuklear.
-~~A TUI is currently work-in-progress by the lazy american~~ Apparently we've moved on to GUI and TUI is just sitting half baked.
+~~A TUI is currently work-in-progress by the lazy american~~ ~~Apparently we've moved on to GUI and TUI is just sitting half baked.~~
 
-Note that the GUI is not yet linked to the information transfer interfaces and is currently seperate.
+A TUI & GUI that only need the bare minimum features to run.
+
+Note that the UIs are not yet linked to the information transfer interfaces and is currently seperate.
 
 ## Information Transfer
 
@@ -29,5 +32,19 @@ Future tests:
 
 ## Credits
 kaboom (the cool one): implemented all the interfaces and tests  
-jeremiah (inois is ill): ~~didn't do anything 🤣🤣🤣🤣🤣~~ apparently he worked on the non-functional TUI and the first revision of the file interface and is working on GUI  
-simon (simon): made the entire GUI and placeholder files for us to work on, also guided us :3
+jeremiah (inois is ill): ~~didn't do anything 🤣🤣🤣🤣🤣~~ ~~apparently he worked on the non-functional TUI and the first revision of the file interface and is working on GUI~~ did all the tui and gui stuff ✅
+simon (simon): made the ~~entire~~ GUI and placeholder files for us to work on, also guided us :3
+
+## How to Run
+
+Grab a release or build it yourself:
+
+```
+make
+```
+
+Then run it (only shows a test GUI ATM):
+
+```
+./build/Linux/transfur # (or run whatever binary is for your OS)
+```
