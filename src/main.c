@@ -8,7 +8,10 @@
 int main(void) {
         struct basic_renderable renderables[1];
 
-        run_basic("Transfur", 1000, 400, renderables, 0);
+        /* TODO: make this have renderables */
+        run_basic("Transfur (Basic GUI Test)", 1080, 720, renderables, 0);
+
+        /* TODO: merge TUI and basic GUI renderables into a single thing suppored by both */
 
         /*
         struct renderable my_content[4];
