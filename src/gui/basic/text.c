@@ -52,6 +52,8 @@ void draw_text(char *text, int x, int y, int size, struct color color) {
         while (true) {
                 char pattern[CHAR_PATTERN_WIDTH * CHAR_PATTERN_MAX_HEIGHT];
                 int j = 0;
+                char prev_row[CHAR_PATTERN_WIDTH] = {0};
+                char this_row[CHAR_PATTERN_WIDTH] = {0};
 
                 if (text[i] == '\0') break;
 
@@ -202,12 +204,44 @@ void draw_text(char *text, int x, int y, int size, struct color color) {
                 }
 
                 while (true) {
+                        int col = j % CHAR_PATTERN_WIDTH;
+
                         if (pattern[j] == '\0') break;
+
+                        if (j > 0 && col == 0) {
+                                memcpy(prev_row, this_row, CHAR_PATTERN_WIDTH);
+                        }
+
+                        this_row[col] = pattern[j];
 
                         if (pattern[j] == '1') {
                                 int j_x = j % CHAR_PATTERN_WIDTH + LETTER_SPACE * i + CHAR_PATTERN_WIDTH * i;
                                 int j_y = j / CHAR_PATTERN_WIDTH;
                                 basic_fill_rect(x + size * j_x, y + size * j_y, size, size, color);
+                        }
+
+                        /* if size > 1, add some rounding */
+                        if (size > 1 && j > CHAR_PATTERN_WIDTH - 1) {
+                                if (pattern[j] == '1' && prev_row[col] != '1') {
+                                        if (col > 0 && prev_row[col - 1] == '1') {
+                                                /* bottom left corner fill */
+                                                if (size % 2 == 0) {
+                                                        /* even pyramid style corner fill */
+                                                        int j_x = j % CHAR_PATTERN_WIDTH + LETTER_SPACE * i + CHAR_PATTERN_WIDTH * i;
+                                                        int j_y = (j-CHAR_PATTERN_WIDTH) / CHAR_PATTERN_WIDTH;
+                                                        int base_x = x + size * j_x;
+                                                        int base_y = y + size * j_y;
+                                                        int k;
+                                                        for (k=0; k < size / 2; k++) {
+                                                                int l;
+                                                                int row_y = base_y + size - 1 - k;
+                                                                for (l=0; l < (size / 2 - k); l++) {
+                                                                        basic_set_pixel(base_x+l, row_y, color);
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
                         }
 
                         j++;
