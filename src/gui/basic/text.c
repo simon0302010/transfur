@@ -1,5 +1,6 @@
-#include "../basic_wrapper/basic_wrapper.h"
 #include <string.h>
+
+#include "sdl3/basic_wrapper.h"
 
 #define CHAR_PATTERN_WIDTH 5
 #define CHAR_PATTERN_MAX_HEIGHT 8

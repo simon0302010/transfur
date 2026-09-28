@@ -1,5 +1,4 @@
 #include "basic.h"
-#include "../basic_wrapper/basic_wrapper.h"
 #include "text.h"
 #include <stdbool.h>
 
