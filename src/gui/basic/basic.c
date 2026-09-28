@@ -28,7 +28,7 @@ void run_basic(char *title, int width, int height, struct basic_renderable rende
 
                 basic_fill_rect(12, 14, 16, 18, color);
 
-                draw_text("Hello world! abcdefghijklmnopqrstuvwxyz 0123456789", 34, 34, 8, color);
+                draw_text("Hello world! abcdefghijklmnopqrstuvwxyz 0123456789", 34, 34, 7, color);
 
                 basic_present();
         }
