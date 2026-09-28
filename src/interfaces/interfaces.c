@@ -140,9 +140,11 @@ const char *get_sender_text(enum interface interface) {
 
 const enum interface *get_supported_interfaces(void) {
 #if defined(__linux__)
-        static const enum interface interfaces[] = {if_file, if_lan, if_serial, if_empty};
+        static const enum interface interfaces[] = {if_file, if_lan, if_serial,
+                                                    if_empty};
 #elif defined(_WIN32)
-        static const enum interface interfaces[] = {if_file, if_lan, if_serial, if_empty};
+        static const enum interface interfaces[] = {if_file, if_lan, if_serial,
+                                                    if_empty};
 #elif defined(__APPLE__) && defined(__MACH__)
         static const enum interface interfaces[] = {if_file, if_empty};
 #else

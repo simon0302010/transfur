@@ -6,7 +6,7 @@
 #include "src/interfaces/file/file.h"
 #include "src/interfaces/serial/serial.h"
 
-#define T_DATA 0 
+#define T_DATA 0
 #define T_DONE 1
 #define TIMEOUT_SECONDS 30
 
@@ -27,7 +27,8 @@ static void put_be32(unsigned char *p, unsigned long v) {
 }
 
 static unsigned long get_be32(const unsigned char *p) {
-        return ((unsigned long)p[0] << 24) | ((unsigned long)p[1] << 16) | ((unsigned long)p[2] << 8) | (unsigned long)p[3];
+        return ((unsigned long)p[0] << 24) | ((unsigned long)p[1] << 16) |
+               ((unsigned long)p[2] << 8) | (unsigned long)p[3];
 }
 
 /* No progress for too long */
@@ -53,8 +54,10 @@ int main(int argc, char **argv) {
         int chunks;
         int is_send;
 
-        if (argc < 3 || argc > 4 || (strcmp(argv[1], "send") != 0 && strcmp(argv[1], "recv") != 0)) {
-                fprintf(stderr, "usage: %s send|recv <device>[:baud] [file]\n", argv[0]);
+        if (argc < 3 || argc > 4 ||
+            (strcmp(argv[1], "send") != 0 && strcmp(argv[1], "recv") != 0)) {
+                fprintf(stderr, "usage: %s send|recv <device>[:baud] [file]\n",
+                        argv[0]);
                 return 2;
         }
 
@@ -86,7 +89,9 @@ int main(int argc, char **argv) {
                         memset(&chunk, 0, sizeof chunk);
                         r = recv_chunk_file(fslot, &chunk);
                         if (r != 0) {
-                                fprintf(stderr, "reading %s failed (file missing?)\n", path);
+                                fprintf(stderr,
+                                        "reading %s failed (file missing?)\n",
+                                        path);
                                 return 1;
                         }
                         if (chunk.type == T_DONE) {
@@ -108,10 +113,12 @@ int main(int argc, char **argv) {
                 chunk.type = T_DONE;
                 r = send_chunk_serial(sslot, &chunk);
                 if (r != SERIAL_OK) {
-                        fprintf(stderr, "send_chunk_serial (end marker) failed\n");
+                        fprintf(stderr,
+                                "send_chunk_serial (end marker) failed\n");
                         return 1;
                 }
-                printf("send: sent %lu bytes in %d chunks from %s\n", total, chunks, path);
+                printf("send: sent %lu bytes in %d chunks from %s\n", total,
+                       chunks, path);
 
                 /* reciever finish reply after it has saved everything */
                 memset(&chunk, 0, sizeof chunk);
@@ -120,8 +127,12 @@ int main(int argc, char **argv) {
                         fprintf(stderr, "waiting for reply failed\n");
                         return 1;
                 }
-                if (chunk.type != T_DATA || get_be32(chunk.length) != (unsigned long)strlen(REPLY) || memcmp(chunk.data, REPLY, strlen(REPLY)) != 0){
-                        fprintf(stderr, "send: unexpected reply (type=%d len=%lu)\n", chunk.type, get_be32(chunk.length));
+                if (chunk.type != T_DATA ||
+                    get_be32(chunk.length) != (unsigned long)strlen(REPLY) ||
+                    memcmp(chunk.data, REPLY, strlen(REPLY)) != 0) {
+                        fprintf(stderr,
+                                "send: unexpected reply (type=%d len=%lu)\n",
+                                chunk.type, get_be32(chunk.length));
                         return 1;
                 }
                 printf("send: got reply \"%s\"\n", REPLY);
@@ -152,7 +163,8 @@ int main(int argc, char **argv) {
                         break;
                 }
                 if (chunk.type != T_DATA) {
-                        fprintf(stderr, "recv: unexpected chunk type %d\n", chunk.type);
+                        fprintf(stderr, "recv: unexpected chunk type %d\n",
+                                chunk.type);
                         return 1;
                 }
 
@@ -167,7 +179,8 @@ int main(int argc, char **argv) {
                 alarm(TIMEOUT_SECONDS);
         }
 
-        printf("recv: saved %lu bytes in %d chunks to %s\n", total, chunks, path);
+        printf("recv: saved %lu bytes in %d chunks to %s\n", total, chunks,
+               path);
 
         /* unblock sender before local verification */
         memset(&chunk, 0, sizeof chunk);
@@ -195,7 +208,8 @@ int main(int argc, char **argv) {
                 checked += get_be32(chunk.length);
         }
         if (checked != total) {
-                fprintf(stderr, "recv: read back %lu bytes but saved %lu\n", checked, total);
+                fprintf(stderr, "recv: read back %lu bytes but saved %lu\n",
+                        checked, total);
                 return 1;
         }
 

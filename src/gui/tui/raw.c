@@ -1,14 +1,14 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 static struct termios original_termios;
 
 void disable_raw_mode(void) {
         printf("\x1b[?25h\x1b[?1049l");
         fflush(stdout);
-        tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios); 
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
 }
 
 void enable_raw_mode(void) {

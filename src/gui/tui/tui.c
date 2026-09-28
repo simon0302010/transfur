@@ -1,14 +1,14 @@
 #include "tui.h"
+#include "raw.h"
+#include "timer.h"
+#include <poll.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <stdbool.h>
-#include <poll.h>
-#include "raw.h"
-#include "timer.h"
 
 /* #define WIDTH_OVERRIDE 0 */
 #define USE_ANSI
@@ -101,8 +101,8 @@ void render_content(struct renderable renderables[], size_t count) {
                         printf(ANSI_COLOR_RESET);
 #endif
 
-                                break;
-                        }
+                        break;
+                }
 
                         fflush(stdout);
 
@@ -148,17 +148,20 @@ void render_content(struct renderable renderables[], size_t count) {
                         break;
                 }
                 case TEXT_INPUT: {
-                                struct text_input_options *options = renderables[i].content;
-                                
-                                if (options->is_focused) {
-                                        /* TODO: Account for cursor position */
-                                        printf("%s [%s_]", options->label, options->buffer);
+                        struct text_input_options *options =
+                            renderables[i].content;
 
-                                } else {
-                                        printf("%s [%s]", options->label, options->buffer);
-                                }
-                                
-                                break;
+                        if (options->is_focused) {
+                                /* TODO: Account for cursor position */
+                                printf("%s [%s_]", options->label,
+                                       options->buffer);
+
+                        } else {
+                                printf("%s [%s]", options->label,
+                                       options->buffer);
+                        }
+
+                        break;
                 }
                 }
         }
@@ -170,7 +173,8 @@ void update_content(struct renderable renderables[], size_t count, double dt) {
         for (i = 0; i < count; i++) {
                 switch (renderables[i].type) {
                 case LOADING_BAR: {
-                        struct loading_bar_options *options = renderables[i].content;
+                        struct loading_bar_options *options =
+                            renderables[i].content;
                         float step_interval;
                         if (options->speed <= 0.0f) {
                                 break;
@@ -178,7 +182,8 @@ void update_content(struct renderable renderables[], size_t count, double dt) {
                         step_interval = 1.0f / options->speed;
                         options->accumulator += (float)dt;
                         while (options->accumulator >= step_interval) {
-                                options->offset = (options->offset + 1) % charset_size;
+                                options->offset =
+                                    (options->offset + 1) % charset_size;
                                 options->accumulator -= step_interval;
                         }
                         break;
@@ -219,35 +224,38 @@ static struct tui_event read_key_event(void) {
                 pfd.events = POLLIN;
 
                 if (poll(&pfd, 1, 25) > 0 && (pfd.revents & POLLIN)) {
-                        if (read(STDIN_FILENO, &seq[0], 1) > 0 && seq[0] == '[') {
+                        if (read(STDIN_FILENO, &seq[0], 1) > 0 &&
+                            seq[0] == '[') {
                                 /* this is an ansi sequence */
                                 if (read(STDIN_FILENO, &seq[1], 1) > 0) {
                                         switch (seq[1]) {
-                                                case 'A':
-                                                        event.key = KEY_ARROW_UP;
-                                                        break;
-                                                case 'B':
-                                                        event.key = KEY_ARROW_DOWN;
-                                                        break;
-                                                case 'C':
-                                                        event.key = KEY_ARROW_RIGHT;
-                                                        break;
-                                                case 'D':
-                                                        event.key = KEY_ARROW_LEFT;
-                                                        break;
-                                                case 'Z':
-                                                        event.key = KEY_SHIFT_TAB;
-                                                        break;
-                                                case '3':
-                                                        if (read(STDIN_FILENO, &seq[2], 1) > 0 && seq[2] == '~') {
-                                                                event.key = KEY_DELETE;
-                                                        }
-                                                        break;
-                                                default:
-                                                        break;
+                                        case 'A':
+                                                event.key = KEY_ARROW_UP;
+                                                break;
+                                        case 'B':
+                                                event.key = KEY_ARROW_DOWN;
+                                                break;
+                                        case 'C':
+                                                event.key = KEY_ARROW_RIGHT;
+                                                break;
+                                        case 'D':
+                                                event.key = KEY_ARROW_LEFT;
+                                                break;
+                                        case 'Z':
+                                                event.key = KEY_SHIFT_TAB;
+                                                break;
+                                        case '3':
+                                                if (read(STDIN_FILENO, &seq[2],
+                                                         1) > 0 &&
+                                                    seq[2] == '~') {
+                                                        event.key = KEY_DELETE;
                                                 }
+                                                break;
+                                        default:
+                                                break;
                                         }
                                 }
+                        }
                 } else {
                         event.key = KEY_ESC;
                 }
@@ -259,34 +267,36 @@ static struct tui_event read_key_event(void) {
         return event;
 }
 
-bool renderable_handle_event(struct tui_event event, struct renderable renderable) {
+bool renderable_handle_event(struct tui_event event,
+                             struct renderable renderable) {
         if (renderable.type == TEXT_INPUT) {
-                struct text_input_options *options = (struct text_input_options *)renderable.content;
+                struct text_input_options *options =
+                    (struct text_input_options *)renderable.content;
                 size_t len;
 
                 len = strlen(options->buffer);
 
                 switch (event.key) {
-                        case KEY_CHAR:
-                                /* TODO: Acocount for cursor position */
-                                /* TODO: account for max len option */
-                                options->buffer[len] = event.ch;
-                                options->buffer[len+1] = '\0';
-                                break;
-                        case KEY_BACKSPACE:
-                                /* TODO: Acocount for cursor position */
-                                options->buffer[len-1] = '\0';
-                                break;
+                case KEY_CHAR:
+                        /* TODO: Acocount for cursor position */
+                        /* TODO: account for max len option */
+                        options->buffer[len] = event.ch;
+                        options->buffer[len + 1] = '\0';
+                        break;
+                case KEY_BACKSPACE:
+                        /* TODO: Acocount for cursor position */
+                        options->buffer[len - 1] = '\0';
+                        break;
 
-                        case KEY_DELETE: /* TODO: handle the below */
-                                break;
-                        case KEY_ARROW_LEFT:
-                                break;
-                        case KEY_ARROW_RIGHT:
-                                break;
-                        default:
-                                return false;
-                                break;
+                case KEY_DELETE: /* TODO: handle the below */
+                        break;
+                case KEY_ARROW_LEFT:
+                        break;
+                case KEY_ARROW_RIGHT:
+                        break;
+                default:
+                        return false;
+                        break;
                 }
                 return true;
         }
@@ -305,7 +315,7 @@ void run_tui(struct renderable renderables[], size_t count) {
         double elapsed;
         const double target_fps = 30.0;
         const double target_frame_duration = 1.0 / target_fps;
-        
+
         /* if -1, nothing is focused */
         int focus_index = -1;
         struct tui_event event;
@@ -326,14 +336,16 @@ void run_tui(struct renderable renderables[], size_t count) {
 
                 update_content(renderables, count, dt);
 
-                printf("\x1b[H"); /* TODO: double check this is supported on all systems */
+                printf("\x1b[H"); /* TODO: double check this is supported on all
+                                     systems */
                 fflush(stdout);
 
                 render_content(renderables, count);
 
                 elapsed = get_time_seconds() - current_time;
                 if (elapsed < target_frame_duration) {
-                        timeout_ms = (int)((target_frame_duration - elapsed) * 1000.0);
+                        timeout_ms =
+                            (int)((target_frame_duration - elapsed) * 1000.0);
                 } else {
                         timeout_ms = 0;
                 }
@@ -344,38 +356,54 @@ void run_tui(struct renderable renderables[], size_t count) {
                         handled = false;
 
                         /* navigation keys */
-                        if (event.key == KEY_TAB || event.key == KEY_SHIFT_TAB) {
+                        if (event.key == KEY_TAB ||
+                            event.key == KEY_SHIFT_TAB) {
                                 int direction = (event.key == KEY_TAB);
                                 int new_focus = focus_index;
 
                                 for (i = 0; i < count; i++) {
-                                        new_focus = (new_focus + direction + (int)count) % (int)count;
+                                        new_focus = (new_focus + direction +
+                                                     (int)count) %
+                                                    (int)count;
 
                                         /* make sure this is foucsable */
-                                        if (renderables[new_focus].type == TEXT_INPUT) break;
+                                        if (renderables[new_focus].type ==
+                                            TEXT_INPUT)
+                                                break;
                                 }
 
-                                /* modify options to set the new one as focused and old one as unfocused */
-                                if (renderables[focus_index].type == TEXT_INPUT) {
-                                        ((struct text_input_options *)renderables[focus_index].content)->is_focused = false;
-                                        
+                                /* modify options to set the new one as focused
+                                 * and old one as unfocused */
+                                if (renderables[focus_index].type ==
+                                    TEXT_INPUT) {
+                                        ((struct text_input_options *)
+                                             renderables[focus_index]
+                                                 .content)
+                                            ->is_focused = false;
                                 }
                                 focus_index = new_focus;
                                 if (renderables[new_focus].type == TEXT_INPUT) {
-                                        ((struct text_input_options *)renderables[focus_index].content)->is_focused = true;
+                                        ((struct text_input_options *)
+                                             renderables[focus_index]
+                                                 .content)
+                                            ->is_focused = true;
                                 }
 
                                 handled = true;
                         }
 
                         /* TODO: send to focused widget */
-                        if (!handled && focus_index >= 0 && focus_index < (int)count) {
-                                handled = renderable_handle_event(event, renderables[focus_index]);
+                        if (!handled && focus_index >= 0 &&
+                            focus_index < (int)count) {
+                                handled = renderable_handle_event(
+                                    event, renderables[focus_index]);
                         }
 
                         /* quit keys */
                         if (!handled) {
-                                if (event.key == KEY_ESC || (event.key == KEY_CHAR && event.ch == 'q')) {
+                                if (event.key == KEY_ESC ||
+                                    (event.key == KEY_CHAR &&
+                                     event.ch == 'q')) {
                                         running = false;
                                 }
                         }
@@ -422,8 +450,8 @@ struct renderable create_progress_bar(struct progress_bar_options *options,
         return new_progress_bar;
 }
 
-
-struct renderable create_text_input(struct text_input_options *options, size_t size) {
+struct renderable create_text_input(struct text_input_options *options,
+                                    size_t size) {
         struct renderable new_text_input;
 
         new_text_input.type = TEXT_INPUT;

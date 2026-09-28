@@ -7,16 +7,17 @@
 #include "../interfaces.h"
 
 #define SERIAL_OK 0
-#define SERIAL_ERR_ARG 1        /* NULL pointer or malformed chunk */
-#define SERIAL_ERR_OPTIONS 2    /* not a valid options string */
-#define SERIAL_ERR_STATE 3      /* init_conn_serial never succeded on this slot */
-#define SERIAL_ERR_OPEN 4       /* open() failed */
-#define SERIAL_ERR_CONFIG 5     /* configuring the port failed */
-#define SERIAL_ERR_SEND 6       /* write() failed */
-#define SERIAL_ERR_RECV 7       /* read() failed */
-#define SERIAL_ERR_CLOSED 8     /* the peer hung up ):< */
-#define SERIAL_ERR_FRAME 9      /* frame gave a length more than CHUNK_SIZE */
-#define SERIAL_ERR_PLATFORM 10  /* this platform does not have a working implementation yet */
+#define SERIAL_ERR_ARG 1     /* NULL pointer or malformed chunk */
+#define SERIAL_ERR_OPTIONS 2 /* not a valid options string */
+#define SERIAL_ERR_STATE 3   /* init_conn_serial never succeded on this slot */
+#define SERIAL_ERR_OPEN 4    /* open() failed */
+#define SERIAL_ERR_CONFIG 5  /* configuring the port failed */
+#define SERIAL_ERR_SEND 6    /* write() failed */
+#define SERIAL_ERR_RECV 7    /* read() failed */
+#define SERIAL_ERR_CLOSED 8  /* the peer hung up ):< */
+#define SERIAL_ERR_FRAME 9   /* frame gave a length more than CHUNK_SIZE */
+#define SERIAL_ERR_PLATFORM                                                    \
+        10 /* this platform does not have a working implementation yet */
 
 /*
 `const char *port` points to a null-terminated string containing the serial port

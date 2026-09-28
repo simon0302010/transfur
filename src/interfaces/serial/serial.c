@@ -12,13 +12,14 @@ the README and not compiled for systems with lacking support.
 Apple is not implemented yet.
 
 The connection options are:
-- "<path>:<baud>" >>> open the serial device at the given baud rate, if it is not provided, BAUD_RATE will be used.
-On windows the path is a port name such as "COM3" or "\\\\.\\COM10"; the
+- "<path>:<baud>" >>> open the serial device at the given baud rate, if it is
+not provided, BAUD_RATE will be used. On windows the path is a port name such as
+"COM3" or "\\\\.\\COM10"; the
 "\\\\.\\" prefix is added automatically when missing.
 */
 
-#include <string.h>
 #include "serial.h"
+#include <string.h>
 
 #if defined(__linux__)
 
@@ -58,32 +59,16 @@ static speed_t lookup_baud(unsigned long v) {
                 unsigned long value;
                 speed_t speed;
         } table[] = {
-                /* Although this probably isn't ever going to go above 115200, we need to be all inclusive :3*/
-                {50UL, B50},
-                {75UL, B75},
-                {110UL, B110},
-                {134UL, B134},
-                {150UL, B150},
-                {200UL, B200},
-                {300UL, B300},
-                {600UL, B600},
-                {1200UL, B1200},
-                {1800UL, B1800},
-                {2400UL, B2400},
-                {4800UL, B4800},
-                {9600UL, B9600},
-                {19200UL, B19200},
-                {38400UL, B38400},
-                {57600UL, B57600},
-                {115200UL, B115200},
-                {230400UL, B230400},
-                {460800UL, B460800},
-                {500000UL, B500000},
-                {576000UL, B576000},
-                {921600UL, B921600},
-                {1000000UL, B1000000},
-                {1152000UL, B1152000}
-        };
+            /* Although this probably isn't ever going to go above 115200, we
+               need to be all inclusive :3*/
+            {50UL, B50},         {75UL, B75},           {110UL, B110},
+            {134UL, B134},       {150UL, B150},         {200UL, B200},
+            {300UL, B300},       {600UL, B600},         {1200UL, B1200},
+            {1800UL, B1800},     {2400UL, B2400},       {4800UL, B4800},
+            {9600UL, B9600},     {19200UL, B19200},     {38400UL, B38400},
+            {57600UL, B57600},   {115200UL, B115200},   {230400UL, B230400},
+            {460800UL, B460800}, {500000UL, B500000},   {576000UL, B576000},
+            {921600UL, B921600}, {1000000UL, B1000000}, {1152000UL, B1152000}};
         size_t i;
 
         for (i = 0; i < sizeof table / sizeof table[0]; i++) {
@@ -117,7 +102,8 @@ static int serial_port_open(const char *path, unsigned long baud,
         speed = lookup_baud(baud);
 
         /* I completely understand what this does. This is not foreshadowing. */
-        if (cfsetispeed(&tty, speed) != 0 || cfsetospeed(&tty, speed) != 0 || tcsetattr(fd, TCSANOW, &tty) != 0) {
+        if (cfsetispeed(&tty, speed) != 0 || cfsetospeed(&tty, speed) != 0 ||
+            tcsetattr(fd, TCSANOW, &tty) != 0) {
                 close(fd);
                 return SERIAL_ERR_CONFIG;
         }
@@ -163,11 +149,10 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
 /* Validate baud rate, the value itself goes into DCB.BaudRate as-is */
 static unsigned long lookup_baud(unsigned long v) {
         static const unsigned long table[] = {
-                50UL, 75UL, 110UL, 134UL, 150UL, 200UL, 300UL, 600UL,
-                1200UL, 1800UL, 2400UL, 4800UL, 9600UL, 19200UL, 38400UL,
-                57600UL, 115200UL, 230400UL, 460800UL, 500000UL, 576000UL,
-                921600UL, 1000000UL, 1152000UL
-        };
+            50UL,     75UL,     110UL,    134UL,    150UL,     200UL,
+            300UL,    600UL,    1200UL,   1800UL,   2400UL,    4800UL,
+            9600UL,   19200UL,  38400UL,  57600UL,  115200UL,  230400UL,
+            460800UL, 500000UL, 576000UL, 921600UL, 1000000UL, 1152000UL};
         size_t i;
 
         for (i = 0; i < sizeof table / sizeof table[0]; i++) {
@@ -234,7 +219,8 @@ static int serial_port_open(const char *path, unsigned long baud,
                 return SERIAL_ERR_CONFIG;
         }
 
-        /* All zero time-outs: block until the full count arrives, like VMIN=1 */
+        /* All zero time-outs: block until the full count arrives, like VMIN=1
+         */
         memset(&timeouts, 0, sizeof timeouts);
         if (SetCommTimeouts(h, &timeouts) == 0) {
                 CloseHandle(h);
@@ -303,10 +289,12 @@ struct serial_state {
         unsigned char ping_outstanding;
 };
 
-typedef char serial_state_fits_in_slot[sizeof(struct serial_state) <= 512 ? 1 : -1];
+typedef char
+    serial_state_fits_in_slot[sizeof(struct serial_state) <= 512 ? 1 : -1];
 
 /* Split options from <path>[:<baud>] */
-static int parse_serial_options(const char *options, char *path, size_t path_size, unsigned long *baud) {
+static int parse_serial_options(const char *options, char *path,
+                                size_t path_size, unsigned long *baud) {
         const char *colon;
         const char *suffix;
         size_t i;
@@ -347,11 +335,11 @@ static int parse_serial_options(const char *options, char *path, size_t path_siz
                         if (lookup_baud(v) == 0) {
                                 return SERIAL_ERR_OPTIONS;
                         }
-                        
+
                         *baud = v;
                         len = (size_t)(colon - options);
                 }
-        } 
+        }
 
         if (len == 0 || len >= path_size) {
                 return -1;
@@ -359,7 +347,7 @@ static int parse_serial_options(const char *options, char *path, size_t path_siz
 
         memcpy(path, options, len);
         path[len] = '\0';
-        
+
         return 0;
 }
 
@@ -409,7 +397,8 @@ static void put_u32(unsigned char *dst, unsigned long v) {
 }
 
 static unsigned long get_u32(const unsigned char *src) {
-        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) | ((unsigned long)src[2] << 8) | (unsigned long)src[3];
+        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) |
+               ((unsigned long)src[2] << 8) | (unsigned long)src[3];
 }
 
 /* just read the function name 💔💔💔💔💔 */
@@ -505,7 +494,7 @@ int init_conn_serial(void *conn, const char *options) {
         }
 
         st->fd = fd;
-        st-> ping_outstanding = 0;
+        st->ping_outstanding = 0;
         st->inited = 1;
 
         return SERIAL_OK;
@@ -526,7 +515,7 @@ int send_chunk_serial(void *conn, const struct chunk *chunk) {
 
         r = write_frame(st->fd, chunk);
         if (r == SERIAL_OK && chunk->type == CHUNK_TYPE_PING) {
-                st->ping_outstanding =1;
+                st->ping_outstanding = 1;
         }
 
         return r;
@@ -543,8 +532,8 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
         st = (struct serial_state *)conn;
         if (st->inited != 1) {
                 return SERIAL_ERR_STATE;
-        } 
-        
+        }
+
         for (;;) {
                 r = read_frame(st->fd, chunk);
                 if (r != SERIAL_OK) {
@@ -561,7 +550,8 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
                         return SERIAL_OK;
                 }
 
-                /* write_frame directly so the ping does not set ping_outstanding */
+                /* write_frame directly so the ping does not set
+                 * ping_outstanding */
                 r = write_frame(st->fd, chunk);
                 if (r != SERIAL_OK) {
                         return r;

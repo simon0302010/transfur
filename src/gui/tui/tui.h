@@ -1,12 +1,23 @@
 #ifndef TUI_H
 #define TUI_H
 
-#include <stddef.h>
 #include "raw.h"
 #include <stdbool.h>
+#include <stddef.h>
 
 enum tui_key {
-        KEY_NONE, KEY_CHAR, KEY_ENTER, KEY_BACKSPACE, KEY_TAB, KEY_SHIFT_TAB, KEY_ESC, KEY_ARROW_UP, KEY_ARROW_DOWN, KEY_ARROW_RIGHT, KEY_ARROW_LEFT, KEY_DELETE
+        KEY_NONE,
+        KEY_CHAR,
+        KEY_ENTER,
+        KEY_BACKSPACE,
+        KEY_TAB,
+        KEY_SHIFT_TAB,
+        KEY_ESC,
+        KEY_ARROW_UP,
+        KEY_ARROW_DOWN,
+        KEY_ARROW_RIGHT,
+        KEY_ARROW_LEFT,
+        KEY_DELETE
 };
 
 struct tui_event {
@@ -14,7 +25,13 @@ struct tui_event {
         char ch;
 };
 
-enum renderable_type { RENDERABLE_GROUP, TEXT, PROGRESS_BAR, TEXT_INPUT, LOADING_BAR };
+enum renderable_type {
+        RENDERABLE_GROUP,
+        TEXT,
+        PROGRESS_BAR,
+        TEXT_INPUT,
+        LOADING_BAR
+};
 
 struct renderable {
         enum renderable_type type;
@@ -46,7 +63,8 @@ struct text_input_options {
    we ask the focused widget if it is willing to handle the event
    if this returns false, the widget doesn't care about that event
 */
-bool renderable_handle_event(struct tui_event event, struct renderable renderable);
+bool renderable_handle_event(struct tui_event event,
+                             struct renderable renderable);
 
 void update_content(struct renderable renderables[], size_t count, double dt);
 
@@ -64,6 +82,7 @@ struct renderable create_progress_bar(struct progress_bar_options *options,
 struct renderable create_loading_bar(struct loading_bar_options *options,
                                      size_t size);
 
-struct renderable create_text_input(struct text_input_options *options, size_t size);
+struct renderable create_text_input(struct text_input_options *options,
+                                    size_t size);
 
 #endif

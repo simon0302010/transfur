@@ -14,7 +14,8 @@ static void put_be32(unsigned char *dst, unsigned long v) {
 }
 
 static unsigned long get_be32(const unsigned char *src) {
-        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) | ((unsigned long)src[2] << 8) | (unsigned long)src[3];     
+        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) |
+               ((unsigned long)src[2] << 8) | (unsigned long)src[3];
 }
 
 int main(void) {
@@ -56,8 +57,9 @@ int main(void) {
 
         len = get_be32(in.length);
         printf("read %lu bytes: %.*s\n", len, (int)len, in.data);
-        
-        if (len < (unsigned long)strlen(MESSAGE) || memcmp(in.data, MESSAGE, strlen(MESSAGE)) != 0) {
+
+        if (len < (unsigned long)strlen(MESSAGE) ||
+            memcmp(in.data, MESSAGE, strlen(MESSAGE)) != 0) {
                 printf("payload mismatch\n");
                 failed = 1;
         }

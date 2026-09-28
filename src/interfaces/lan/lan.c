@@ -287,7 +287,7 @@ static long lan_socket_send(lan_sock socket, const unsigned char *buf,
 
         do {
                 n = send(socket, (const char *)buf, (int)len, 0);
-        } while (n == SOCKET_ERROR &&  WSAGetLastError() == WSAEINTR);
+        } while (n == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 
         return (long)n;
 }
@@ -300,7 +300,7 @@ static long lan_socket_recv(lan_sock socket, unsigned char *buf, size_t len) {
                 n = recv(socket, (char *)buf, (int)len, 0);
         } while (n == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 
-            return (long)n;
+        return (long)n;
 }
 
 /* winsock has no SIGPIPE */

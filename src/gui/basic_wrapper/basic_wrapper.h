@@ -3,7 +3,6 @@
 #ifndef BASIC_WRAPPER_H
 #define BASIC_WRAPPER_H
 
-
 struct color {
         int r;
         int g;

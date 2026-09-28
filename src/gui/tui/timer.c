@@ -1,8 +1,8 @@
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199309L
 #endif
-#include <time.h>
 #include "timer.h"
+#include <time.h>
 
 double get_time_seconds(void) {
         struct timespec ts;
