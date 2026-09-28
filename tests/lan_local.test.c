@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "src/interfaces/lan/lan.h"
+#include "../src/interfaces/lan/lan.h"
 
 #define T_DATA 0
 

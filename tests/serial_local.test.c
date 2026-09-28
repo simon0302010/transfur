@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "src/interfaces/file/file.h"
-#include "src/interfaces/serial/serial.h"
+#include "../src/interfaces/file/file.h"
+#include "../src/interfaces/serial/serial.h"
 
 #define T_DATA 0
 #define T_DONE 1

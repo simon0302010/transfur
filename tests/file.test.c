@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "src/interfaces/file/file.h"
+#include "../src/interfaces/file/file.h"
 
 #define TEST_PATH "/tmp/testing.bin"
 #define MESSAGE "hello my sweet pookies"
