@@ -1,5 +1,7 @@
 #include <string.h>
 
+#include "../../misc/bool.h"
+
 #include "sdl3/basic_wrapper.h"
 
 #define CHAR_PATTERN_WIDTH 5
@@ -217,18 +219,18 @@ void draw_text(char *text, int x, int y, int size, struct color color) {
                                 basic_fill_rect(base_x, base_y, size, size,
                                                 color);
                         } else if (size > 1) {
-                                bool has_up =
+                                tbool has_up =
                                     (row > 0 &&
                                      pattern[(row - 1) * CHAR_PATTERN_WIDTH +
                                              col] == '1');
-                                bool has_down =
+                                tbool has_down =
                                     (pattern[(row + 1) * CHAR_PATTERN_WIDTH +
                                              col] == '1');
-                                bool has_left =
+                                tbool has_left =
                                     (col > 0 &&
                                      pattern[row * CHAR_PATTERN_WIDTH +
                                              (col - 1)] == '1');
-                                bool has_right =
+                                tbool has_right =
                                     (col < CHAR_PATTERN_WIDTH - 1 &&
                                      pattern[row * CHAR_PATTERN_WIDTH +
                                              (col + 1)] == '1');

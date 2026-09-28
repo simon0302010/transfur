@@ -1,10 +1,11 @@
+#include "../../misc/bool.h"
+
 #include "basic.h"
 #include "text.h"
-#include <stdbool.h>
 
 void run_basic(char *title, int width, int height,
                struct basic_renderable renderables[], size_t count) {
-        bool running = true;
+        tbool running = true;
         struct color color;
         struct basic_event event;
 

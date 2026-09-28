@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "../../misc/bool.h"
 #include "raw.h"
@@ -55,10 +56,9 @@ void render_content(struct renderable renderables[], size_t count) {
                         int progress_chars;
                         int remaining_width;
                         char progress_string[8];
-                        KOmmst
-                            /* Turns XX% into a string */
-                            sprintf(progress_string, "%i%%",
-                                    (int)(*(options->progress) * 100));
+                        /* Turns XX% into a string */
+                        sprintf(progress_string, "%i%%",
+                                (int)(*(options->progress) * 100));
 
                         /* Calculate the widths now that we have progress_string
                          */
@@ -267,8 +267,8 @@ static struct tui_event read_key_event(void) {
         return event;
 }
 
-bool renderable_handle_event(struct tui_event event,
-                             struct renderable renderable) {
+tbool renderable_handle_event(struct tui_event event,
+                              struct renderable renderable) {
         if (renderable.type == TEXT_INPUT) {
                 struct text_input_options *options =
                     (struct text_input_options *)renderable.content;
@@ -304,7 +304,7 @@ bool renderable_handle_event(struct tui_event event,
 }
 
 void run_tui(struct renderable renderables[], size_t count) {
-        bool running = true;
+        tbool running = true;
         int ret;
         char ch;
         struct pollfd pfd;
@@ -319,7 +319,7 @@ void run_tui(struct renderable renderables[], size_t count) {
         /* if -1, nothing is focused */
         int focus_index = -1;
         struct tui_event event;
-        bool handled;
+        tbool handled;
         size_t i;
 
         enable_raw_mode();

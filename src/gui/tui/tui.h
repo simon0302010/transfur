@@ -55,15 +55,15 @@ struct text_input_options {
         char *buffer;
         size_t max_len;
         size_t cursor;
-        bool is_focused;
+        tbool is_focused;
 };
 
 /* when a key event occurs
    we ask the focused widget if it is willing to handle the event
    if this returns false, the widget doesn't care about that event
 */
-bool renderable_handle_event(struct tui_event event,
-                             struct renderable renderable);
+tbool renderable_handle_event(struct tui_event event,
+                              struct renderable renderable);
 
 void update_content(struct renderable renderables[], size_t count, double dt);
 
