@@ -2,6 +2,7 @@
 #include <windows.h>
 #elif defined(__MSDOS__)
 #include <dos.h>
+#include <time.h>
 #else
 #include <time.h>
 #endif
@@ -23,62 +24,30 @@ void sleep_ms(unsigned int ms) {
 #endif
 }
 
-struct td get_unix_time(void) {
-        struct td elapsed = {0, 0};
-
+double get_unix_time(void) {
 #ifdef _WIN32
         SYSTEMTIME st;
+        FILETIME ft;
+        ULARGE_INTEGER uli;
 
         GetSystemTime(&st);
+        SystemTimeToFileTime(&st, &ft);
 
-        elapsed =
-            get_unix_time_from_date(st.wYear, st.wMonth, st.wDay, st.wHour,
-                                    st.wMinute, st.wSecond, st.wMilliseconds);
+        uli.LowPart = ft.dwLowDateTime;
+        uli.HighPart = ft.dwHighDateTime;
+
+        /* Windows FILETIME starts Jan 1, 1601 in 100-ns intervals.
+           Subtract 11644473600 seconds to reach Unix Epoch (Jan 1, 1970). */
+        return (double)(uli.QuadPart - 116444736000000000ULL) / 10000000.0;
 #elif defined(__MSDOS__) || defined(__TURBOC__)
-        elapsed.seconds = time(NULL);
+        time_t now = time(NULL);
+        clock_t ticks = clock();
+        double subsecond =
+            (double)(ticks % CLOCKS_PER_SEC) / (double)CLOCKS_PER_SEC;
+        return (double)now + subsecond;
 #else
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
-        elapsed.seconds = (time_sec_t)ts.tv_sec;
-        elapsed.microseconds = (time_sec_t)ts.tv_nsec / 1000L;
+        return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
 #endif
-
-        return elapsed;
-}
-
-char is_leap_year(short year) {
-        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-}
-
-struct td get_unix_time_from_date(short year, short month, short day,
-                                  short hour, short minute, short second,
-                                  short millisecond) {
-        int i;
-        short days_per_month[12] = {31, 28, 31, 30, 31, 30,
-                                    31, 31, 30, 31, 30, 31};
-        struct td elapsed = {0, 0};
-
-        if (year < 1970)
-                return elapsed;
-
-        for (i = 1970; i < year; i++) {
-                if (is_leap_year(i))
-                        elapsed.seconds += 31622400L; /* Leap year */
-                else
-                        elapsed.seconds += 31536000L;
-        }
-
-        if (is_leap_year(year))
-                days_per_month[1] = 29;
-
-        for (i = 0; i < month - 1; i++) /* -1 to exclude current month */
-                elapsed.seconds += (time_sec_t)days_per_month[i] * 86400L;
-
-        elapsed.seconds += (time_sec_t)(day - 1) * 86400L;
-        elapsed.seconds += (time_sec_t)hour * 3600;
-        elapsed.seconds += (time_sec_t)minute * 60;
-        elapsed.seconds += second;
-        elapsed.microseconds += (time_sec_t)millisecond * 1000;
-
-        return elapsed;
 }
