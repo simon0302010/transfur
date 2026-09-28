@@ -105,6 +105,7 @@ int main(int argc, char **argv) {
                                 return 1;
                         }
                         total += len;
+#include <poll.h>
                         chunks++;
                         alarm(TIMEOUT_SECONDS);
                 }

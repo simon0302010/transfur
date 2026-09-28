@@ -1,7 +1,7 @@
-#include <stdbool.h>
-
 #ifndef BASIC_WRAPPER_H
 #define BASIC_WRAPPER_H
+
+#include "../../../misc/bool.h"
 
 struct color {
         int r;
@@ -35,7 +35,7 @@ void basic_begin_frame(void);
 
 void basic_present(void);
 
-bool basic_poll_event(struct basic_event *event);
+tbool basic_poll_event(struct basic_event *event);
 
 double basic_get_time(void);
 

@@ -1,8 +1,7 @@
 #ifndef TUI_H
 #define TUI_H
 
-#include "raw.h"
-#include <stdbool.h>
+#include "../../misc/bool.h"
 #include <stddef.h>
 
 enum tui_key {

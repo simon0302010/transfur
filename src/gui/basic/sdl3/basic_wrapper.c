@@ -73,7 +73,7 @@ void basic_fill_rect(int x, int y, int w, int h, struct color color) {
 
 double basic_get_time(void) { return (double)SDL_GetTicksNS() / 1e9; }
 
-bool basic_poll_event(struct basic_event *event) {
+tbool basic_poll_event(struct basic_event *event) {
         SDL_Event sdl_event;
 
         event->type = BASIC_EVENT_NONE;

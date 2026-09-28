@@ -7,7 +7,7 @@
 #include <time.h>
 #endif
 
-#include "transfur_time.h"
+#include "ttime.h"
 
 void sleep_ms(unsigned int ms) {
 #ifdef _WIN32

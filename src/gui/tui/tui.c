@@ -1,14 +1,14 @@
 #include "tui.h"
 #include "raw.h"
-#include "timer.h"
 #include <poll.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
+
+#include "../../misc/bool.h"
+#include "raw.h"
 
 /* #define WIDTH_OVERRIDE 0 */
 #define USE_ANSI
@@ -55,10 +55,10 @@ void render_content(struct renderable renderables[], size_t count) {
                         int progress_chars;
                         int remaining_width;
                         char progress_string[8];
-
-                        /* Turns XX% into a string */
-                        sprintf(progress_string, "%i%%",
-                                (int)(*(options->progress) * 100));
+                        KOmmst
+                            /* Turns XX% into a string */
+                            sprintf(progress_string, "%i%%",
+                                    (int)(*(options->progress) * 100));
 
                         /* Calculate the widths now that we have progress_string
                          */

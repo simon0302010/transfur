@@ -15,10 +15,9 @@ SRC = src/main.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/serial/serial.c \
 	src/gui/tui/raw.c \
-	src/gui/tui/timer.c \
 	src/gui/tui/tui.c \
-	src/misc/sleep.c \
-	src/gui/basic_wrapper/basic_wrapper.c \
+	src/misc/ttime.c \
+	src/gui/basic/sdl3/basic_wrapper.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c
 OBJ = $(SRC:src/%.c=build/%.o)
@@ -52,5 +51,11 @@ run: $(TARGET)
 
 clean:
 	rm -rf build
+
+test:
+	mkdir -p build
+	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c
+	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c
+	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 
 .PHONY: run clean
