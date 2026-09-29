@@ -9,6 +9,8 @@
 #include <unistd.h>
 
 #include "../../misc/bool.h"
+#include "../../misc/console.h"
+#include "../../misc/ttime.h"
 #include "raw.h"
 
 /* #define WIDTH_OVERRIDE 0 */
@@ -29,9 +31,8 @@ void render_content(struct renderable renderables[], size_t count) {
 #ifdef WIDTH_OVERRIDE
         width = WIDTH_OVERRIDE;
 #else
-        struct winsize w;
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-        width = w.ws_col;
+        /* Works on Windows, MS-DOS and POSIX systems */
+        width = get_console_size().columns;
 #endif
 
         for (i = 0; i < count; i++) {
@@ -327,10 +328,10 @@ void run_tui(struct renderable renderables[], size_t count) {
         pfd.fd = STDIN_FILENO;
         pfd.events = POLLIN;
 
-        prev_time = get_time_seconds();
+        prev_time = get_unix_time();
 
         while (running) {
-                current_time = get_time_seconds();
+                current_time = get_unix_time();
                 dt = current_time - prev_time;
                 prev_time = current_time;
 
@@ -342,7 +343,7 @@ void run_tui(struct renderable renderables[], size_t count) {
 
                 render_content(renderables, count);
 
-                elapsed = get_time_seconds() - current_time;
+                elapsed = get_unix_time() - current_time;
                 if (elapsed < target_frame_duration) {
                         timeout_ms =
                             (int)((target_frame_duration - elapsed) * 1000.0);

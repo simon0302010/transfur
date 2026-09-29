@@ -1,22 +1,18 @@
 
 /* #include "gui/gui.h" */
 
-#include "gui/basic/basic.h"
-/* For commented-out parts of the code
+/* #include "gui/basic/basic.h" */
 #include "gui/tui/tui.h"
-#include "misc/sleep.h"
-*/
 
 int main(void) {
-        struct basic_renderable renderables[1];
+        /* struct basic_renderable renderables[1]; */
 
         /* TODO: make this have renderables */
-        run_basic("Transfur (Basic GUI Test)", 1080, 720, renderables, 0);
+        /* run_basic("Transfur (Basic GUI Test)", 1080, 720, renderables, 0); */
 
         /* TODO: merge TUI and basic GUI renderables into a single thing
          * suppored by both */
 
-        /*
         struct renderable my_content[4];
         struct progress_bar_options my_options;
         struct loading_bar_options loading_bar_options;
@@ -40,18 +36,16 @@ int main(void) {
         my_content[2] = create_loading_bar(&loading_bar_options,
                                            sizeof(loading_bar_options));
 
-
         text_input_options.buffer = text_buffer;
         text_input_options.cursor = 0;
         text_input_options.is_focused = false;
         text_input_options.label = title;
         text_input_options.max_len = 50;
 
-        my_content[3] = create_text_input(&text_input_options,
-        sizeof(text_input_options));
+        my_content[3] =
+            create_text_input(&text_input_options, sizeof(text_input_options));
 
         run_tui(my_content, 4);
-        */
 
         /*
         if (run_gui("Transfur") != 0)

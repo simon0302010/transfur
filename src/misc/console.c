@@ -1,0 +1,31 @@
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__MSDOS__) || defined(__TURBOC__)
+#include <conio.h>
+#else
+#include <sys/ioctl.h>
+#endif
+
+#include "console.h"
+
+struct consolesize get_console_size(void) {
+        struct consolesize cs = {0, 0};
+
+#if defined(_WIN32)
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        cs.rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+        cs.columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#elif defined(__MSDOS__) || defined(__TURBOC__)
+        struct text_info info;
+        gettextinfo(&info);
+        cs.rows = info.screenheight;
+        cs.columns = info.screenwidth;
+#else
+        struct winsize max;
+        ioctl(0, TIOCGWINSZ, &max);
+        cs.rows = max.ws_row;
+        cs.columns = max.ws_col;
+#endif
+        return cs;
+}
