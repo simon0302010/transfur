@@ -68,7 +68,7 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
                 return 1;
         }
 
-        file = fopen(st->path, "a");
+        file = fopen(st->path, "ab");
         if (file == NULL) {
                 return 1;
         }
@@ -88,7 +88,7 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
 
         st = (struct file_state *)conn;
 
-        file = fopen(st->path, "r");
+        file = fopen(st->path, "rb");
         if (file == NULL) {
                 return 1;
         }

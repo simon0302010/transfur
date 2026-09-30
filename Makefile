@@ -22,23 +22,21 @@ SRC = src/main.c \
 	src/gui/basic/text.c \
 	src/misc/console.c \
 	src/gui/tui/input.c
-OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c
-	LDLIBS += -lX11
-	CFLAGS += -D_POSIX_C_SOURCE=199309
+	LDLIBS += -lX11 $(shell pkg-config --libs sdl3)
+	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lm
 endif
 
-CFLAGS += $(shell pkg-config --cflags sdl3)
-LDLIBS += $(shell pkg-config --libs sdl3)
+OBJ = $(SRC:src/%.c=build/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
