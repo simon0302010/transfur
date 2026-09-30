@@ -20,7 +20,8 @@ SRC = src/main.c \
 	src/gui/basic/sdl3/basic_wrapper.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c \
-	src/misc/console.c
+	src/misc/console.c \
+	src/gui/tui/input.c
 OBJ = $(SRC:src/%.c=build/%.o)
 
 ifeq ($(OS),Windows_NT)

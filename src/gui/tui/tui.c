@@ -1,17 +1,18 @@
 #include "tui.h"
 #include "raw.h"
-#include <poll.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 #include "../../misc/bool.h"
 #include "../../misc/console.h"
 #include "../../misc/ttime.h"
+#if !defined(_WIN32) && !defined(__MSDOS__)
 #include "raw.h"
+#endif
+
+#include "input.h"
 
 /* #define WIDTH_OVERRIDE 0 */
 #define USE_ANSI
@@ -199,75 +200,6 @@ void update_content(struct renderable renderables[], size_t count, double dt) {
         }
 }
 
-static struct tui_event read_key_event(void) {
-        struct tui_event event;
-        char ch;
-
-        event.key = KEY_NONE;
-        event.ch = '\0';
-
-        if (read(STDIN_FILENO, &ch, 1) <= 0) {
-                return event;
-        }
-
-        if (ch == '\r' || ch == '\n') {
-                event.key = KEY_ENTER;
-        } else if (ch == '\t') {
-                event.key = KEY_TAB;
-        } else if (ch == 127 || ch == '\b') {
-                event.key = KEY_BACKSPACE;
-        } else if (ch == 27) {
-                /* esc or an ANSI sequence */
-                struct pollfd pfd;
-                char seq[3];
-
-                pfd.fd = STDIN_FILENO;
-                pfd.events = POLLIN;
-
-                if (poll(&pfd, 1, 25) > 0 && (pfd.revents & POLLIN)) {
-                        if (read(STDIN_FILENO, &seq[0], 1) > 0 &&
-                            seq[0] == '[') {
-                                /* this is an ansi sequence */
-                                if (read(STDIN_FILENO, &seq[1], 1) > 0) {
-                                        switch (seq[1]) {
-                                        case 'A':
-                                                event.key = KEY_ARROW_UP;
-                                                break;
-                                        case 'B':
-                                                event.key = KEY_ARROW_DOWN;
-                                                break;
-                                        case 'C':
-                                                event.key = KEY_ARROW_RIGHT;
-                                                break;
-                                        case 'D':
-                                                event.key = KEY_ARROW_LEFT;
-                                                break;
-                                        case 'Z':
-                                                event.key = KEY_SHIFT_TAB;
-                                                break;
-                                        case '3':
-                                                if (read(STDIN_FILENO, &seq[2],
-                                                         1) > 0 &&
-                                                    seq[2] == '~') {
-                                                        event.key = KEY_DELETE;
-                                                }
-                                                break;
-                                        default:
-                                                break;
-                                        }
-                                }
-                        }
-                } else {
-                        event.key = KEY_ESC;
-                }
-        } else if ((unsigned char)ch >= 32 && (unsigned char)ch <= 126) {
-                event.key = KEY_CHAR;
-                event.ch = ch;
-        }
-
-        return event;
-}
-
 tbool renderable_handle_event(struct tui_event event,
                               struct renderable renderable) {
         if (renderable.type == TEXT_INPUT) {
@@ -286,7 +218,8 @@ tbool renderable_handle_event(struct tui_event event,
                         break;
                 case KEY_BACKSPACE:
                         /* TODO: Acocount for cursor position */
-                        options->buffer[len - 1] = '\0';
+                        if (len > 0)
+                                options->buffer[len - 1] = '\0';
                         break;
 
                 case KEY_DELETE: /* TODO: handle the below */
@@ -306,9 +239,7 @@ tbool renderable_handle_event(struct tui_event event,
 
 void run_tui(struct renderable renderables[], size_t count) {
         tbool running = true;
-        int ret;
         char ch;
-        struct pollfd pfd;
         int timeout_ms;
         double current_time;
         double prev_time;
@@ -323,10 +254,9 @@ void run_tui(struct renderable renderables[], size_t count) {
         tbool handled;
         size_t i;
 
+#if !defined(_WIN32) && !defined(__MSDOS__)
         enable_raw_mode();
-
-        pfd.fd = STDIN_FILENO;
-        pfd.events = POLLIN;
+#endif
 
         prev_time = get_unix_time();
 
@@ -351,9 +281,8 @@ void run_tui(struct renderable renderables[], size_t count) {
                         timeout_ms = 0;
                 }
 
-                ret = poll(&pfd, 1, timeout_ms);
-                if (ret > 0 && (pfd.revents & POLLIN)) {
-                        event = read_key_event(); /* TODO: implement */
+                event = poll_key_event(timeout_ms);
+                if (event.key != KEY_NONE) {
                         handled = false;
 
                         /* navigation keys */
@@ -410,8 +339,9 @@ void run_tui(struct renderable renderables[], size_t count) {
                         }
                 }
         }
-
+#if !defined(_WIN32) && !defined(__MSDOS__)
         disable_raw_mode();
+#endif
 }
 
 struct renderable create_text(int length, char *content) {
