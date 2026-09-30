@@ -23,7 +23,8 @@ struct consolesize get_console_size(void) {
         cs.columns = info.screenwidth;
 #else
         struct winsize max;
-        ioctl(0, TIOCGWINSZ, &max);
+        if (ioctl(0, TIOCGWINSZ, &max) < 0)
+                return cs;
         cs.rows = max.ws_row;
         cs.columns = max.ws_col;
 #endif

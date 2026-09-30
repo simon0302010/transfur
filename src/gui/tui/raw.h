@@ -1,4 +1,4 @@
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#if !defined(_WIN32) && !defined(__MSDOS__) && !defined(__TURBOC__)
 
 #include <termios.h>
 
