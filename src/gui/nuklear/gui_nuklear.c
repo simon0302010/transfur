@@ -33,7 +33,7 @@ static char sender_options[128] = "";
 static int receiver_connected = 0;
 static int sender_connected = 0;
 
-static void calculator(const char *title, struct nk_context *ctx, int width,
+static void nk_gui(const char *title, struct nk_context *ctx, int width,
                        int height) {
         if (nk_begin(ctx, title, nk_rect(0, 0, width, height), 0)) {
                 ctx->style.menu_button = ctx->style.button;
@@ -160,4 +160,4 @@ static void calculator(const char *title, struct nk_context *ctx, int width,
         nk_end(ctx);
 }
 
-int run_gui(const char *title) { return run_gui_nuklear(title, calculator); }
+int run_gui(const char *title) { return run_gui_nuklear(title, nk_gui); }
