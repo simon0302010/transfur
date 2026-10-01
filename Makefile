@@ -4,8 +4,8 @@ LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
 	OS_NAME := windows
-else 
-	OS_NAME := $(shell uname -s)
+else
+	OS_NAME := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 endif
 
 TARGET = build/$(OS_NAME)/transfur
@@ -17,7 +17,6 @@ SRC = src/main.c \
 	src/gui/tui/raw.c \
 	src/gui/tui/tui.c \
 	src/misc/ttime.c \
-	src/gui/basic/sdl3/basic_wrapper.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c \
 	src/misc/console.c \
@@ -27,7 +26,7 @@ ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
 	LDLIBS += -lX11 $(shell pkg-config --libs sdl3)
 	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)

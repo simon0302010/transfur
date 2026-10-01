@@ -1,8 +1,8 @@
-
-/* #include "gui/gui.h" */
-
-/* #include "gui/basic/basic.h" */
+#ifdef USE_BASIC_GUI
 #include "gui/tui/tui.h"
+#else
+#include "gui/gui.h"
+#endif
 
 int main(void) {
         /* struct basic_renderable renderables[1]; */
@@ -13,6 +13,7 @@ int main(void) {
         /* TODO: merge TUI and basic GUI renderables into a single thing
          * suppored by both */
 
+#ifdef USE_BASIC_GUI
         struct renderable my_content[4];
         struct progress_bar_options my_options;
         struct loading_bar_options loading_bar_options;
@@ -46,11 +47,10 @@ int main(void) {
             create_text_input(&text_input_options, sizeof(text_input_options));
 
         run_tui(my_content, 4);
-
-        /*
+#else
         if (run_gui("Transfur") != 0)
                 perror("gui_init");
-        */
+#endif
 
         return 0;
 }

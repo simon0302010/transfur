@@ -27,6 +27,9 @@ static int loading_bar_running = 0;
 static enum interface receiver = if_empty;
 static enum interface sender = if_empty;
 
+static char receiver_options[128] = "";
+static char sender_options[128] = "";
+
 static int receiver_connected = 0;
 static int sender_connected = 0;
 
@@ -76,6 +79,7 @@ static void calculator(const char *title, struct nk_context *ctx, int width,
 
                 if (nk_button_label(ctx, "Initialize connection")) {
                         loading_bar_running = !loading_bar_running;
+                        /*  */
                 }
 
                 nk_spacer(ctx);
@@ -111,6 +115,38 @@ static void calculator(const char *title, struct nk_context *ctx, int width,
                 /* Vertical spacer */
                 nk_layout_row_dynamic(ctx, 10, 1);
 
+                /* Row for option labels */
+                nk_layout_row_template_begin(ctx, 20);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_push_dynamic(ctx);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_end(ctx);
+
+                /* Option labels */
+                nk_label(ctx, "Receiver Options", NK_TEXT_CENTERED);
+                nk_spacer(ctx);
+                nk_label(ctx, "Sender Options", NK_TEXT_CENTERED);
+
+                /* Row for options */
+                nk_layout_row_template_begin(ctx, 20);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_push_dynamic(ctx);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_end(ctx);
+
+                /* Option inputs */
+                nk_edit_string_zero_terminated(
+                    ctx, NK_EDIT_FIELD, receiver_options,
+                    sizeof(receiver_options), nk_filter_default);
+                nk_spacer(ctx);
+                nk_edit_string_zero_terminated(
+                    ctx, NK_EDIT_FIELD, sender_options, sizeof(sender_options),
+                    nk_filter_default);
+
+                /* Vertical spacer */
+                nk_layout_row_dynamic(ctx, 10, 1);
+
+                /* Row for loading bar */
                 nk_layout_row_dynamic(ctx, 20, 1);
 
                 /* Loading bar */
