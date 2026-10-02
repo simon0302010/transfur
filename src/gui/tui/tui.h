@@ -29,7 +29,8 @@ enum renderable_type {
         TEXT,
         PROGRESS_BAR,
         TEXT_INPUT,
-        LOADING_BAR
+        LOADING_BAR,
+        BUTTON
 };
 
 struct renderable {
@@ -58,6 +59,12 @@ struct text_input_options {
         tbool is_focused;
 };
 
+struct button_options {
+        const char *label;
+        tbool is_focused;
+        void (*on_click)(void);
+};
+
 /* when a key event occurs
    we ask the focused widget if it is willing to handle the event
    if this returns false, the widget doesn't care about that event
@@ -83,5 +90,7 @@ struct renderable create_loading_bar(struct loading_bar_options *options,
 
 struct renderable create_text_input(struct text_input_options *options,
                                     size_t size);
+
+struct renderable create_button(struct button_options *options, size_t size);
 
 #endif

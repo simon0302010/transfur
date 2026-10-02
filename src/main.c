@@ -1,8 +1,13 @@
+#include <stdio.h>
+#define USE_BASIC_GUI
+
 #ifdef USE_BASIC_GUI
 #include "gui/tui/tui.h"
 #else
 #include "gui/gui.h"
 #endif
+
+void on_btn_click(void) { /* Nothing for now*/ }
 
 int main(void) {
         /* struct basic_renderable renderables[1]; */
@@ -14,10 +19,11 @@ int main(void) {
          * suppored by both */
 
 #ifdef USE_BASIC_GUI
-        struct renderable my_content[4];
+        struct renderable my_content[5];
         struct progress_bar_options my_options;
         struct loading_bar_options loading_bar_options;
         struct text_input_options text_input_options;
+        struct button_options button_options;
         float progress = 0.54;
         char title[] = "hEllo";
         char text_buffer[50] = "";
@@ -46,7 +52,13 @@ int main(void) {
         my_content[3] =
             create_text_input(&text_input_options, sizeof(text_input_options));
 
-        run_tui(my_content, 4);
+        button_options.label = "btn";
+        button_options.is_focused = false;
+        button_options.on_click = on_btn_click;
+
+        my_content[4] = create_button(&button_options, sizeof(button_options));
+
+        run_tui(my_content, 5);
 #else
         if (run_gui("Transfur") != 0)
                 perror("gui_init");

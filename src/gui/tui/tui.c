@@ -165,6 +165,17 @@ void render_content(struct renderable renderables[], size_t count) {
 
                         break;
                 }
+                case BUTTON: {
+                        struct button_options *options = renderables[i].content;
+
+                        if (options->is_focused) {
+                                printf("[%s]", options->label);
+                        } else {
+                                printf("|%s|", options->label);
+                        }
+
+                        break;
+                }
                 }
         }
 }
@@ -233,6 +244,12 @@ tbool renderable_handle_event(struct tui_event event,
                         break;
                 }
                 return true;
+        } else if (renderable.type = BUTTON) {
+                struct button_options *options = renderable.content;
+
+                /* Click callback */
+                if (event.key == KEY_ENTER)
+                        options->on_click();
         }
         return false;
 }
@@ -296,9 +313,13 @@ void run_tui(struct renderable renderables[], size_t count) {
                                                      (int)count) %
                                                     (int)count;
 
-                                        /* make sure this is foucsable */
+                                        /* Make sure this is foucsable */
+                                        /* TODO: Find a better way to check this
+                                         * when expanding the list of widgets */
                                         if (renderables[new_focus].type ==
-                                            TEXT_INPUT)
+                                                TEXT_INPUT ||
+                                            renderables[new_focus].type ==
+                                                BUTTON)
                                                 break;
                                 }
 
@@ -310,10 +331,23 @@ void run_tui(struct renderable renderables[], size_t count) {
                                              renderables[focus_index]
                                                  .content)
                                             ->is_focused = false;
+                                } else if (renderables[focus_index].type ==
+                                           BUTTON) {
+                                        ((struct button_options *)
+                                             renderables[focus_index]
+                                                 .content)
+                                            ->is_focused = false;
                                 }
+
                                 focus_index = new_focus;
                                 if (renderables[new_focus].type == TEXT_INPUT) {
                                         ((struct text_input_options *)
+                                             renderables[focus_index]
+                                                 .content)
+                                            ->is_focused = true;
+                                } else if (renderables[new_focus].type ==
+                                           BUTTON) {
+                                        ((struct button_options *)
                                              renderables[focus_index]
                                                  .content)
                                             ->is_focused = true;
@@ -405,4 +439,16 @@ struct renderable create_loading_bar(struct loading_bar_options *options,
         new_loading_bar.content = options;
 
         return new_loading_bar;
+}
+
+struct renderable create_button(struct button_options *options, size_t size) {
+        struct renderable new_button;
+
+        new_button.type = BUTTON;
+
+        new_button.content_size = size;
+
+        new_button.content = options;
+
+        return new_button;
 }
