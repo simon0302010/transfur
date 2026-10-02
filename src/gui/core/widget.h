@@ -1,4 +1,4 @@
-enun widget_type {
+enum widget_type {
   WIDGET_TEXT,
   WIDGET_PROGRESS_BAR,
   WIDGET_LOADING_BAR,
