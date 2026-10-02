@@ -244,7 +244,7 @@ tbool renderable_handle_event(struct tui_event event,
                         break;
                 }
                 return true;
-        } else if (renderable.type = BUTTON) {
+        } else if (renderable.type == BUTTON) {
                 struct button_options *options = renderable.content;
 
                 /* Click callback */
