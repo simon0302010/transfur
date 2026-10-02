@@ -34,7 +34,7 @@ static int receiver_connected = 0;
 static int sender_connected = 0;
 
 static void nk_gui(const char *title, struct nk_context *ctx, int width,
-                       int height) {
+                   int height) {
         if (nk_begin(ctx, title, nk_rect(0, 0, width, height), 0)) {
                 ctx->style.menu_button = ctx->style.button;
 
