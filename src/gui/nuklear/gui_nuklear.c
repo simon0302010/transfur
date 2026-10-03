@@ -30,7 +30,7 @@ Needs to implement all functions defined in `gui.h`
 #include <pthread.h>
 
 #else
-#error "Unsupported platform
+#error "Unsupported platform"
 
 #endif
 

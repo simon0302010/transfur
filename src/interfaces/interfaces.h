@@ -31,8 +31,7 @@ enum chunk_type {
 #elif defined(__GNUC__) || defined(__clang__)
 #define PACKED __attribute__((packed))
 #else
-#warning                                                                       \
-    "This compiler is not officially supported. Chunk struct packing may not work as expected."
+#error "Compiler not supported"
 #endif
 
 /* `char` types are being used to guarantee 8-bit values. */

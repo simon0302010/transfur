@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "interfaces.h"
@@ -165,9 +166,9 @@ const enum interface *get_supported_interfaces(void) {
         static const enum interface interfaces[] = {if_file, if_serial,
                                                     if_empty};
 #else
-#warning                                                                       \
-    "Operating system not officially supported. Some features may behave in unexpected ways."
         static const enum interface interfaces[] = {if_file, if_empty};
+        fprintf(stderr,
+                "Warning: Operating system not officially supported.\n");
 #endif
 
         return interfaces;

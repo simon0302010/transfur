@@ -1,5 +1,3 @@
-#include "../../
-
 #if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 
 #include <stdio.h>
