@@ -27,6 +27,7 @@ SRC = src/main.c \
 	src/gui/tui/render.c \
 	src/gui/tui/input.c \
 	src/gui/tui/tui.c \
+	src/gui/tui/widgets/loading_bar.c \
 	src/gui/tui/widgets/text.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c \

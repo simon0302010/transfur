@@ -4,6 +4,7 @@
 #include "input.h"
 #include "raw.h"
 #include "render.h"
+#include "../../misc/ttime.h"
 
 int run_tui(const char *title) {
         struct ui_context ui;
@@ -17,6 +18,8 @@ int run_tui(const char *title) {
         app_init(&ui);
 
         enable_raw_mode();
+
+        prev_time = get_unix_time();
 
         while (ui.running) {
                 current_time = get_unix_time(); /* TODO: make cross-platform */
