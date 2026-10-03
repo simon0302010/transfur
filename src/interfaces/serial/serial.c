@@ -36,9 +36,16 @@ typedef int serial_handle;
 
 typedef HANDLE serial_handle;
 
+#elif defined(__MSDOS__) || defined(__TURBOC__)
+
+#include "dos_serial/dos_serial.h"
+
+typedef int serial_handle;
+
 #endif
 
-#if defined(__linux__) || defined(_WIN32)
+#if defined(__linux__) || defined(_WIN32) || defined(__MSDOS__) ||             \
+    defined(__TURBOC__)
 
 #if defined(__linux__)
 static speed_t lookup_baud(unsigned long v);
@@ -267,6 +274,42 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
         }
 
         return (long)got;
+}
+
+#elif defined(__MSDOS__) || defined(__TURBOC__)
+
+static int serial_port_open(const char *path, unsigned long baud,
+                            serial_handle *out) {
+        int port;
+
+        /* TODO: Can probably be done in a more efficient way */
+        if (strcmp(path, "COM1") == 0) {
+                port = COM_1;
+        } else if (strcmp(path, "COM2") == 0) {
+                port = COM_2;
+        } else if (strcmp(path, "COM3") == 0) {
+                port = COM_3;
+        } else if (strcmp(path, "COM4") == 0) {
+                port = COM_4;
+        } else {
+                return SERIAL_ERR_OPTIONS; /* TODO: I don't know if this is the
+                                              correct error code for this */
+        }
+
+        if (serial_open(port, (long)baud, 8, 'n', 1, SER_HANDSHAKING_NONE) !=
+            SER_SUCCESS)
+                return SERIAL_ERR_OPEN;
+
+        return port;
+}
+
+static long serial_port_send(serial_handle fd, const unsigned char *buf,
+                             size_t len) {
+        return serial_write(fd, (const char *)buf, len);
+}
+
+static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
+        return serial_read(fd, (char *)buf, len);
 }
 
 #endif
@@ -556,7 +599,7 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
 }
 
 #else
-/* apple stubs */
+/* apple stubs 🥀🥀🥀🥀 */
 
 int init_conn_serial(void *conn, const char *port) {
         (void)conn;

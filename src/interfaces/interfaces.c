@@ -161,6 +161,9 @@ const enum interface *get_supported_interfaces(void) {
                                                     if_empty};
 #elif defined(__APPLE__) && defined(__MACH__)
         static const enum interface interfaces[] = {if_file, if_empty};
+#elif defined(__MSDOS__) || defined(__TURBOC__)
+        static const enum interface interfaces[] = {if_file, if_serial,
+                                                    if_empty};
 #else
         static const enum interface interfaces[] = {if_file, if_empty};
 #endif

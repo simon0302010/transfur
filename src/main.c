@@ -1,4 +1,3 @@
-#include <stdio.h>
 #define USE_BASIC_GUI
 
 #ifdef USE_BASIC_GUI
