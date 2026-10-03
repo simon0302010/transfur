@@ -1,9 +1,9 @@
+#include "../app/app.h"
 #include "../core/ui_core.h"
 #include "../core/widget.h"
-#include "raw.h"
-#include "../app/app.h"
-#include "render.h"
 #include "input.h"
+#include "raw.h"
+#include "render.h"
 
 int run_tui(const char *title) {
         struct ui_context ui;
@@ -26,18 +26,22 @@ int run_tui(const char *title) {
                 ui_update(&ui, dt); /* TODO: add dt */
 
                 reset_cursor();
-                
+
                 tui_render(&ui);
 
                 elapsed = get_unix_time() - current_time;
                 if (elapsed < target_frame_duration) {
-                        timeout_ms = (int)((target_frame_duration - elapsed) * 1000.0);
+                        timeout_ms =
+                            (int)((target_frame_duration - elapsed) * 1000.0);
                 } else {
                         timeout_ms = 0;
                 }
 
                 event = tui_poll_key_event(timeout_ms);
-                if (event.key != UI_KEY_NONE) { /* TODO: remove this, it doesn't support mouse events (although IG that doesn't matter in a TUI) */
+                if (event.key !=
+                    UI_KEY_NONE) { /* TODO: remove this, it doesn't support
+                                      mouse events (although IG that doesn't
+                                      matter in a TUI) */
                         ui_handle_event(&ui, &event);
                 }
         }
