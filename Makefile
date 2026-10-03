@@ -35,6 +35,7 @@ SRC = src/main.c \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
 	src/gui/basic/text.c \
+	src/gui/basic/widgets/loading_bar.c \
 	src/gui/basic/widgets/text.c
 
 ifeq ($(OS),Windows_NT)

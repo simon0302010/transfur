@@ -4,12 +4,14 @@
 #include "../core/ui_core.h"
 #include "event.h"
 #include "render.h"
+#include "sdl3/basic_wrapper.h"
 #include "text.h"
 
 void run_basic(char *title, int width, int height) {
         struct color color;
         struct ui_context ui;
         struct ui_event event;
+        double prev_time, current_time, dt;
 
         color.r = 255;
         color.b = 0;
@@ -18,6 +20,8 @@ void run_basic(char *title, int width, int height) {
         ui_init(&ui);
 
         app_init(&ui);
+
+        prev_time = basic_get_time();
 
         basic_init(title, width, height);
 
@@ -30,6 +34,12 @@ void run_basic(char *title, int width, int height) {
                 default:
                         break;
                 }
+
+                current_time = basic_get_time();
+                dt = current_time - prev_time;
+                prev_time = current_time;
+
+                ui_update(&ui, dt);
 
                 basic_begin_frame();
 

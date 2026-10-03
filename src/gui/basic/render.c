@@ -7,7 +7,7 @@ void basic_render(struct ui_context *ctx) {
         int height = 0;
         struct basic_render_details details;
 
-        details.width = 400; /* TODO: Match window */
+        details.width = 800; /* TODO: Match window */
         details.x = 0;
 
         for (i = 0; i < ctx->count; i++) {
@@ -21,10 +21,10 @@ int basic_render_widget(struct widget widget, struct basic_render_details detail
         case WIDGET_TEXT:
                 return basic_render_text_widget(widget, details);
                 break;
-        /*case WIDGET_LOADING_BAR:
-                tui_render_loading_bar_widget(widget, width);
+        case WIDGET_LOADING_BAR:
+                return basic_render_loading_bar_widget(widget, details);
                 break;
-        case WIDGET_PROGRESS_BAR:
+        /*case WIDGET_PROGRESS_BAR:
                 tui_render_progress_bar_widget(widget, width);
                 break;
         case WIDGET_TEXT_INPUT:
