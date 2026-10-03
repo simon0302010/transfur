@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors
+CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
