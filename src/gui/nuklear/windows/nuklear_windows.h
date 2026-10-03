@@ -1,5 +1,3 @@
-#include "../../../platform.h"
-
 #ifdef OS_WINDOWS
 
 #ifndef NUKLEAR_WINDOWS_H

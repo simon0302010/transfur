@@ -1,7 +1,5 @@
 /* TODO: Compile when compiling for DOS */
 
-#include "../../../platform.h"
-
 #if defined(OS_MSDOS)
 
 #include "dos_serial.h"

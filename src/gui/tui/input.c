@@ -1,5 +1,3 @@
-#include "../../platform.h"
-
 #if defined(OS_WINDOWS) || defined(OS_MSDOS)
 #include "../../misc/ttime.h"
 #include <conio.h>

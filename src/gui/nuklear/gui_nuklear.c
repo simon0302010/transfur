@@ -4,7 +4,6 @@ Needs to implement all functions defined in `gui.h`
 */
 
 #include "../../interfaces/interfaces.h"
-#include "../../platform.h"
 #include "../gui.h"
 #include "../nuklear/nuklear.h"
 

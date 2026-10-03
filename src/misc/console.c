@@ -1,5 +1,3 @@
-#include "../platform.h"
-
 #if defined(OS_WINDOWS)
 #include <windows.h>
 #elif defined(OS_MSDOS)

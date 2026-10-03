@@ -1,5 +1,3 @@
-#include "../../../platform.h"
-
 #ifdef OS_WINDOWS
 
 /* nuklear - 1.32.0 - public domain */

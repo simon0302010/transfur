@@ -7,3 +7,5 @@ CompileFlags:
     - -Werror=declaration-after-statement
     - -pedantic-errors
     - -Wno-empty-translation-unit
+    - "-include"
+    - "src/platform.h"

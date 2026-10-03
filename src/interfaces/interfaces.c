@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "../platform.h"
 #include "interfaces.h"
 
 #include "file/file.h"

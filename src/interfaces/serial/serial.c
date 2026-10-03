@@ -18,8 +18,6 @@ not provided, BAUD_RATE will be used. On windows the path is a port name such as
 "\\\\.\\" prefix is added automatically when missing.
 */
 
-#include "../../platform.h"
-
 #include "serial.h"
 #include <string.h>
 

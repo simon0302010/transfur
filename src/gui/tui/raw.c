@@ -1,4 +1,4 @@
-#include "../../platform.h"
+#include "../../
 
 #if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 

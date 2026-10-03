@@ -1,5 +1,3 @@
-#include "../../../platform.h"
-
 #ifdef OS_LINUX
 
 #include <X11/X.h>

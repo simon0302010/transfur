@@ -8,7 +8,6 @@
 #include "../../misc/bool.h"
 #include "../../misc/console.h"
 #include "../../misc/ttime.h"
-#include "../../platform.h"
 #if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 #include "raw.h"
 #endif

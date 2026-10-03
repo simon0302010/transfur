@@ -1,5 +1,3 @@
-#include "../../../platform.h"
-
 #ifdef OS_LINUX
 
 #ifndef NUKLEAR_LINUX_H

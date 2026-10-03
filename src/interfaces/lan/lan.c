@@ -17,8 +17,6 @@ connect
 - "c:<ip>:<port>" >>> connect to given peer
 */
 
-#include "../../platform.h"
-
 #include "lan.h"
 #include <string.h>
 
