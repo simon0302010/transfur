@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "interfaces.h"
 
@@ -7,7 +8,7 @@
 #include "serial/serial.h"
 
 /* Connection slots */
-static unsigned char connections[MAX_CONN][512];
+static unsigned char connections[MAX_CONN][INTERFACE_CONTEXT_SIZE];
 static enum interface connection_types[MAX_CONN];
 
 /*
@@ -110,6 +111,17 @@ int recv_chunk(const int *conn, struct chunk *chunk) {
         }
 
         return 1;
+}
+
+int close_conn(const int *conn) {
+        void *context = get_conn(conn);
+        if (context == NULL)
+                return 1;
+
+        /* This probably creates a bunch of memory leaks lmao */
+        memset(context, 0, INTERFACE_CONTEXT_SIZE);
+
+        return 0;
 }
 
 const char *get_receiver_text(enum interface interface) {

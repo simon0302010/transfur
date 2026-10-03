@@ -3,6 +3,8 @@
 
 /* TODO: Allow user to change this */
 #define CHUNK_SIZE 4096
+/* Context size per interface */
+#define INTERFACE_CONTEXT_SIZE 512
 /* We should not need more than 8 connections */
 #define MAX_CONN 8
 
@@ -102,6 +104,11 @@ Returns `0` if the chunk transfer succeeded or any other code based on the
 error.
 */
 int recv_chunk(const int *conn, struct chunk *chunk);
+
+/*
+Terminates a connection.
+*/
+int close_conn(const int *conn);
 
 const char *get_receiver_text(enum interface interface);
 
