@@ -4,14 +4,12 @@
 
 #define APP_WIDGET_COUNT 1
 
+static struct widget widgets[APP_WIDGET_COUNT];
+static char title[50] = "Hello, welcome to Transfur.";
+
 void app_init(struct ui_context *ctx) {
-        struct widget widgets[APP_WIDGET_COUNT];
-        size_t count = APP_WIDGET_COUNT;
-
-        char title[50] = "Hello, welcome to Transfur.";
-
         widgets[0] = widget_text(50, title);
 
         ctx->widgets = widgets;
-        ctx->count = count;
+        ctx->count = APP_WIDGET_COUNT;
 }

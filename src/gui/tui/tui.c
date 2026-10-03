@@ -2,6 +2,7 @@
 #include "../core/widget.h"
 #include "raw.h"
 #include "../app/app.h"
+#include "render.h"
 
 int run_tui(const char *title) {
         struct ui_context ui;
@@ -22,7 +23,8 @@ int run_tui(const char *title) {
                 ui_update(&ui, 0); /* TODO: add dt */
 
                 reset_cursor();
-                /* TODO: render widgets */
+                
+                tui_render(&ui);
         }
 
         disable_raw_mode();

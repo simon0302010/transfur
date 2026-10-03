@@ -14,13 +14,23 @@ SRC = src/main.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/serial/serial.c \
-	src/gui/tui/raw.c \
-	src/gui/tui/tui.c \
+	src/misc/console.c \
 	src/misc/ttime.c \
+	src/gui/app/app.c \
+	src/gui/core/ui_core.c \
+	src/gui/core/widgets/group.c \
+	src/gui/core/widgets/loading_bar.c \
+	src/gui/core/widgets/progress_bar.c \
+	src/gui/core/widgets/text.c \
+	src/gui/core/widgets/text_input.c \
+	src/gui/tui/raw.c \
+	src/gui/tui/render.c \
+	src/gui/tui/tui.c \
+	src/gui/tui/widgets/text.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c \
-	src/misc/console.c \
-	src/gui/tui/input.c
+	src/gui/basic/widgets/text.c
+
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
