@@ -12,6 +12,14 @@ Must be passed to `init_conn` in interfaces.c.
 */
 enum interface { if_empty, if_lan, if_serial, if_file };
 
+#if defined(__TURBOC__) || defined(__BORLANDC__)
+#pragma option -a-
+#elif defined(_MSC_VER)
+#pragma pack(push, 1)
+#elif defined(__GNUC__) || defined(__clang__)
+#define PACKED __attribute__((packed))
+#endif
+
 /* `char` types are being used to guarantee 8-bit values. */
 struct chunk {
         /*
@@ -56,6 +64,12 @@ struct chunk {
         */
         unsigned char checksum[8];
 };
+
+#if defined(__TURBOC__) || defined(__BORLANDC__)
+#pragma option -a
+#elif defined(_MSC_VER)
+#pragma pack(pop)
+#endif
 
 /*
 Initializes a new connection via the specified protocol.
