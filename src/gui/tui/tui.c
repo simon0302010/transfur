@@ -1,10 +1,10 @@
+#include "../../misc/ttime.h"
 #include "../app/app.h"
 #include "../core/ui_core.h"
 #include "../core/widget.h"
 #include "input.h"
 #include "raw.h"
 #include "render.h"
-#include "../../misc/ttime.h"
 
 int run_tui(const char *title) {
         struct ui_context ui;
@@ -41,12 +41,7 @@ int run_tui(const char *title) {
                 }
 
                 event = tui_poll_key_event(timeout_ms);
-                if (event.key !=
-                    UI_KEY_NONE) { /* TODO: remove this, it doesn't support
-                                      mouse events (although IG that doesn't
-                                      matter in a TUI) */
-                        ui_handle_event(&ui, &event);
-                }
+                ui_handle_event(&ui, &event);
         }
 
         disable_raw_mode();

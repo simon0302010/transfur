@@ -60,11 +60,14 @@ struct ui_event tui_poll_key_event(int timeout_ms) {
         char ch;
         int res;
 
+        event.type = UI_EVENT_NONE;
         event.key = UI_KEY_NONE;
         event.ch = '\0';
 
         if (poll_key(&ch, timeout_ms) <= 0)
                 return event;
+
+        event.type = UI_EVENT_KEY_DOWN;
 
         if (ch == '\r' || ch == '\n') {
                 event.key = UI_KEY_ENTER;

@@ -22,6 +22,7 @@ enum ui_key {
 };
 
 enum ui_event_type {
+        UI_EVENT_NONE,
         UI_EVENT_QUIT,
         UI_EVENT_KEY_DOWN,
         UI_EVENT_KEY_UP,
