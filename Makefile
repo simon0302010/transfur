@@ -27,12 +27,12 @@ ifeq ($(OS),Windows_NT)
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
-	LDLIBS += -lX11 $(shell pkg-config --libs sdl3)
+	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
 	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += $(shell pkg-config --cflags sdl2)
-	LDLIBS = $(shell pkg-config --libs sdl2) -lm
+	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm 
 endif
 
 OBJ = $(SRC:src/%.c=build/%.o)
