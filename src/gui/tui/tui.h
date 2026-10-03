@@ -39,26 +39,6 @@ struct renderable {
         void *content;
 };
 
-struct progress_bar_options {
-        float *progress;
-        char *title;
-};
-
-struct loading_bar_options {
-        char *title;
-        size_t offset;
-        float speed;
-        float accumulator;
-};
-
-struct text_input_options {
-        const char *label;
-        char *buffer;
-        size_t max_len;
-        size_t cursor;
-        tbool is_focused;
-};
-
 struct button_options {
         const char *label;
         tbool is_focused;

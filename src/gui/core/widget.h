@@ -13,9 +13,3 @@ struct widget {
         size_t content_size;
         void *content;
 };
-
-struct widget widget_text(int length, const char *content);
-struct widget widget_progress_bar(struct progress_bar_options *opts);
-struct widget widget_loading_bar(struct loading_bar_options *opts);
-struct widget widget_text_input(struct text_input_options *opts);
-struct widget widget_group(struct widget *children, size_t count);
