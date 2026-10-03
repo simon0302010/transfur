@@ -12,7 +12,7 @@ struct ui_context {
         tbool running;
 };
 
-void ui_init(struct ui_context *ctx, struct widget *widgets, size_t count);
+void ui_init(struct ui_context *ctx);
 tbool ui_handle_event(struct ui_context *ctx, const struct ui_event *event);
 void ui_update(struct ui_context *ctx, double dt);
 

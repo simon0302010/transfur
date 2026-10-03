@@ -1,13 +1,17 @@
 #include "../core/ui_core.h"
 #include "../core/widget.h"
 #include "raw.h"
+#include "../app/app.h"
 
-int run_tui(const char *title, struct widget *widgets, size_t count) {
+int run_tui(const char *title) {
         struct ui_context ui;
         /* struct ui_event event; */
         int timeout_ms;
 
-        ui_init(&ui, widgets, count);
+        ui_init(&ui);
+
+        app_init(&ui);
+
         enable_raw_mode();
 
         while (ui.running) {

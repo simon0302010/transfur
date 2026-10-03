@@ -1,8 +1,6 @@
 #include "ui_core.h"
 
-void ui_init(struct ui_context *ctx, struct widget *widgets, size_t count) {
-        ctx->widgets = widgets;
-        ctx->count = count;
+void ui_init(struct ui_context *ctx) {
         ctx->focus_index = -1;
         ctx->running = true;
 }
