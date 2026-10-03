@@ -121,6 +121,8 @@ int close_conn(const int *conn) {
         /* This probably creates a bunch of memory leaks lmao */
         memset(context, 0, INTERFACE_CONTEXT_SIZE);
 
+        connection_types[*conn] = if_empty;
+
         return 0;
 }
 
