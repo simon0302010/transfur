@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-struct tui_event poll_key_event(int timeout_ms);
+#include "../core/ui_event.h"
+
+struct ui_event tui_poll_key_event(int timeout_ms);
 
 #endif
