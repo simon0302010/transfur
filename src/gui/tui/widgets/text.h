@@ -1,3 +1,3 @@
-#include "../../core/widget.h";
+#include "../../core/widget.h"
 
-void render_text_widget(struct widget widget);
+void tui_render_text_widget(struct widget widget);
