@@ -51,7 +51,7 @@ int init_conn_file(void *conn, const char *file_path) {
 
         st = (struct file_state *)conn;
         st->offset = 0;
-        memcpy(st->path, file_path, len + 1);
+        strcpy(st->path, file_path);
 
         return 0;
 }
@@ -61,6 +61,12 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
         FILE *file;
         unsigned long len;
         size_t wrote;
+
+        if (chunk->type != chunk_type_data) {
+                fprintf(stderr, "send_chunk_file only accepts chunks with type "
+                                "== chunk_type_data");
+                return 1;
+        }
 
         st = (struct file_state *)conn;
         len = get_be32(chunk->length);
@@ -88,6 +94,12 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
 
         st = (struct file_state *)conn;
 
+        if (chunk->type == (unsigned char)chunk_type_finish) {
+                /* Empties the file */
+                fclose(fopen(st->path, "w"));
+                return 0;
+        }
+
         file = fopen(st->path, "rb");
         if (file == NULL) {
                 return 1;
@@ -101,7 +113,9 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
         st->offset += (unsigned long)got;
 
         if (got == 0) {
-                chunk->type = 1;
+                chunk->type = chunk_type_finish;
+        } else {
+                chunk->type = chunk_type_data;
         }
 
         return 0;

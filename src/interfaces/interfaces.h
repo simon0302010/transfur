@@ -12,12 +12,25 @@ Must be passed to `init_conn` in interfaces.c.
 */
 enum interface { if_empty, if_lan, if_serial, if_file };
 
+/*
+Chunk types
+*/
+enum chunk_type {
+        chunk_type_data,
+        chunk_type_finish,
+        chunk_type_clear_file,
+        chunk_type_ping
+};
+
 #if defined(__TURBOC__) || defined(__BORLANDC__)
 #pragma option -a-
 #elif defined(_MSC_VER)
 #pragma pack(push, 1)
 #elif defined(__GNUC__) || defined(__clang__)
 #define PACKED __attribute__((packed))
+#else
+#warning                                                                       \
+    "This compiler is not officially supported. Chunk struct packing may not work as expected."
 #endif
 
 /* `char` types are being used to guarantee 8-bit values. */
@@ -25,14 +38,7 @@ struct chunk {
         /*
         All interfaces except `file` interfaces can completely ignore this.
 
-        Transmission chunk types:
-
-        0: A regular chunk containing binary data
-
-        1: Transfer done
-
-        2: Request to clear output file on the last receiving `file` interface
-        in the chain.
+        `enum chunk_type` contains all possible values for this.
 
         Contains an unsigned 8-bit integer.
         */

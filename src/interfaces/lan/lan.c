@@ -308,10 +308,6 @@ static void lan_socket_nosigpipe(lan_sock socket) { (void)socket; }
 
 #endif
 
-/* TODO: move to interfaces.h later*/
-#define CHUNK_TYPE_DATA 0
-#define CHUNK_TYPE_PING 3
-
 #define LAN_ROLE_LISTEN 1
 #define LAN_ROLE_CONNECT 2
 
@@ -411,7 +407,7 @@ static int write_frame(lan_sock socket, const struct chunk *c) {
                 return r;
         }
 
-        if (c->type != CHUNK_TYPE_DATA) {
+        if (c->type != chunk_type_data) {
                 return send_all(socket, lan_zeroes, CHUNK_SIZE);
         }
 
@@ -657,7 +653,7 @@ int send_chunk_lan(void *conn, const struct chunk *chunk) {
         }
 
         r = write_frame(st->fd, chunk);
-        if (r == LAN_OK && chunk->type == CHUNK_TYPE_PING) {
+        if (r == LAN_OK && chunk->type == chunk_type_ping) {
                 st->ping_outstanding = 1;
         }
 
@@ -683,7 +679,7 @@ int recv_chunk_lan(void *conn, struct chunk *chunk) {
                         return r;
                 }
 
-                if (chunk->type != CHUNK_TYPE_PING) {
+                if (chunk->type != chunk_type_ping) {
                         return LAN_OK;
                 }
 

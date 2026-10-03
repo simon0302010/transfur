@@ -271,10 +271,6 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
 
 #endif
 
-/* TODO: move to interfaces.h later */
-#define CHUNK_TYPE_DATA 0
-#define CHUNK_TYPE_PING 3
-
 #define SERIAL_HDR_SIZE 17
 
 /*
@@ -514,7 +510,7 @@ int send_chunk_serial(void *conn, const struct chunk *chunk) {
         }
 
         r = write_frame(st->fd, chunk);
-        if (r == SERIAL_OK && chunk->type == CHUNK_TYPE_PING) {
+        if (r == SERIAL_OK && chunk->type == chunk_type_ping) {
                 st->ping_outstanding = 1;
         }
 
@@ -540,7 +536,7 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
                         return r;
                 }
 
-                if (chunk->type != CHUNK_TYPE_PING) {
+                if (chunk->type != chunk_type_ping) {
                         return SERIAL_OK;
                 }
 
