@@ -9,15 +9,19 @@ void tui_render(struct ui_context *ctx) {
         width = get_console_size().columns;
 
         for (i = 0; i < ctx->count; i++) {
-                switch (ctx->widgets[i].type) {
-                case WIDGET_TEXT:
-                        tui_render_text_widget(ctx->widgets[i], width);
-                        break;
-                case WIDGET_LOADING_BAR:
-                        tui_render_loading_bar_widget(ctx->widgets[i], width);
-                        break;
-                default:
-                        break;
-                }
+                tui_render_widget(ctx->widgets[i], width);
+        }
+}
+
+void tui_render_widget(struct widget widget, int width) {
+        switch (widget.type) {
+        case WIDGET_TEXT:
+                tui_render_text_widget(widget, width);
+                break;
+        case WIDGET_LOADING_BAR:
+                tui_render_loading_bar_widget(widget, width);
+                break;
+        default:
+                break;
         }
 }
