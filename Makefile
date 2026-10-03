@@ -29,6 +29,7 @@ SRC = src/main.c \
 	src/gui/tui/tui.c \
 	src/gui/tui/widgets/loading_bar.c \
 	src/gui/tui/widgets/progress_bar.c \
+	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/text.c \
