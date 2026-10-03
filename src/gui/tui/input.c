@@ -1,4 +1,6 @@
-#if defined(_WIN32) || defined(__MSDOS__) || defined(__TURBOC__)
+#include "../../platform.h"
+
+#if defined(OS_WINDOWS) || defined(OS_MSDOS)
 #include "../../misc/ttime.h"
 #include <conio.h>
 #else
@@ -10,7 +12,7 @@
 
 /* Returns 1 for succes and anything below 1 for errors */
 static int poll_key(char *c, int timeout_ms) {
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
         unsigned int elapsed = 0;
 
         while (elapsed < timeout_ms) {
@@ -24,7 +26,7 @@ static int poll_key(char *c, int timeout_ms) {
         }
 
         return -1;
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
         unsigned int elapsed = 0;
 
         while (elapsed < timeout_ms) {
@@ -72,10 +74,12 @@ struct tui_event poll_key_event(int timeout_ms) {
         } else if (ch == 127 || ch == '\b') {
                 event.key = KEY_BACKSPACE;
         } else if (ch == 27) {
-                /* esc or an ANSI sequence */
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
+                struct pollfd pfd;
+                char seq[3];
 
-                /* Everything commented out for now due to not being cross
-                platform. char seq[3];
+                pfd.fd = STDIN_FILENO;
+                pfd.events = POLLIN;
 
                 if (poll(&pfd, 1, 25) > 0 && (pfd.revents & POLLIN)) {
                         if (read(STDIN_FILENO, &seq[0], 1) > 0 &&
@@ -109,9 +113,12 @@ struct tui_event poll_key_event(int timeout_ms) {
                                         }
                                 }
                         }
-                } else {*/
+                } else {
+                        event.key = KEY_ESC;
+                }
+#else
                 event.key = KEY_ESC;
-                /*}*/
+#endif
         } else if ((unsigned char)ch >= 32 && (unsigned char)ch <= 126) {
                 event.key = KEY_CHAR;
                 event.ch = ch;

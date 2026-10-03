@@ -1,4 +1,6 @@
-#ifdef __APPLE__
+#include "../../../platform.h"
+
+#ifdef OS_MACOS
 
 /* nuklear - 1.32.0 - public domain */
 #include <assert.h>

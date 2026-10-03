@@ -17,12 +17,14 @@ connect
 - "c:<ip>:<port>" >>> connect to given peer
 */
 
+#include "../../platform.h"
+
 #include "lan.h"
 #include <string.h>
 
 /* TODO: i'm not sure if apple supports these libs, so check and add accordingly
  */
-#if defined(__linux__)
+#if defined(OS_LINUX)
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -35,7 +37,7 @@ typedef int lan_sock;
 
 #define LAN_INVALID_SOCK (-1)
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 #include <winsock2.h>
 typedef SOCKET lan_sock;
 
@@ -58,7 +60,7 @@ static long lan_socket_send(lan_sock socket, const unsigned char *buf,
 static long lan_socket_recv(lan_sock socket, unsigned char *buf, size_t len);
 static void lan_socket_nosigpipe(lan_sock socket);
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 
 /* Some systems do not have MSG_NOSIGNAL or SO_NOSIGPIPE */
 static int lan_net_init(void) {
@@ -183,7 +185,7 @@ static void lan_socket_nosigpipe(lan_sock socket) {
 #endif
 }
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 
 /* winsock does not have SIGPIPE so nosigpipe is just a no-op */
 static int wsa_started = 0;

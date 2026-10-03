@@ -8,7 +8,8 @@
 #include "../../misc/bool.h"
 #include "../../misc/console.h"
 #include "../../misc/ttime.h"
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#include "../../platform.h"
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 #include "raw.h"
 #endif
 
@@ -271,7 +272,7 @@ void run_tui(struct renderable renderables[], size_t count) {
         tbool handled;
         size_t i;
 
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
         enable_raw_mode();
 #endif
 
@@ -373,7 +374,7 @@ void run_tui(struct renderable renderables[], size_t count) {
                         }
                 }
         }
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
         disable_raw_mode();
 #endif
 }

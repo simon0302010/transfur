@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "../platform.h"
 #include "interfaces.h"
 
 #include "file/file.h"
@@ -153,18 +154,20 @@ const char *get_sender_text(enum interface interface) {
 }
 
 const enum interface *get_supported_interfaces(void) {
-#if defined(__linux__)
+#if defined(OS_LINUX)
         static const enum interface interfaces[] = {if_file, if_lan, if_serial,
                                                     if_empty};
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
         static const enum interface interfaces[] = {if_file, if_lan, if_serial,
                                                     if_empty};
-#elif defined(__APPLE__) && defined(__MACH__)
+#elif defined(OS_MACOS)
         static const enum interface interfaces[] = {if_file, if_empty};
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
         static const enum interface interfaces[] = {if_file, if_serial,
                                                     if_empty};
 #else
+#warning                                                                       \
+    "Operating system not officially supported. Some features may behave in unexpected ways."
         static const enum interface interfaces[] = {if_file, if_empty};
 #endif
 

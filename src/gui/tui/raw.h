@@ -1,4 +1,6 @@
-#if !defined(_WIN32) && !defined(__MSDOS__) && !defined(__TURBOC__)
+#include "../../platform.h"
+
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 
 #include <termios.h>
 

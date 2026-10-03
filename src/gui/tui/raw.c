@@ -1,4 +1,6 @@
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#include "../../platform.h"
+
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +12,7 @@ static struct termios original_termios;
 #endif
 
 void disable_raw_mode(void) {
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
         printf("\x1b[?25h\x1b[?1049l");
         fflush(stdout);
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
@@ -18,7 +20,7 @@ void disable_raw_mode(void) {
 }
 
 void enable_raw_mode(void) {
-#if !defined(_WIN32) && !defined(__MSDOS__)
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
         struct termios raw;
         tcgetattr(STDIN_FILENO, &original_termios);
         atexit(disable_raw_mode);

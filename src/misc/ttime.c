@@ -1,6 +1,8 @@
-#ifdef _WIN32
+#include "../platform.h"
+
+#ifdef OS_WINDOWS
 #include <windows.h>
-#elif defined(__MSDOS__)
+#elif defined(OS_MSDOS)
 #include <dos.h>
 #include <time.h>
 #else
@@ -10,9 +12,9 @@
 #include "ttime.h"
 
 void sleep_ms(unsigned int ms) {
-#ifdef _WIN32
+#ifdef OS_WINDOWS
         Sleep(ms);
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
         delay(ms);
 #else
         struct timespec ts;
@@ -25,7 +27,7 @@ void sleep_ms(unsigned int ms) {
 }
 
 double get_unix_time(void) {
-#ifdef _WIN32
+#ifdef OS_WINDOWS
         SYSTEMTIME st;
         FILETIME ft;
         ULARGE_INTEGER uli;
@@ -39,7 +41,7 @@ double get_unix_time(void) {
         /* Windows FILETIME starts Jan 1, 1601 in 100-ns intervals.
            Subtract 11644473600 seconds to reach Unix Epoch (Jan 1, 1970). */
         return (double)(uli.QuadPart - 116444736000000000ULL) / 10000000.0;
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
         time_t now = time(NULL);
         clock_t ticks = clock();
         double subsecond =

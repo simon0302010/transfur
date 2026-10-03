@@ -4,17 +4,17 @@ Needs to implement all functions defined in `gui.h`
 */
 
 #include "../../interfaces/interfaces.h"
+#include "../../platform.h"
 #include "../gui.h"
-
 #include "../nuklear/nuklear.h"
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 #include "linux/nuklear_linux.h"
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 #include "windows/nuklear_windows.h"
 
-#elif defined(__APPLE__) && defined(__MACH__)
+#elif defined(OS_MACOS)
 #include "macos/nuklear_macos.h"
 
 #else

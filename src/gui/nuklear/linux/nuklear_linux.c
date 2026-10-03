@@ -1,4 +1,6 @@
-#ifdef __linux__
+#include "../../../platform.h"
+
+#ifdef OS_LINUX
 
 #include <X11/X.h>
 #include <assert.h>

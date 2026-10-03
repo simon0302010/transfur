@@ -1,4 +1,6 @@
-#ifdef __APPLE__
+#include "../../../platform.h"
+
+#ifdef OS_MACOS
 
 #ifndef NUKLEAR_MACOS_H
 #define NUKLEAR_MACOS_H

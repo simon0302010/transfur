@@ -1,7 +1,9 @@
+#include "../../../platform.h"
+
+#ifdef OS_WINDOWS
+
 #ifndef NUKLEAR_WINDOWS_H
 #define NUKLEAR_WINDOWS_H
-
-#ifdef _WIN32
 
 #include "../nuklear.h"
 

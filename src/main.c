@@ -1,5 +1,3 @@
-#define USE_BASIC_GUI
-
 #ifdef USE_BASIC_GUI
 #include "gui/tui/tui.h"
 #else

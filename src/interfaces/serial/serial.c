@@ -18,10 +18,12 @@ not provided, BAUD_RATE will be used. On windows the path is a port name such as
 "\\\\.\\" prefix is added automatically when missing.
 */
 
+#include "../../platform.h"
+
 #include "serial.h"
 #include <string.h>
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 
 #include <errno.h>
 #include <fcntl.h>
@@ -30,13 +32,13 @@ not provided, BAUD_RATE will be used. On windows the path is a port name such as
 
 typedef int serial_handle;
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 
 #include <windows.h>
 
 typedef HANDLE serial_handle;
 
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
 
 #include "dos_serial/dos_serial.h"
 
@@ -44,12 +46,11 @@ typedef int serial_handle;
 
 #endif
 
-#if defined(__linux__) || defined(_WIN32) || defined(__MSDOS__) ||             \
-    defined(__TURBOC__)
+#if defined(OS_LINUX) || defined(OS_WINDOWS) || defined(OS_MSDOS)
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 static speed_t lookup_baud(unsigned long v);
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 static unsigned long lookup_baud(unsigned long v);
 #endif
 static int serial_port_open(const char *path, unsigned long baud,
@@ -58,7 +59,7 @@ static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len);
 static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len);
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 
 /* Map baud rate to termios constant*/
 static speed_t lookup_baud(unsigned long v) {
@@ -151,7 +152,7 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
         return (long)n;
 }
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 
 /* Validate baud rate, the value itself goes into DCB.BaudRate as-is */
 static unsigned long lookup_baud(unsigned long v) {
@@ -276,7 +277,7 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
         return (long)got;
 }
 
-#elif defined(__MSDOS__) || defined(__TURBOC__)
+#elif defined(OS_MSDOS)
 
 static int serial_port_open(const char *path, unsigned long baud,
                             serial_handle *out) {

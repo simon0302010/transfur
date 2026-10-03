@@ -1,8 +1,10 @@
 /* TODO: Compile when compiling for DOS */
 
-#include "dos_serial.h"
+#include "../../../platform.h"
 
-#if defined(__MSDOS__) || defined(__TURBOC__)
+#if defined(OS_MSDOS)
+
+#include "dos_serial.h"
 
 #include <conio.h>
 #include <dos.h>

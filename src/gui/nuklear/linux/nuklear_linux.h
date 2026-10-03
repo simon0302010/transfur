@@ -1,4 +1,6 @@
-#ifdef __linux__
+#include "../../../platform.h"
+
+#ifdef OS_LINUX
 
 #ifndef NUKLEAR_LINUX_H
 #define NUKLEAR_LINUX_H
