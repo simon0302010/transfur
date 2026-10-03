@@ -8,6 +8,6 @@ struct widget_progress_bar_options {
         char *title;
 };
 
-struct widget widget_progress_bar(struct widget_progress_bar_options *opts);
+struct widget widget_progress_bar(struct widget_progress_bar_options *opts, size_t size);
 
 #endif /* CORE_WIDGETS_PROGRESS_BAR_H */

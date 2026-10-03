@@ -12,6 +12,7 @@ struct widget_text_input_options {
         tbool is_focused;
 };
 
-struct widget widget_text_input(struct widget_text_input_options *opts);
+struct widget widget_text_input(struct widget_text_input_options *opts,
+                                size_t size);
 
 #endif /* CORE_WIDGETS_TEXT_INPUT_H */

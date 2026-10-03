@@ -10,6 +10,7 @@ struct widget_loading_bar_options {
         float accumulator;
 };
 
-struct widget widget_loading_bar(struct widget_loading_bar_options *opts);
+struct widget widget_loading_bar(struct widget_loading_bar_options *opts,
+                                 size_t size);
 
 #endif /* CORE_WIDGETS_LOADING_BAR_H */

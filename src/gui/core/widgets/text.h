@@ -3,6 +3,6 @@
 
 #include "../widget.h"
 
-struct widget widget_text(int length, const char *content);
+struct widget widget_text(int length, char *content);
 
 #endif /* CORE_WIDGETS_TEXT_H */
