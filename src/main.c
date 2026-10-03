@@ -4,8 +4,6 @@
 #include "gui/gui.h"
 #endif
 
-#define USE_TUI
-
 int main(void) {
         /* All app logic should now be written in `gui/app/` */
 

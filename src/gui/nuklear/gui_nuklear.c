@@ -206,7 +206,8 @@ static const char *status_text(char *buf) {
                 sprintf(buf, "Transfurring, %lu chunks", worker_chunks);
                 return buf;
         case wk_done:
-                sprintf(buf, "Transfur complete (%lu chunks)", worker_chunks);
+                sprintf(buf, "Transfur complete (%lu chunk%s)", worker_chunks,
+                        worker_chunks > 1 ? "s" : "");
                 return buf;
         case wk_error:
                 sprintf(buf, "%s failed: %s", step_text(worker_step),
@@ -395,7 +396,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 /* A side that is already connected cannot be re-inited as there
                  * is no way to close a connection yet */
                 can_start =
-                    !worker_action() && receiver != if_empty &&
+                    !worker_active() && receiver != if_empty &&
                     sender != if_empty &&
                     (receiver_connected || receiver_options[0] != '\0') &&
                     (sender_connected || sender_options[0] != '\0');

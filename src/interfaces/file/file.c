@@ -62,11 +62,11 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
         unsigned long len;
         size_t wrote;
 
-        if (chunk->type != chunk_type_data) {
+        /*if (chunk->type != chunk_type_data) {
                 fprintf(stderr, "send_chunk_file only accepts chunks with type "
-                                "== chunk_type_data");
+                                "== chunk_type_data\n");
                 return 1;
-        }
+        }*/
 
         st = (struct file_state *)conn;
         len = get_be32(chunk->length);
