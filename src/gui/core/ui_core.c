@@ -28,11 +28,12 @@ void ui_update(struct ui_context *ctx, double dt) {
                         }
                         step_interval = 1.0f / options->speed;
                         options->accumulator += (float)dt;
-                        while (options->accumulator >= step_interval) {
+                        if (options->accumulator >= step_interval) {
+                                int steps = (int)(options->accumulator / step_interval);
                                 options->offset =
-                                    (options->offset + 1) %
+                                    (options->offset + steps) %
                                     6; /* TODO: replace 6 with charset_size */
-                                options->accumulator -= step_interval;
+                                options->accumulator -= (float)steps * step_interval;
                         }
                         break;
                 }
