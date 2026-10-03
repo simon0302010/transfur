@@ -13,4 +13,6 @@ struct widget_loading_bar_options {
 struct widget widget_loading_bar(struct widget_loading_bar_options *opts,
                                  size_t size);
 
+void widget_update_loading_bar(struct widget *widget, double dt);
+
 #endif /* CORE_WIDGETS_LOADING_BAR_H */

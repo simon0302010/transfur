@@ -20,21 +20,7 @@ void ui_update(struct ui_context *ctx, double dt) {
         for (i = 0; i < ctx->count; i++) {
                 switch (ctx->widgets[i].type) {
                 case WIDGET_LOADING_BAR: {
-                        struct widget_loading_bar_options *options =
-                            ctx->widgets[i].content;
-                        float step_interval;
-                        if (options->speed <= 0.0f) {
-                                break;
-                        }
-                        step_interval = 1.0f / options->speed;
-                        options->accumulator += (float)dt;
-                        if (options->accumulator >= step_interval) {
-                                int steps = (int)(options->accumulator / step_interval);
-                                options->offset =
-                                    (options->offset + steps) %
-                                    6; /* TODO: replace 6 with charset_size */
-                                options->accumulator -= (float)steps * step_interval;
-                        }
+                        widget_update_loading_bar(&(ctx->widgets[i]), dt);
                         break;
                 }
                 default:
