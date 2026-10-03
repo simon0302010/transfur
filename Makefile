@@ -32,6 +32,8 @@ SRC = src/main.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
 	src/gui/basic/basic.c \
+	src/gui/basic/render.c \
+	src/gui/basic/event.c \
 	src/gui/basic/text.c \
 	src/gui/basic/widgets/text.c
 
