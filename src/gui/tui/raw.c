@@ -34,3 +34,10 @@ void enable_raw_mode(void) {
         fflush(stdout);
 #endif
 }
+
+/* use `fflush(stdout)` after running */
+void reset_cursor(void) {
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
+        printf("\x1b[H");
+#endif
+}
