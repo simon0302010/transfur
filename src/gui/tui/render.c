@@ -21,6 +21,9 @@ void tui_render_widget(struct widget widget, int width) {
         case WIDGET_LOADING_BAR:
                 tui_render_loading_bar_widget(widget, width);
                 break;
+        case WIDGET_PROGRESS_BAR:
+                tui_render_progress_bar_widget(widget, width);
+                break;
         default:
                 break;
         }
