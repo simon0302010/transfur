@@ -17,4 +17,4 @@ struct ui_event {
   char ch;
   int mouse_x; /* always 0 in TUI environment */
   int mouse_y;
-}
+};
