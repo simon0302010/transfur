@@ -1,3 +1,6 @@
+#ifndef CORE_WIDGET_H
+#define CORE_WIDGET_H
+
 #include <stddef.h>
 
 enum widget_type {
@@ -13,3 +16,5 @@ struct widget {
         size_t content_size;
         void *content;
 };
+
+#endif /* CORE_WIDGET_H */

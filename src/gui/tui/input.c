@@ -7,6 +7,7 @@
 #endif
 
 #include "tui.h"
+#include "input.h"
 
 /* Returns 1 for succes and anything below 1 for errors */
 static int poll_key(char *c, int timeout_ms) {
@@ -54,23 +55,23 @@ static int poll_key(char *c, int timeout_ms) {
 #endif
 }
 
-struct tui_event poll_key_event(int timeout_ms) {
-        struct tui_event event;
+struct ui_event tui_poll_key_event(int timeout_ms) {
+        struct ui_event event;
         char ch;
         int res;
 
-        event.key = KEY_NONE;
+        event.key = UI_KEY_NONE;
         event.ch = '\0';
 
         if (poll_key(&ch, timeout_ms) <= 0)
                 return event;
 
         if (ch == '\r' || ch == '\n') {
-                event.key = KEY_ENTER;
+                event.key = UI_KEY_ENTER;
         } else if (ch == '\t') {
-                event.key = KEY_TAB;
+                event.key = UI_KEY_TAB;
         } else if (ch == 127 || ch == '\b') {
-                event.key = KEY_BACKSPACE;
+                event.key = UI_KEY_BACKSPACE;
         } else if (ch == 27) {
 #if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
                 struct pollfd pfd;
@@ -85,25 +86,25 @@ struct tui_event poll_key_event(int timeout_ms) {
                                 if (read(STDIN_FILENO, &seq[1], 1) > 0) {
                                         switch (seq[1]) {
                                         case 'A':
-                                                event.key = KEY_ARROW_UP;
+                                                event.key = UI_KEY_UP;
                                                 break;
                                         case 'B':
-                                                event.key = KEY_ARROW_DOWN;
+                                                event.key = UI_KEY_DOWN;
                                                 break;
                                         case 'C':
-                                                event.key = KEY_ARROW_RIGHT;
+                                                event.key = UI_KEY_RIGHT;
                                                 break;
                                         case 'D':
-                                                event.key = KEY_ARROW_LEFT;
+                                                event.key = UI_KEY_LEFT;
                                                 break;
                                         case 'Z':
-                                                event.key = KEY_SHIFT_TAB;
+                                                event.key = UI_KEY_SHIFT_TAB;
                                                 break;
                                         case '3':
                                                 if (read(STDIN_FILENO, &seq[2],
                                                          1) > 0 &&
                                                     seq[2] == '~') {
-                                                        event.key = KEY_DELETE;
+                                                        event.key = UI_KEY_DELETE;
                                                 }
                                                 break;
                                         default:
@@ -112,13 +113,13 @@ struct tui_event poll_key_event(int timeout_ms) {
                                 }
                         }
                 } else {
-                        event.key = KEY_ESC;
+                        event.key = UI_KEY_ESC;
                 }
 #else
-                event.key = KEY_ESC;
+                event.key = UI_KEY_ESC;
 #endif
         } else if ((unsigned char)ch >= 32 && (unsigned char)ch <= 126) {
-                event.key = KEY_CHAR;
+                event.key = UI_KEY_CHAR;
                 event.ch = ch;
         }
 
