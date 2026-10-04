@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h
+CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
@@ -16,6 +16,7 @@ SRC = src/main.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
 	src/misc/ttime.c \
+	src/misc/debug.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
 	src/gui/core/widgets/group.c \
@@ -75,7 +76,7 @@ clean:
 
 test:
 	mkdir -p build
-	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c
+	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
 	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c
 	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 

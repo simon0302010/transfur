@@ -1,10 +1,4 @@
-#ifdef USE_BASIC_GUI
-#include "gui/tui/tui.h"
-#else
 #include "gui/gui.h"
-#endif
-
-#define USE_BASIC_GUI
 
 int main(void) {
         /* All app logic should now be written in `gui/app/` */

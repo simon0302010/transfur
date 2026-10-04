@@ -238,6 +238,9 @@ static void *transfer_worker(void *arg)
                               receiver_conn_opts);
 
                 if (r != 0) {
+                        /* init_conn claims the slot before the interface runs, free it on failure */
+                        close_conn(&receiver_conn);
+                        receiver_conn = -1;
                         worker_if = (int)receiver_conn_if;
                         worker_step = STEP_INIT_RECEIVER;
                         worker_code = r;
@@ -258,6 +261,9 @@ static void *transfer_worker(void *arg)
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
                 if (r != 0) {
+                        /* Same as receiver side */
+                        close_conn(&sender_conn);
+                        sender_conn = -1;
                         worker_if = (int)sender_conn_if;
                         worker_step = STEP_INIT_SENDER;
                         worker_code = r;
@@ -340,6 +346,8 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                    int height) {
         char status[192];
         int can_start;
+        int can_close_receiver;
+        int can_close_sender;
         int bar_visible;
 
         status[0] = '\0';
@@ -393,8 +401,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
 
                 nk_spacer(ctx);
 
-                /* A side that is already connected cannot be re-inited as there
-                 * is no way to close a connection yet */
+                /* Connected side stays locked until closed. Initialize only initializes sides that are not connected yet */
                 can_start =
                     !worker_active() && receiver != if_empty &&
                     sender != if_empty &&
@@ -493,6 +500,51 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                     ctx, NK_EDIT_FIELD, sender_options, sizeof(sender_options),
                     nk_filter_default);
                 if (sender_connected) {
+                        nk_widget_disable_end(ctx);
+                }
+
+                /* Row for close buttons */
+                nk_layout_row_template_begin(ctx, 20);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_push_dynamic(ctx);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_end(ctx);
+
+                /*
+                Closing while the worker still holds the connection is not safe, 
+                so the buttons are only usable when no worker is running.
+                */
+                can_close_receiver = !worker_active() && receiver_connected;
+                if (!can_close_receiver) {
+                        nk_widget_disable_begin(ctx);
+                }
+                if (nk_button_label(ctx, "Close receiver")) {
+                        close_conn(&receiver_conn);
+                        receiver_conn = -1;;
+                        receiver_inited = 0;
+                        receiver_connected = 0;
+                        worker_state = wk_idle;
+                        loading_bar_state = 0;
+                }
+                if (!can_close_receiver) {
+                        nk_widget_disable_end(ctx);
+                }
+
+                nk_spacer(ctx);
+
+                can_close_sender = !worker_active() && sender_connected;
+                if (!can_close_sender) {
+                        nk_widget_disable_begin(ctx);
+                }
+                if (nk_button_label(ctx, "Close sender")) {
+                        close_conn(&sender_conn);
+                        sender_conn = -1;
+                        sender_inited = 0;
+                        sender_connected = 0;
+                        worker_state = wk_idle;
+                        loading_bar_state = 0;
+                }
+                if (!can_close_sender) {
                         nk_widget_disable_end(ctx);
                 }
 
