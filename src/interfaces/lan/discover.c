@@ -330,7 +330,7 @@ void discover_frame(void) {
                 if (strncmp(buf, DISCOVER_REPLY, DISCOVER_PREFIX_LEN) != 0) {
                         continue;
                 }
-                if (strncpy(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) != 0) {
+                if (strncmp(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) != 0) {
                         continue;
                 }
                 if (buf[DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN] != ' ') {
@@ -342,7 +342,7 @@ void discover_frame(void) {
                         continue;
                 }
 
-                strncmp(ip, inet_ntoa(from.sin_addr), sizeof ip - 1);
+                strncpy(ip, inet_ntoa(from.sin_addr), sizeof ip - 1);
                 ip[sizeof ip - 1] = '\0';
                 discover_add_peer(ip, port);
         }
