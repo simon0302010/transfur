@@ -697,3 +697,31 @@ int recv_chunk_lan(void *conn, struct chunk *chunk) {
                 }
         }
 }
+
+int close_conn_lan(void *conn) {
+        struct lan_state *st;
+
+        if (conn == NULL) {
+                return LAN_ERR_ARG;
+        }
+
+        st = (struct lan_state *)conn;
+
+        /*
+        init_conn_lan may have failed after the slot was claimmed, 
+        there is no socket to close in that case but the caller still frees the slot.
+        */
+        if (st->inited != 1) {
+                return LAN_OK
+        }
+        
+        lan_socket_close(st->fd);
+
+        st->fd = LAN_INVALID_SOCK;
+        st->port = 0;
+        st->role = 0;
+        st->ping_outstanding = 0;
+        st->inited = 0;
+
+        return LAN_OK;
+}
