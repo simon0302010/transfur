@@ -712,7 +712,7 @@ int close_conn_lan(void *conn) {
         there is no socket to close in that case but the caller still frees the slot.
         */
         if (st->inited != 1) {
-                return LAN_OK
+                return LAN_OK;
         }
         
         lan_socket_close(st->fd);
