@@ -238,7 +238,8 @@ static void *transfer_worker(void *arg)
                               receiver_conn_opts);
 
                 if (r != 0) {
-                        /* init_conn claims the slot before the interface runs, free it on failure */
+                        /* init_conn claims the slot before the interface runs,
+                         * free it on failure */
                         close_conn(&receiver_conn);
                         receiver_conn = -1;
                         worker_if = (int)receiver_conn_if;
@@ -401,7 +402,8 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
 
                 nk_spacer(ctx);
 
-                /* Connected side stays locked until closed. Initialize only initializes sides that are not connected yet */
+                /* Connected side stays locked until closed. Initialize only
+                 * initializes sides that are not connected yet */
                 can_start =
                     !worker_active() && receiver != if_empty &&
                     sender != if_empty &&
@@ -511,7 +513,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 nk_layout_row_template_end(ctx);
 
                 /*
-                Closing while the worker still holds the connection is not safe, 
+                Closing while the worker still holds the connection is not safe,
                 so the buttons are only usable when no worker is running.
                 */
                 can_close_receiver = !worker_active() && receiver_connected;
@@ -520,7 +522,8 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 }
                 if (nk_button_label(ctx, "Close receiver")) {
                         close_conn(&receiver_conn);
-                        receiver_conn = -1;;
+                        receiver_conn = -1;
+                        ;
                         receiver_inited = 0;
                         receiver_connected = 0;
                         worker_state = wk_idle;

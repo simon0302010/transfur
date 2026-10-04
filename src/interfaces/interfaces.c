@@ -126,7 +126,8 @@ int close_conn(const int *conn) {
         case if_empty:
                 break; /* How would this even happen lmao */
         case if_file:
-                break; /* Nothing needs to happen for file as it doesn't keep any resource open between chunks */
+                break; /* Nothing needs to happen for file as it doesn't keep
+                          any resource open between chunks */
         case if_serial:
                 r = close_conn_serial(context);
                 break;
@@ -138,7 +139,7 @@ int close_conn(const int *conn) {
         /* This probably creates a bunch of memory leaks lmao */
         memset(context, 0, INTERFACE_CONTEXT_SIZE);
         connection_types[*conn] = if_empty;
-        
+
         return r;
 }
 
