@@ -56,6 +56,7 @@ static unsigned long lookup_baud(unsigned long v);
 #endif
 static int serial_port_open(const char *path, unsigned long baud,
                             serial_handle *out);
+static void serial_port_close(serial_handle fd);
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len);
 static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len);
@@ -124,6 +125,10 @@ static int serial_port_open(const char *path, unsigned long baud,
 
         *out = fd;
         return SERIAL_OK;
+}
+
+static void serial_port_close(serial_handle fd) {
+        (void)close(fd);
 }
 
 /* Send bytes to port, retry on EINTR */
@@ -245,6 +250,10 @@ static int serial_port_open(const char *path, unsigned long baud,
         return SERIAL_OK;
 }
 
+static void serial_port_close(serial_handle fd) {
+        (void)CloseHandle(fd);
+}
+
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len) {
         DWORD written;
@@ -303,6 +312,10 @@ static int serial_port_open(const char *path, unsigned long baud,
                 return SERIAL_ERR_OPEN;
 
         return port;
+}
+
+static void serial_port_close(serial_handle fd) {
+        (void)serial_close(fd);
 }
 
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
