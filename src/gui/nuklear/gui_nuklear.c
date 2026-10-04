@@ -348,6 +348,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                    int height) {
         char status[192];
         char peers_label[64];
+        char ip_label[32];
         int can_start;
         int can_scan;
         int can_show_peers;
@@ -577,7 +578,8 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                         nk_widget_disable_end(ctx);
                 }
 
-                nk_spacer(ctx);
+                sprintf(ip_label, "Local IP: %s", get_lan_ip());
+                nk_label(ctx, ip_label, NK_TEXT_RIGHT);
 
                 /*
                 Closing while the worker still holds the connection is not safe,

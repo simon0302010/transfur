@@ -43,8 +43,11 @@ typedef SOCKET lan_sock;
 
 #endif
 
+static char lan_ip[16] = "";
+
 static int lan_net_init(void);
 static lan_sock lan_socket_open(void);
+static lan_sock lan_socket_open_dgram(void);
 static int lan_socket_close(lan_sock socket);
 static int lan_socket_reuseaddr(lan_sock socket);
 static int lan_socket_bind(lan_sock socket, unsigned long ip,
@@ -57,6 +60,7 @@ static long lan_socket_send(lan_sock socket, const unsigned char *buf,
                             size_t len);
 static long lan_socket_recv(lan_sock socket, unsigned char *buf, size_t len);
 static void lan_socket_nosigpipe(lan_sock socket);
+static void lan_resolve_ip(char *out, int out_size);
 
 #if defined(OS_LINUX)
 
@@ -72,6 +76,18 @@ static lan_sock lan_socket_open(void) {
         int fd;
 
         fd = socket(AF_INET, SOCK_STREAM, 0);
+
+        if (fd < 0) {
+                return LAN_INVALID_SOCK;
+        }
+
+        return fd;
+}
+
+static lan_sock lan_socket_open_dgram(void) {
+        int fd;
+
+        fd = socket(AF_INET, SOCK_DGRAM, 0);
 
         if (fd < 0) {
                 return LAN_INVALID_SOCK;
@@ -210,6 +226,18 @@ static lan_sock lan_socket_open(void) {
         lan_sock fd;
 
         fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (fd == INVALID_SOCKET) {
+                return LAN_INVALID_SOCK;
+        }
+
+        return fd;
+}
+
+static lan_sock lan_socket_open_dgram(void) {
+        lan_sock fd;
+
+        fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_TCP);
+
         if (fd == INVALID_SOCKET) {
                 return LAN_INVALID_SOCK;
         }
@@ -724,4 +752,50 @@ int close_conn_lan(void *conn) {
         st->inited = 0;
 
         return LAN_OK;
+}
+
+static void lan_resolve_ip(char *out, int out_size) {
+        lan_sock sock;
+        struct sockaddr_in src;
+#if defined(OS_WINDOWS)
+        int srclen;
+#else
+        socklen_t srclen;
+#endif
+
+        strncpy(out, "unknown", (size_t)out_size - 1);
+        out[out_size - 1] = '\0';
+
+        sock = lan_socket_open_dgram();
+
+        if (sock == LAN_INVALID_SOCK) {
+                return;
+        }
+
+        if (lan_socket_connect(sock, 0x0808080UL, 53) != 0) {
+                lan_socket_close(sock);
+                return;
+        }
+
+        memset(&src, 0, sizeof src);
+        srclen = (int)sizeof src;
+        if (getsockname(sock, (struct sockaddr *)&src, &srclen) != 0) {
+                lan_socket_close(sock);
+                return;
+        }
+        if (src.sin_addr.s_addr == htonl(INADDR_ANY)) {
+                lan_socket_close(sock);
+                return;
+        }
+
+        strncpy(out, inet_ntoa(src.sin_addr), (size_t)out_size - 1);
+        out[out_size - 1] = '\0';
+        lan_socket_close(sock);
+}
+
+const char *get_lan_ip(void) {
+        if (lan_ip[0] == '\0' || strcmp(lan_ip, "unknown") == 0) {
+                lan_resolve_ip(lan_ip, sizeof lan_ip);
+        }
+        return lan_ip;
 }
