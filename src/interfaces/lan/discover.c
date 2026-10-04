@@ -83,6 +83,19 @@ static int discover_open(discover_sock *out, unsigned short port) {
 
         (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof on);
         (void)setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (const char *)&on, sizeof on);
+
+        memset(&addr, 0, sizeof addr);
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(port);
+        addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+        if (bind(sock, (struct sockaddr *)&addr, sizeof addr) != 0) {
+                discover_close_sock(sock);
+                return -1;
+        }
+
+        *out = sock;
+        return 0;
 }
 
 /* is a datagram waiting? return `0` when nothing arrived */
