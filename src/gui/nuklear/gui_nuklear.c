@@ -8,6 +8,7 @@ Needs to implement all functions defined in `gui.h`
 
 #include "../../interfaces/interfaces.h"
 #include "../../interfaces/lan/lan.h"
+#include "../../interfaces/lan/discover.h"
 #include "../../interfaces/serial/serial.h"
 #include "../gui.h"
 
@@ -345,12 +346,23 @@ static int worker_active(void) {
 static void nk_gui(const char *title, struct nk_context *ctx, int width,
                    int height) {
         char status[192];
+        char peers_label[64];
         int can_start;
+        int can_scan;
+        int can_show_peers;
         int can_close_receiver;
         int can_close_sender;
         int bar_visible;
 
         status[0] = '\0';
+
+        /* Discovery */
+        discover_init()
+        discover_set_listener_opts(
+                worker_state == wk_wait_receiver && receiver_conn_if == if_lan
+                        ? receiver_conn_opts
+                        : "");
+        discover_frame();
 
         if (nk_begin(ctx, title, nk_rect(0, 0, width, height), 0)) {
                 ctx->style.menu_button = ctx->style.button;
@@ -502,6 +514,13 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 if (sender_connected) {
                         nk_widget_disable_end(ctx);
                 }
+                
+                /* Row for LAN peer discovery */
+                nk_layout_row_template_begin(ctx, 20);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_push_dynamic(ctx);
+                nk_layout_row_template_push_static(ctx, 180);
+                nk_layout_row_template_end(ctx);
 
                 /* Row for close buttons */
                 nk_layout_row_template_begin(ctx, 20);
@@ -509,6 +528,50 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 nk_layout_row_template_push_dynamic(ctx);
                 nk_layout_row_template_push_static(ctx, 180);
                 nk_layout_row_template_end(ctx);
+
+                /* Scanning uses it's own UDP socket, so it is fine even while a transfur runs */
+                can_scan = discover_ready() && !discover_scanning();
+                if (!can_scan) {
+                        nk_widget_disable_begin(ctx);
+                }
+                if (nk_button_label(ctx, discover_scanning()
+                                                        ? "Scanning"
+                                                        : "Scan for receivers")) {
+                        discover_scan()
+                }
+                if (!can_scan) {
+                        nk_widget_disable_end(ctx);
+                }
+
+                sprintf(peers_label, "Peers found: %d", discover_count());
+                can_show_peers = discover_count() > 0;
+                if (!can_show_peers) {
+                        nk_widget_disable_begin(ctx);
+                }
+                if (nk_menu_begin_label(ctx, peers_label, NK_TEXT_CENTERED, nk_vec2(180, 160))) {
+                        int i;
+                        char item[32];
+                        char ip[16];
+                        int port;
+
+                        nk_layout_row_dynamic(ctx, 25, 1);
+                        for (i = 0; i < discover_count(); i++) {
+                                if (discover_peer(i, ip, sizeof ip, &port) != 0) {
+                                        continue;
+                                }
+                                sprintf(item, "%s:%d", ip, port);
+                                if (nk_menu_item_label(ctx, item, NK_TEXT_LEFT)) {
+                                        strcpy(sender_options, item);
+                                        sender = if_lan;
+                                }
+                        }
+                        nk_menu_end(ctx);
+                }
+                if (!can_show_peers) {
+                        nk_widget_disable_end(ctx);
+                }
+
+                nk_spacer(ctx);
 
                 /*
                 Closing while the worker still holds the connection is not safe, 
