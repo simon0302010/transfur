@@ -77,7 +77,7 @@ static int discover_open(discover_sock *out, unsigned short port) {
         int on = 1;
 
         sock = socket(AF_INET, SOCK_DGRAM, 0);
-        if (s == DISCOVER_INVALID_SOCK) {
+        if (sock == DISCOVER_INVALID_SOCK) {
                 return -1;
         }
 
@@ -324,7 +324,7 @@ void discover_frame(void) {
                         continue;
                 }
 
-                port = atoi(buf + DISCOVER);
+                port = atoi(buf + DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN + 1);
                 if (port <= 0 || port > 65535) {
                         continue;
                 }
@@ -348,7 +348,7 @@ int discover_peer(int index, char *ip, int ip_size, int *port) {
                 return -1;
         }
 
-        strncpy(ip, peer_ip[index], (size_t)ip_size - 1;);
+        strncpy(ip, peer_ip[index], (size_t)ip_size - 1);
         ip[ip_size - 1] = '\0';
         *port = peer_port[index];
 

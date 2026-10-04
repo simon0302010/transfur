@@ -357,7 +357,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
         status[0] = '\0';
 
         /* Discovery */
-        discover_init()
+        discover_init();
         discover_set_listener_opts(
                 worker_state == wk_wait_receiver && receiver_conn_if == if_lan
                         ? receiver_conn_opts
@@ -537,7 +537,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 if (nk_button_label(ctx, discover_scanning()
                                                         ? "Scanning"
                                                         : "Scan for receivers")) {
-                        discover_scan()
+                        discover_scan();
                 }
                 if (!can_scan) {
                         nk_widget_disable_end(ctx);

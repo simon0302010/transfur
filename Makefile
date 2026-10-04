@@ -13,8 +13,10 @@ SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
+	src/interfaces/lan/discover.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
+	src/misc/debug.c \
 	src/misc/ttime.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
