@@ -8,11 +8,12 @@
 
 static struct widget widgets[APP_WIDGET_COUNT];
 static char title[50] = "Hello, welcome to Transfur.";
+static char input_buffer[50];
 static struct widget_loading_bar_options loading_bar_opts;
 static struct widget_text_input_options text_input_opts;
 
 void app_init(struct ui_context *ctx) {
-        char input_buffer[50];
+        
 
         loading_bar_opts.title = title;
         loading_bar_opts.speed = 2.0f;
@@ -24,6 +25,7 @@ void app_init(struct ui_context *ctx) {
         text_input_opts.buffer = input_buffer;
         text_input_opts.max_len = 50;
         text_input_opts.label = title;
+        text_input_opts.cursor = 0;
 
         widgets[0] = widget_text(50, title);
 
