@@ -1,3 +1,5 @@
 #include "../../core/widget.h"
+#include "../render.h"
 
-void basic_render_text_widget(struct widget widget);
+int basic_render_text_widget(struct widget widget,
+                              struct basic_render_details details);

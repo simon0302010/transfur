@@ -1,37 +1,49 @@
-#include "../../misc/bool.h"
-
 #include "basic.h"
+#include "../../misc/bool.h"
+#include "../app/app.h"
+#include "../core/ui_core.h"
+#include "event.h"
+#include "render.h"
+#include "sdl3/basic_wrapper.h"
 #include "text.h"
 
-void run_basic(char *title, int width, int height,
-               struct basic_renderable renderables[], size_t count) {
-        tbool running = true;
+void run_basic(char *title, int width, int height) {
         struct color color;
-        struct basic_event event;
+        struct ui_context ui;
+        struct ui_event event;
+        double prev_time, current_time, dt;
 
         color.r = 255;
         color.b = 0;
         color.g = 0;
 
+        ui_init(&ui);
+
+        app_init(&ui);
+
+        prev_time = basic_get_time();
+
         basic_init(title, width, height);
 
-        while (running) {
-                while (basic_poll_event(&event)) {
-                        switch (event.type) {
-                        case BASIC_EVENT_QUIT:
-                                running = false;
-                                break;
-                        default:
-                                break;
-                        }
+        while (ui.running) {
+                event = basic_poll_ui_event();
+                switch (event.type) {
+                case UI_EVENT_QUIT:
+                        ui.running = false;
+                        break;
+                default:
+                        break;
                 }
+
+                current_time = basic_get_time();
+                dt = current_time - prev_time;
+                prev_time = current_time;
+
+                ui_update(&ui, dt);
 
                 basic_begin_frame();
 
-                basic_fill_rect(12, 14, 16, 18, color);
-
-                draw_text("Hello world! abcdefghijklmnopqrstuvwxyz 0123456789",
-                          34, 34, 7, color);
+                basic_render(&ui);
 
                 basic_present();
         }
