@@ -51,13 +51,19 @@ else ifeq ($(shell uname -s),Darwin)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
 endif
 
-OBJ = $(SRC:src/%.c=build/%.o)
+ASM_SRC = src/gui/basic/font.S
+
+OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
 
 build/%.o: src/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+build/%.o: src/%.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 

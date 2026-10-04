@@ -24,13 +24,14 @@ int basic_render_loading_bar_widget(struct widget widget,
         short i;
         short color_set_size = 6;
 
-        size_t title_width = strlen(options->title);
-        int bar_width = details.width - ((int)title_width * 5) - 3;
+        int bar_width = details.width - 3;
+        int title_width;
 
         if (bar_width <= 0)
                 return 0;
 
-        draw_text(options->title, details.x, details.y, 1, text_color);
+        title_width = draw_text(options->title, details.x, details.y, 1, text_color).width;
+        bar_width -= title_width;
 
         for (i = 0; i < bar_width; i += 1)
                 basic_fill_rect(
