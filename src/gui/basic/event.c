@@ -25,7 +25,7 @@ struct ui_event basic_poll_ui_event(void) {
                 event.type = UI_EVENT_MOUSE_MOVE;
                 break;
         default:
-                event.type = UI_EVENT_KEY_DOWN; /* TODO: Add UI_EVENT_NONE */
+                event.type = UI_EVENT_NONE;
                 break;
         }
 
@@ -33,13 +33,20 @@ struct ui_event basic_poll_ui_event(void) {
         event.mouse_x = basic_event.mouse_x;
         event.mouse_y = basic_event.mouse_y;
 
-        switch (basic_event.key_code) {
-        case 9:
-                event.key = UI_KEY_TAB;
-                break;
-        default:
-                event.key = UI_KEY_CHAR;
-                break;
+        if (event.type == UI_EVENT_KEY_DOWN || UI_EVENT_KEY_UP) {
+                switch (basic_event.key_code) {
+                case 9:
+                        event.key = UI_KEY_TAB;
+                        break;
+                default:
+                        event.key = UI_KEY_CHAR;
+                        break;
+                }
+        } else
+                event.key = UI_KEY_NONE;
+
+        if (event.key == UI_KEY_CHAR && event.ch == '\0') {
+                event.key = UI_KEY_NONE;
         }
 
         return event;
