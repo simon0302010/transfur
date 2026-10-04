@@ -19,8 +19,13 @@ chunk types 1 and 2.
 #include "../../misc/debug.h"
 #include "../interfaces.h"
 
-/* File path limit */
+#ifdef OS_MSDOS
+/* https://delorie.com/djgpp/doc/rbinter/id/30/28.html */
+#define FILE_PATH_LIMIT 128
+#else
+/* Keeping this at 480 to allow the state to fit into 512 bytes */
 #define FILE_PATH_LIMIT 480
+#endif
 
 struct file_state {
         unsigned long offset;

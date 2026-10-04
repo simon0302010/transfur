@@ -16,7 +16,6 @@ SRC = src/main.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
 	src/misc/ttime.c \
-	src/misc/debug.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
 	src/gui/core/widgets/group.c \
@@ -32,12 +31,6 @@ SRC = src/main.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
-	src/gui/basic/basic.c \
-	src/gui/basic/render.c \
-	src/gui/basic/event.c \
-	src/gui/basic/text.c \
-	src/gui/basic/widgets/loading_bar.c \
-	src/gui/basic/widgets/text.c \
 	src/misc/debug.c
 
 ifeq ($(OS),Windows_NT)
