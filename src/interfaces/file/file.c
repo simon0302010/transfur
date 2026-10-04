@@ -16,6 +16,7 @@ chunk types 1 and 2.
 #include <stdio.h>
 #include <string.h>
 
+#include "../../misc/debug.h"
 #include "../interfaces.h"
 
 /* File path limit */
@@ -62,8 +63,11 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
         unsigned long len;
         size_t wrote;
 
+        print_debug("chunk type: %i\n", chunk->type);
+
         /*if (chunk->type != chunk_type_data) {
-                fprintf(stderr, "send_chunk_file only accepts chunks with type "
+                fprintf(stderr, "send_chunk_file only accepts chunks with
+        type "
                                 "== chunk_type_data\n");
                 return 1;
         }*/
