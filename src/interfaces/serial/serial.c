@@ -29,18 +29,21 @@ not provided, BAUD_RATE will be used. On windows the path is a port name such as
 #include <unistd.h>
 
 typedef int serial_handle;
+#define SERIAL_INVALID_HANDLE (-1)
 
 #elif defined(OS_WINDOWS)
 
 #include <windows.h>
 
 typedef HANDLE serial_handle;
+#define SERIAL_INVALID_HANDLE INVALID_HANDLE_VALUE
 
 #elif defined(OS_MSDOS)
 
 #include "dos_serial/dos_serial.h"
 
 typedef int serial_handle;
+#define SERIAL_INVALID_HANDLE 0
 
 #endif
 
