@@ -31,8 +31,7 @@ SRC = src/main.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
-	src/misc/debug.c
-	src/gui/basic/basic.c \
+#	src/gui/basic/basic.c This is commented out because jeremiah's code does not compile ):< \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
 	src/gui/basic/text.c \
