@@ -25,15 +25,15 @@ typedef int discover_sock;
 
 typedef SOCKET discover_sock;
 
-#define DISCOVER_INVALID_SOCK INVALID_SOCK;
+#define DISCOVER_INVALID_SOCK INVALID_SOCK
 
 #endif
 
 #define DISCOVER_PORT 9001
 #define DISCOVER_SCAN_SECONDS 2.0
 #define DISCOVER_PROBE_SECONDS 0.75
-#define DISCOVER_QUERY "TFDISCv1 QUERY"
-#define DISCOVER_REPLY "TFDISCv1 REPLY"
+#define DISCOVER_QUERY "TFDISCv1 QUERY "
+#define DISCOVER_REPLY "TFDISCv1 REPLY "
 #define DISCOVER_PREFIX_LEN 15 /* strlen of either query/reply above */
 #define DISCOVER_ID_LEN 4
 #define DISCOVER_MAX_FRAME 64
@@ -50,8 +50,8 @@ static double scan_deadline = 0.0;
 static double last_probe = 0.0;
 
 static char peer_ip[MAX_PEERS][16];
-static char peer_port[MAX_PEERS];
-static char peer_count = 0;
+static int peer_port[MAX_PEERS];
+static int peer_count = 0;
 
 static void discover_close_sock(discover_sock sock);
 static int discover_open(discover_sock *out, unsigned short port);
@@ -110,7 +110,7 @@ static int discover_wait(discover_sock sock, int timeout_ms) {
         tv.tv_usec = (timeout_ms % 1000) * 1000;
 
 #if defined(OS_WINDOWS)
-        r = select(0, &rfds, NULL, NULLl, &tv);
+        r = select(0, &rfds, NULL, NULL, &tv);
 #else
         r = select(sock + 1, &rfds, NULL, NULL, &tv);
 #endif
@@ -330,7 +330,7 @@ void discover_frame(void) {
                 if (strncmp(buf, DISCOVER_REPLY, DISCOVER_PREFIX_LEN) != 0) {
                         continue;
                 }
-                if (strncmp(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) != 0) {
+                if (strncpy(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) != 0) {
                         continue;
                 }
                 if (buf[DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN] != ' ') {
