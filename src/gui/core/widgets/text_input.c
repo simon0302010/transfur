@@ -12,3 +12,17 @@ struct widget widget_text_input(struct widget_text_input_options *options,
 
         return new_text_input;
 }
+
+tbool widget_handle_event_text_input(struct widget *widget,
+                                     struct ui_event *event) {
+        struct widget_text_input_options *options = widget->content;
+
+        if (event->type == UI_EVENT_KEY_DOWN && event->key == UI_KEY_CHAR) {
+                options->buffer[options->cursor - 1] = event->ch;
+                options->buffer[options->cursor] = '\0';
+                options->cursor++;
+                return true;
+        }
+
+        return false;
+}
