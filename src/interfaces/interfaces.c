@@ -127,6 +127,8 @@ int close_conn(const int *conn) {
                 break; /* How would this even happen lmao */
         case if_file:
                 break; /* Nothing needs to happen for file as it doesn't keep any resource open between chunks */
+        case if_serial:
+                break; /* TODO: release the serial port (fd/handle) */
         case if_lan:
                 r = close_conn_lan(context);
                 break;
