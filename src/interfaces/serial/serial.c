@@ -29,18 +29,21 @@ not provided, BAUD_RATE will be used. On windows the path is a port name such as
 #include <unistd.h>
 
 typedef int serial_handle;
+#define SERIAL_INVALID_HANDLE (-1)
 
 #elif defined(OS_WINDOWS)
 
 #include <windows.h>
 
 typedef HANDLE serial_handle;
+#define SERIAL_INVALID_HANDLE INVALID_HANDLE_VALUE
 
 #elif defined(OS_MSDOS)
 
 #include "dos_serial/dos_serial.h"
 
 typedef int serial_handle;
+#define SERIAL_INVALID_HANDLE 0
 
 #endif
 
@@ -53,6 +56,7 @@ static unsigned long lookup_baud(unsigned long v);
 #endif
 static int serial_port_open(const char *path, unsigned long baud,
                             serial_handle *out);
+static void serial_port_close(serial_handle fd);
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len);
 static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len);
@@ -121,6 +125,10 @@ static int serial_port_open(const char *path, unsigned long baud,
 
         *out = fd;
         return SERIAL_OK;
+}
+
+static void serial_port_close(serial_handle fd) {
+        (void)close(fd);
 }
 
 /* Send bytes to port, retry on EINTR */
@@ -242,6 +250,10 @@ static int serial_port_open(const char *path, unsigned long baud,
         return SERIAL_OK;
 }
 
+static void serial_port_close(serial_handle fd) {
+        (void)CloseHandle(fd);
+}
+
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len) {
         DWORD written;
@@ -293,6 +305,7 @@ static int serial_port_open(const char *path, unsigned long baud,
         } else {
                 return SERIAL_ERR_OPTIONS; /* TODO: I don't know if this is the
                                               correct error code for this */
+                                           /* It's correct -kaboom */
         }
 
         if (serial_open(port, (long)baud, 8, 'n', 1, SER_HANDSHAKING_NONE) !=
@@ -300,6 +313,10 @@ static int serial_port_open(const char *path, unsigned long baud,
                 return SERIAL_ERR_OPEN;
 
         return port;
+}
+
+static void serial_port_close(serial_handle fd) {
+        (void)serial_close(fd);
 }
 
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
@@ -597,6 +614,29 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
         }
 }
 
+int close_conn_serial(void *conn) {
+        struct serial_state *st;
+
+        if (conn == NULL) {
+                return SERIAL_ERR_ARG;
+        }
+
+        st = (struct serial_state *)conn;
+
+        /* if init_conn_serial fails, it does not save a handle so treat as already closed */
+        if (st->inited != 1) {
+                return SERIAL_OK;
+        }
+
+        serial_port_close(st->fd);
+
+        st->fd = SERIAL_INVALID_HANDLE;
+        st->ping_outstanding = 0;
+        st->inited = 0;
+
+        return SERIAL_OK;
+}
+
 #else
 /* apple stubs 🥀🥀🥀🥀 */
 
@@ -617,5 +657,8 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
         (void)chunk;
         return SERIAL_ERR_PLATFORM;
 }
-
+int close_conn_serial(void *conn) {
+        (void)conn;
+        return SERIAL_ERR_PLATFORM;
+}
 #endif

@@ -32,12 +32,18 @@ SRC = src/main.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
 	src/misc/debug.c
+	src/gui/basic/basic.c \
+	src/gui/basic/render.c \
+	src/gui/basic/event.c \
+	src/gui/basic/text.c \
+	src/gui/basic/widgets/loading_bar.c \
+	src/gui/basic/widgets/text.c
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
 	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
 	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
@@ -46,13 +52,19 @@ else ifeq ($(shell uname -s),Darwin)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
 endif
 
-OBJ = $(SRC:src/%.c=build/%.o)
+ASM_SRC = src/gui/basic/font.S
+
+OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
 
 build/%.o: src/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+build/%.o: src/%.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 

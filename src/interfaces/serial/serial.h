@@ -44,4 +44,10 @@ error.
 */
 int recv_chunk_serial(void *conn, struct chunk *chunk);
 
+/*
+Closes the serial port and resets the connection state.
+Returns `0` on success or an error code based on the error
+*/
+int close_conn_serial(void *conn);
+
 #endif
