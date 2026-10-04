@@ -530,6 +530,24 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                         nk_widget_disable_end(ctx);
                 }
 
+                nk_spacer(ctx);
+
+                can_close_sender = !worker_active() && sender_connected;
+                if (!can_close_sender) {
+                        nk_widget_disable_begin(ctx);
+                }
+                if (nk_button_label(ctx, "Close sender")) {
+                        close_conn(&sender_conn);
+                        sender_conn = -1;
+                        sender_inited = 0;
+                        sender_connected = 0;
+                        worker_state = wk_idle;
+                        loading_bar_state = 0;
+                }
+                if (!can_close_sender) {
+                        nk_widget_disable_end(ctx);
+                }
+
                 /* Vertical spacer */
                 nk_layout_row_dynamic(ctx, 10, 1);
 
