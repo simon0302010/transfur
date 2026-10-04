@@ -13,8 +13,10 @@ SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
+	src/interfaces/lan/discover.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
+	src/misc/debug.c \
 	src/misc/ttime.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
@@ -31,12 +33,14 @@ SRC = src/main.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
-	src/misc/debug.c
+	src/misc/debug.c \
 	src/gui/basic/basic.c \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
 	src/gui/basic/text.c \
 	src/gui/basic/widgets/loading_bar.c \
+	src/gui/basic/widgets/progress_bar.c \
+	src/gui/basic/widgets/text_input.c \
 	src/gui/basic/widgets/text.c
 
 ifeq ($(OS),Windows_NT)

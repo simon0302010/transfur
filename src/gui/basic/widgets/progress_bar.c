@@ -1,6 +1,5 @@
 #include "progress_bar.h"
 #include "../../core/widgets/progress_bar.h"
-#include "../ansi.h"
 #include "../sdl3/basic_wrapper.h"
 #include <malloc.h>
 #include <stdio.h>

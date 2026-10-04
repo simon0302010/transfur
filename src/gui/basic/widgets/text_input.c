@@ -1,6 +1,7 @@
 #include "../../core/widgets/text_input.h"
 #include "../sdl3/basic_wrapper.h"
 #include "text_input.h"
+#include "../text.h"
 
 #define INPUT_PADDING 4
 #define INPUT_BORDER_SIZE 2
