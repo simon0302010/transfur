@@ -116,15 +116,27 @@ int recv_chunk(const int *conn, struct chunk *chunk) {
 
 int close_conn(const int *conn) {
         void *context = get_conn(conn);
-        if (context == NULL)
+        int r = 0;
+
+        if (context == NULL) {
                 return 1;
+        }
+
+        switch (connection_types[*conn]) {
+        case if_empty:
+                break; /* How would this even happen lmao */
+        case if_file:
+                break; /* Nothing needs to happen for file as it doesn't keep any resource open between chunks */
+        case if_lan:
+                r = close_conn_lan(context);
+                break;
+        }
 
         /* This probably creates a bunch of memory leaks lmao */
         memset(context, 0, INTERFACE_CONTEXT_SIZE);
-
         connection_types[*conn] = if_empty;
-
-        return 0;
+        
+        return r;
 }
 
 const char *get_receiver_text(enum interface interface) {
