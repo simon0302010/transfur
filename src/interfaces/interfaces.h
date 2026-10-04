@@ -106,6 +106,7 @@ int recv_chunk(const int *conn, struct chunk *chunk);
 
 /*
 Terminates a connection.
+Returns `0` on success, `1` if conn is invalid, or an interface error code
 */
 int close_conn(const int *conn);
 
