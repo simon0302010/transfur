@@ -168,7 +168,7 @@ const enum interface *get_supported_interfaces(void) {
 #else
         static const enum interface interfaces[] = {if_file, if_empty};
         fprintf(stderr,
-                "Warning: Operating system not officially supported.\n");
+                "warning: operating system not officially supported.\n");
 #endif
 
         return interfaces;

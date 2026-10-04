@@ -63,18 +63,41 @@ int send_chunk_file(void *conn, const struct chunk *chunk) {
         unsigned long len;
         size_t wrote;
 
-        print_debug("chunk type: %i\n", chunk->type);
-
-        /*if (chunk->type != chunk_type_data) {
-                fprintf(stderr, "send_chunk_file only accepts chunks with
-        type "
-                                "== chunk_type_data\n");
-                return 1;
-        }*/
-
         st = (struct file_state *)conn;
+
         len = get_be32(chunk->length);
         if (len > (unsigned long)CHUNK_SIZE) {
+                return 1;
+        }
+
+        print_debug(
+            "file interface %p received a chunk of type %i and length %lu\n",
+            conn, chunk->type, len);
+
+        if (chunk->type == chunk_type_clear_file) {
+                /* Empties the file */
+                FILE *delfile = fopen(st->path, "w");
+                if (delfile) {
+                        fclose(delfile);
+                        print_debug("deleting contents of %s\n", st->path);
+                        return 0;
+                } else {
+                        fprintf(stderr,
+                                "file interface %p failed to delete contents "
+                                "of %s\n",
+                                conn, st->path);
+                        return 1;
+                }
+        } else if (chunk->type == chunk_type_finish) {
+                if (len > 0)
+                        print_debug("warning: file interface %p received final "
+                                    "chunk with length %lu\n",
+                                    conn, len);
+                return 0;
+        } else if (chunk->type != chunk_type_data) {
+                print_debug(
+                    "file interface %p received incompatible chunk type: %i\n",
+                    conn, chunk->type);
                 return 1;
         }
 
@@ -97,12 +120,6 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
         size_t got;
 
         st = (struct file_state *)conn;
-
-        if (chunk->type == (unsigned char)chunk_type_finish) {
-                /* Empties the file */
-                fclose(fopen(st->path, "w"));
-                return 0;
-        }
 
         file = fopen(st->path, "rb");
         if (file == NULL) {

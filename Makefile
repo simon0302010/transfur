@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h
+CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
@@ -36,7 +36,8 @@ SRC = src/main.c \
 	src/gui/basic/event.c \
 	src/gui/basic/text.c \
 	src/gui/basic/widgets/loading_bar.c \
-	src/gui/basic/widgets/text.c
+	src/gui/basic/widgets/text.c \
+	src/misc/debug.c
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
