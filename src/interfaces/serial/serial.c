@@ -615,7 +615,7 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
 }
 
 int close_conn_serial(void *conn) {
-        struct serial_state *st
+        struct serial_state *st;
 
         if (conn == NULL) {
                 return SERIAL_ERR_ARG;
@@ -625,7 +625,7 @@ int close_conn_serial(void *conn) {
 
         /* if init_conn_serial fails, it does not save a handle so treat as already closed */
         if (st->inited != 1) {
-                return SERIAL_OK
+                return SERIAL_OK;
         }
 
         serial_port_close(st->fd);
