@@ -43,4 +43,13 @@ error.
 */
 int recv_chunk_lan(void *conn, struct chunk *chunk);
 
+/*
+Closes the connection's socket and resets the connection state.
+Returns `0` on success or an error code based on the error
+*/
+int close_conn_lan(void *conn);
+
+/* Just read the function name brochacho */
+const char *get_lan_ip(void);
+
 #endif
