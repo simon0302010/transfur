@@ -790,7 +790,7 @@ static void lan_resolve_ip(char *out, int out_size) {
 
         strncpy(out, inet_ntoa(src.sin_addr), (size_t)out_size - 1);
         out[out_size - 1] = '\0';
-        lan_socket_close
+        lan_socket_close(sock);
 }
 
 const char *get_lan_ip(void) {
