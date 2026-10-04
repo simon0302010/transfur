@@ -305,6 +305,7 @@ static int serial_port_open(const char *path, unsigned long baud,
         } else {
                 return SERIAL_ERR_OPTIONS; /* TODO: I don't know if this is the
                                               correct error code for this */
+                                           /* It's correct -kaboom */
         }
 
         if (serial_open(port, (long)baud, 8, 'n', 1, SER_HANDSHAKING_NONE) !=
@@ -613,6 +614,29 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
         }
 }
 
+int close_conn_serial(void *conn) {
+        struct serial_state *st
+
+        if (conn == NULL) {
+                return SERIAL_ERR_ARG;
+        }
+
+        st = (struct serial_state *)conn;
+
+        /* if init_conn_serial fails, it does not save a handle so treat as already closed */
+        if (st->inited != 1) {
+                return SERIAL_OK
+        }
+
+        serial_port_close(st->fd);
+
+        st->fd = SERIAL_INVALID_HANDLE;
+        st->ping_outstanding = 0;
+        st->inited = 0;
+
+        return SERIAL_OK;
+}
+
 #else
 /* apple stubs 🥀🥀🥀🥀 */
 
@@ -633,5 +657,8 @@ int recv_chunk_serial(void *conn, struct chunk *chunk) {
         (void)chunk;
         return SERIAL_ERR_PLATFORM;
 }
-
+int close_conn_serial(void *conn) {
+        (void)conn;
+        return SERIAL_ERR_PLATFORM;
+}
 #endif
