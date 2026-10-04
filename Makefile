@@ -16,6 +16,7 @@ SRC = src/main.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
 	src/misc/ttime.c \
+	src/misc/debug.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
 	src/gui/core/widgets/group.c \
@@ -31,18 +32,12 @@ SRC = src/main.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
-	src/gui/basic/basic.c \
-	src/gui/basic/render.c \
-	src/gui/basic/event.c \
-	src/gui/basic/text.c \
-	src/gui/basic/widgets/loading_bar.c \
-	src/gui/basic/widgets/text.c
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c
 	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
 	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
@@ -69,7 +64,7 @@ clean:
 
 test:
 	mkdir -p build
-	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c
+	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
 	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c
 	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 
