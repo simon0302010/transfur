@@ -6,7 +6,7 @@
 void tui_render_text_input_widget(struct widget widget, int width) {
         struct widget_text_input_options *options = widget.content;
 
-        if (options->is_focused) {
+        if (widget.is_focused) {
                 /* TODO: Account for cursor position */
                 printf("%s [%s_]", options->label, options->buffer);
 

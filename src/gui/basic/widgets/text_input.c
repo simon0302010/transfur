@@ -1,7 +1,7 @@
 #include "../../core/widgets/text_input.h"
 #include "../sdl3/basic_wrapper.h"
-#include "text_input.h"
 #include "../text.h"
+#include "text_input.h"
 
 #define INPUT_PADDING 4
 #define INPUT_BORDER_SIZE 2
@@ -42,7 +42,7 @@ int basic_render_text_input_widget(struct widget widget,
                             text_height + INPUT_PADDING,
                         details.width, INPUT_BORDER_SIZE, border_color);
 
-        if (options->is_focused) {
+        if (widget.is_focused) {
                 basic_draw_rect(details.x + INPUT_BORDER_SIZE,
                                 details.y + INPUT_BORDER_SIZE,
                                 details.width - INPUT_BORDER_SIZE -

@@ -32,6 +32,7 @@ void run_basic(char *title, int width, int height) {
                         ui.running = false;
                         break;
                 default:
+                        ui_handle_event(&ui, &event);
                         break;
                 }
 

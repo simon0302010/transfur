@@ -34,8 +34,12 @@ struct ui_event basic_poll_ui_event(void) {
         event.mouse_y = basic_event.mouse_y;
 
         switch (basic_event.key_code) {
+        case 9:
+                event.key = UI_KEY_TAB;
+                break;
         default:
                 event.key = UI_KEY_CHAR;
+                break;
         }
 
         return event;
