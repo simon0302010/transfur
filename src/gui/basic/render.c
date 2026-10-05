@@ -1,17 +1,20 @@
 #include "render.h"
 #include "widgets/text.h"
 
+#define BASIC_MARGIN 8
+#define BASIC_SPACING 4
+
 void basic_render(struct ui_context *ctx) {
         int i;
-        int height = 0;
+        int height = BASIC_MARGIN;
         struct basic_render_details details;
 
-        details.width = 800; /* TODO: Match window */
-        details.x = 0;
+        details.width = 800 - BASIC_MARGIN - BASIC_MARGIN; /* TODO: Match window */
+        details.x = BASIC_MARGIN;
 
         for (i = 0; i < ctx->count; i++) {
                 details.y = height;
-                height += basic_render_widget(ctx->widgets[i], details);
+                height += basic_render_widget(ctx->widgets[i], details) + BASIC_SPACING;
         }
 }
 
