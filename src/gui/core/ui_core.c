@@ -12,6 +12,10 @@ void ui_init(struct ui_context *ctx) {
 tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
         /* esc always unfocuses */
         if (event->type == UI_EVENT_KEY_DOWN && event->key == UI_KEY_ESC) {
+                if (ctx->focus_index >= 0 && ctx->focus_index < ctx->count) {
+                        ctx->widgets[ctx->focus_index].is_focused = false;
+                }
+
                 ctx->focus_index = -1;
                 return true;
         }
@@ -20,20 +24,21 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
         if (event->type == UI_EVENT_KEY_DOWN &&
             (event->key == UI_KEY_TAB || event->key == UI_KEY_SHIFT_TAB)) {
                 tbool found_widget = false;
-                
+
                 if (ctx->focus_index >= 0 && ctx->focus_index < ctx->count) {
                         ctx->widgets[ctx->focus_index].is_focused = false;
                 }
 
-                
                 while (!found_widget) {
                         if (event->key == UI_KEY_TAB)
                                 ctx->focus_index++;
                         else
                                 ctx->focus_index--;
 
-                        if (ctx->focus_index < 0) ctx->focus_index = ctx->count - 1;
-                        if (ctx->focus_index >= ctx->count) ctx->focus_index = 0; 
+                        if (ctx->focus_index < 0)
+                                ctx->focus_index = ctx->count - 1;
+                        if (ctx->focus_index >= ctx->count)
+                                ctx->focus_index = 0;
 
                         switch (ctx->widgets[ctx->focus_index].type) {
                         case WIDGET_TEXT_INPUT:
