@@ -15,6 +15,8 @@ static const struct color color_set[6] = {
     {255, 255, 0}  /* yellow */
 };
 
+#define ENABLE_EASTER_EGGS
+
 static struct color text_color = {255, 255, 255};
 
 int basic_render_loading_bar_widget(struct widget widget,
@@ -33,11 +35,37 @@ int basic_render_loading_bar_widget(struct widget widget,
         title_width = draw_text(options->title, details.x, details.y, 1, text_color).width;
         bar_width -= title_width;
 
+        #ifdef ENABLE_EASTER_EGGS
+        #define EASTER_EGG_SEGMENT_SIZE 12
+        for (i = 0; i < bar_width; i += 1) {
+                /* head position should be 0/7, 1/7, 2/7, 3/7, 4/7, 5/7, 6/7 */
+                int head_position = (int)((double)(options->offset) / 6.0 * bar_width);
+                int j;
+
+                basic_fill_rect(title_width + 3 + details.x + i, details.y + 2, 1, 2, text_color);
+                basic_fill_rect(title_width + 3 + details.x + i, details.y + EASTER_EGG_SEGMENT_SIZE - 4, 1, 2, text_color);
+
+                if ((i+4) % 8 == 0) basic_fill_rect(title_width + 3 + details.x + i, details.y, 2, EASTER_EGG_SEGMENT_SIZE, text_color);
+
+                /* draw head */
+                basic_fill_rect(title_width + 3 + details.x + head_position + 2, details.y - 2, 2, 6, color_set[0]);
+                basic_fill_rect(title_width + 3 + details.x + head_position, details.y + 2, EASTER_EGG_SEGMENT_SIZE, 6, color_set[0]);
+                
+                /* draw each car */
+                for (j = 1; j < color_set_size; j++) {
+                        int x = title_width + 3 + details.x + head_position - (EASTER_EGG_SEGMENT_SIZE + 2) * j;
+                        if (x < title_width + 3 + details.x) x += bar_width;
+                        basic_fill_rect(x, details.y, EASTER_EGG_SEGMENT_SIZE, 8, color_set[j]);
+                }
+        }
+        return EASTER_EGG_SEGMENT_SIZE;
+        #else
         for (i = 0; i < bar_width; i += 1)
                 basic_fill_rect(
                     title_width + 3 + details.x + i * LOADING_SEGMENT_SIZE, details.y,
                     LOADING_SEGMENT_SIZE, LOADING_SEGMENT_SIZE,
                     color_set[(i + options->offset) % color_set_size]);
+        #endif
 
         return LOADING_SEGMENT_SIZE;
 }
