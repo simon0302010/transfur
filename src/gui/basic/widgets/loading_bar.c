@@ -105,5 +105,5 @@ int basic_render_loading_bar_widget(struct widget widget,
                     color_set[(i + options->offset) % color_set_size]);
 #endif
 
-        return LOADING_SEGMENT_SIZE;
+        return LOADING_SEGMENT_SIZE + 2;
 }
