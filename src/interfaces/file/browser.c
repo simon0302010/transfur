@@ -22,15 +22,17 @@ static char browser_dir_path[BROWSER_MAX_PATH] = "";
 static struct browser_entry *browser_items = NULL;
 static int browser_item_count = 0;
 
-static void browser_join(char *out, int out_size, const char *dir, const char *name);
+static void browser_join(char *out, int out_size, const char *dir,
+                         const char *name);
 static void browser_parent(char *out, int out_size, const char *dir);
 static int browser_push(const char *name, int is_dir);
 static void browser_clear(void);
-static int browser_cmp (const void *a, const void *b);
+static int browser_cmp(const void *a, const void *b);
 static int browser_is_abs(const char *path);
 static void browser_abs(char *out, int out_size, const char *path);
 
-static void browser_join(char *out, int out_size, const char *dir, const char *name) {
+static void browser_join(char *out, int out_size, const char *dir,
+                         const char *name) {
         size_t limit;
         size_t pos;
         size_t n;
@@ -49,7 +51,7 @@ static void browser_join(char *out, int out_size, const char *dir, const char *n
         }
         memcpy(out, dir, n);
         pos = n;
-        
+
         if (pos > 0 && out[pos - 1] != '/' && pos < limit) {
                 out[pos] = '/';
                 pos++;
@@ -87,7 +89,7 @@ static void browser_parent(char *out, int out_size, const char *dir) {
                 len--;
         }
 
-        if(len > (size_t)out_size - 1) {
+        if (len > (size_t)out_size - 1) {
                 len = (size_t)out_size - 1;
         }
 
@@ -110,9 +112,8 @@ static int browser_push(const char *name, int is_dir) {
 
         if ((browser_item_count % 64) == 0) {
                 grown = (struct browser_entry *)realloc(
-                        browser_items, 
-                        (size_t)(browser_item_count + 64) *
-                            sizeof(struct browser_entry));
+                    browser_items, (size_t)(browser_item_count + 64) *
+                                       sizeof(struct browser_entry));
                 if (grown == NULL) {
                         return -1;
                 }
@@ -152,8 +153,10 @@ static int browser_cmp(const void *a, const void *b) {
 }
 
 static int browser_is_abs(const char *path) {
-#if defined(OS_WINDOWS) 
-        if (((path[0] >= 'A' && path[0] <= 'Z') || (path[0] >= 'a' && path[0] <= 'z')) || path[1] == ':') {
+#if defined(OS_WINDOWS)
+        if (((path[0] >= 'A' && path[0] <= 'Z') ||
+             (path[0] >= 'a' && path[0] <= 'z')) ||
+            path[1] == ':') {
                 return 1;
         }
 
@@ -225,7 +228,8 @@ static int browser_read_dir(const char *dir) {
                 while (!failed && (entry = readdir(handle)) != NULL) {
                         int is_dir;
 
-                        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+                        if (strcmp(entry->d_name, ".") == 0 ||
+                            strcmp(entry->d_name, "..") == 0) {
                                 continue;
                         }
 
@@ -240,7 +244,7 @@ static int browser_read_dir(const char *dir) {
                                 failed = 1;
                         }
                 }
-                
+
                 if (handle != NULL) {
                         closedir(handle);
                 }

@@ -43,6 +43,7 @@ SRC = src/main.c \
 	src/gui/basic/widgets/progress_bar.c \
 	src/gui/basic/widgets/text_input.c \
 	src/gui/basic/widgets/text.c \
+	src/gui/tui/widgets/button.c \
 	src/gui/basic/widgets/button.c
 
 ifeq ($(OS),Windows_NT)

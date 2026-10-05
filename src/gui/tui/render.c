@@ -1,5 +1,6 @@
 #include "render.h"
 #include "../../misc/console.h"
+#include "widgets/button.h"
 #include "widgets/text.h"
 
 void tui_render(struct ui_context *ctx) {
