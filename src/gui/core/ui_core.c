@@ -51,11 +51,11 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
 
         /* if a widget if focused, check if it would handle interaction */
         if (ctx->focus_index >= 0 && ctx->focus_index < ctx->count) {
-                struct widget focused_widget = ctx->widgets[ctx->focus_index];
+                struct widget *focused_widget = &ctx->widgets[ctx->focus_index];
 
-                switch (focused_widget.type) {
+                switch (focused_widget->type) {
                 case WIDGET_TEXT_INPUT: {
-                        if (widget_handle_event_text_input(&focused_widget,
+                        if (widget_handle_event_text_input(focused_widget,
                                                            event))
                                 return true;
                 }
