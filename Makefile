@@ -25,6 +25,7 @@ SRC = src/main.c \
 	src/gui/core/widgets/progress_bar.c \
 	src/gui/core/widgets/text.c \
 	src/gui/core/widgets/text_input.c \
+	src/gui/core/widgets/button.c \
 	src/gui/tui/raw.c \
 	src/gui/tui/render.c \
 	src/gui/tui/input.c \
@@ -41,7 +42,8 @@ SRC = src/main.c \
 	src/gui/basic/widgets/loading_bar.c \
 	src/gui/basic/widgets/progress_bar.c \
 	src/gui/basic/widgets/text_input.c \
-	src/gui/basic/widgets/text.c
+	src/gui/basic/widgets/text.c \
+	src/gui/basic/widgets/button.c
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c

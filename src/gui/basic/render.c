@@ -30,6 +30,9 @@ int basic_render_widget(struct widget widget,
         case WIDGET_TEXT_INPUT:
                 return basic_render_text_input_widget(widget, details);
                 break;
+        case WIDGET_BUTTON:
+                return basic_render_button_widget(widget, details);
+                break;
         default:
                 break;
         }
