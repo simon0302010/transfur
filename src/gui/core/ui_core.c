@@ -19,8 +19,13 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
         /* tab / shift+tab navigation */
         if (event->type == UI_EVENT_KEY_DOWN &&
             (event->key == UI_KEY_TAB || event->key == UI_KEY_SHIFT_TAB)) {
-                /* TODO: unfocus old widget */
                 tbool found_widget = false;
+                
+                if (ctx->focus_index >= 0 && ctx->focus_index < ctx->count) {
+                        ctx->widgets[ctx->focus_index].is_focused = false;
+                }
+
+                
                 while (!found_widget) {
                         if (event->key == UI_KEY_TAB)
                                 ctx->focus_index++;
@@ -31,7 +36,8 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
                         if (ctx->focus_index >= ctx->count) ctx->focus_index = 0; 
 
                         switch (ctx->widgets[ctx->focus_index].type) {
-                        case WIDGET_TEXT_INPUT: {
+                        case WIDGET_TEXT_INPUT:
+                        case WIDGET_BUTTON: {
                                 ctx->widgets[ctx->focus_index].is_focused =
                                     true;
                                 found_widget = true;
