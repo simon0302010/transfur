@@ -4,6 +4,10 @@ A cross platform file transfer software
 
 Our goal is to be able to transfer information from any system to any other system with ease, regardless of system, speed, and age.  
 
+## Quick Project Update
+
+The project is now in an MVP state. TUI/basic GUI still work-in-progress.
+
 ## User Interfaces
 We currently have a cross-platform GUI tested and working on Linux (WSL2 and Native) powered by Nuklear.
 
