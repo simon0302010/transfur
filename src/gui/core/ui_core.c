@@ -27,6 +27,9 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
                         else
                                 ctx->focus_index--;
 
+                        if (ctx->focus_index < 0) ctx->focus_index = ctx->count - 1;
+                        if (ctx->focus_index >= ctx->count) ctx->focus_index = 0; 
+
                         switch (ctx->widgets[ctx->focus_index].type) {
                         case WIDGET_TEXT_INPUT: {
                                 ctx->widgets[ctx->focus_index].is_focused =

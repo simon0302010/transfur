@@ -18,12 +18,26 @@ enum basic_event_type {
         BASIC_EVENT_KEY_DOWN
 };
 
+enum basic_key {
+        BASIC_KEY_NONE,
+        BASIC_KEY_ESC,
+        BASIC_KEY_TAB,
+        BASIC_KEY_SHIFT_TAB,
+        BASIC_KEY_ENTER,
+        BASIC_KEY_BACKSPACE,
+        BASIC_KEY_DELETE,
+        BASIC_KEY_UP,
+        BASIC_KEY_DOWN,
+        BASIC_KEY_LEFT,
+        BASIC_KEY_RIGHT
+};
+
 struct basic_event {
         enum basic_event_type type;
         int mouse_x;
         int mouse_y;
         int mouse_button;
-        int key_code;
+        enum basic_key key;
         char ch;
 };
 

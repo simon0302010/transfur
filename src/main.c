@@ -3,6 +3,8 @@
 int main(void) {
         /* All app logic should now be written in `gui/app/` */
 
+#define USE_BASIC_GUI
+
 #ifdef USE_TUI
         run_tui("Transfur");
 #elif defined(USE_BASIC_GUI)

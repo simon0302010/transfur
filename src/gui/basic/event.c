@@ -34,8 +34,8 @@ struct ui_event basic_poll_ui_event(void) {
         event.mouse_y = basic_event.mouse_y;
 
         if (event.type == UI_EVENT_KEY_DOWN || UI_EVENT_KEY_UP) {
-                switch (basic_event.key_code) {
-                case 9:
+                switch (basic_event.key) {
+                case BASIC_KEY_TAB:
                         event.key = UI_KEY_TAB;
                         break;
                 default:

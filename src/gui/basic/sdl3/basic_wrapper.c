@@ -1,6 +1,7 @@
 #include "basic_wrapper.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
+#include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 
@@ -80,7 +81,7 @@ tbool basic_poll_event(struct basic_event *event) {
         event->mouse_x = 0;
         event->mouse_y = 0;
         event->mouse_button = 0;
-        event->key_code = 0;
+        event->key = BASIC_KEY_NONE;
         event->ch = '\0';
 
         if (!SDL_PollEvent(&sdl_event))
@@ -113,7 +114,44 @@ tbool basic_poll_event(struct basic_event *event) {
 
         case SDL_EVENT_KEY_DOWN:
                 event->type = BASIC_EVENT_KEY_DOWN;
-                event->key_code = (int)sdl_event.key.key;
+
+                switch (sdl_event.key.key) {
+                case SDLK_ESCAPE:
+                        event->key = BASIC_KEY_ESC;
+                        break;
+                case SDLK_TAB:
+                        if (sdl_event.key.mod & SDL_KMOD_SHIFT)
+                                event->key = BASIC_KEY_SHIFT_TAB;
+                        else
+                                event->key = BASIC_KEY_TAB;
+                        break;
+                case SDLK_RETURN:
+                case SDLK_KP_ENTER:
+                        event->key = BASIC_KEY_ENTER;
+                        break;
+                case SDLK_BACKSPACE:
+                        event->key = BASIC_KEY_BACKSPACE;
+                        break;
+                case SDLK_DELETE:
+                        event->key = BASIC_KEY_DELETE;
+                        break;
+                case SDLK_UP:
+                        event->key = BASIC_KEY_UP;
+                        break;
+                case SDLK_DOWN:
+                        event->key = BASIC_KEY_DOWN;
+                        break;
+                case SDLK_LEFT:
+                        event->key = BASIC_KEY_LEFT;
+                        break;
+                case SDLK_RIGHT:
+                        event->key = BASIC_KEY_RIGHT;
+                        break;
+                default:
+                        event->key = BASIC_KEY_NONE;
+                        break;
+                }
+
                 if (sdl_event.key.key >= 32 && sdl_event.key.key <= 126) {
                         event->ch = (char)sdl_event.key.key;
                 }
