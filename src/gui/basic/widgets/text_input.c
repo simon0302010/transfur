@@ -49,4 +49,6 @@ int basic_render_text_input_widget(struct widget widget,
                                     INPUT_BORDER_SIZE,
                                 INPUT_BORDER_SIZE + text_height, focus_color);
         }
+
+        return text_height + INPUT_PADDING + INPUT_PADDING + INPUT_BORDER_SIZE + INPUT_BORDER_SIZE;
 }
