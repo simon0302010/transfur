@@ -9,6 +9,7 @@
 
 static struct widget widgets[APP_WIDGET_COUNT];
 static char title[50] = "Transfur TRANSFUR hello";
+static char loading[] = "(this is a loading bar)";
 static char input_buffer[50];
 static struct widget_loading_bar_options loading_bar_opts;
 static struct widget_text_input_options text_input_opts;
@@ -16,7 +17,7 @@ static struct widget_button_options button_opts;
 
 void app_init(struct ui_context *ctx) {
 
-        loading_bar_opts.title = title;
+        loading_bar_opts.title = loading;
         loading_bar_opts.speed = 2.0f;
         loading_bar_opts.offset = 0;
         loading_bar_opts.accumulator = 0.0f;
