@@ -39,21 +39,21 @@ int basic_render_button_widget(struct widget widget,
                         bar_width - BUTTON_PADDING - BUTTON_PADDING,
                         title_height, bg_color);
 
-        #ifdef ENABLE_EASTER_EGGS      
-                for (i=0; i < bar_width - BUTTON_PADDING - BUTTON_PADDING; i++) {
-                        struct color color;
-                        color.r = (int)(100.0 * ((sin(i % 9)+2.0)/2.0));
-                        color.g = (int)(40.0 * ((cos(i / 9)+2.0)/2.0));
-                        color.b = (int)(40.0 * ((tan(i * 9)+2.0)/2.0));
+#ifdef ENABLE_EASTER_EGGS
+        for (i = 0; i < bar_width - BUTTON_PADDING - BUTTON_PADDING; i++) {
+                struct color color;
+                color.r = (int)(100.0 * ((sin(i % 9) + 2.0) / 2.0));
+                color.g = (int)(40.0 * ((cos(i / 9) + 2.0) / 2.0));
+                color.b = (int)(40.0 * ((tan(i * 9) + 2.0) / 2.0));
 
-                        basic_fill_rect(details.x + BUTTON_PADDING + i, details.y + BUTTON_PADDING, 1, title_height, color);
-                }
-        #endif
-        
+                basic_fill_rect(details.x + BUTTON_PADDING + i,
+                                details.y + BUTTON_PADDING, 1, title_height,
+                                color);
+        }
+#endif
+
         draw_text(options->title, details.x + BUTTON_PADDING,
                   details.y + BUTTON_PADDING, 1, text_color);
-
-        
 
         return title_height + BUTTON_PADDING + BUTTON_PADDING;
 }
