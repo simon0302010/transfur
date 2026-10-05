@@ -27,6 +27,9 @@ void tui_render_widget(struct widget widget, int width) {
         case WIDGET_TEXT_INPUT:
                 tui_render_text_input_widget(widget, width);
                 break;
+        case WIDGET_BUTTON:
+                tui_render_button_widget(widget, width);
+                break;
         default:
                 break;
         }
