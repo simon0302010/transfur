@@ -38,6 +38,9 @@ struct ui_event basic_poll_ui_event(void) {
                 case BASIC_KEY_TAB:
                         event.key = UI_KEY_TAB;
                         break;
+                case BASIC_KEY_BACKSPACE:
+                        event.key = UI_KEY_BACKSPACE;
+                        break;
                 default:
                         event.key = UI_KEY_CHAR;
                         break;
