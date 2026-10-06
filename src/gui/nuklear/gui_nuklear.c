@@ -191,32 +191,43 @@ static const char *step_text(int step) {
 /*
 Builds the status line in buf
 */
-static const char *status_text(char *buf) {
+static void status_text(char *buf) {
+        strcpy(buf, "Status: "); /* Will append status text */
+
         switch (worker_state) {
         case wk_idle:
-                return "Idle";
+                sprintf(buf + strlen(buf), "Idle");
+                break;
         case wk_init_receiver:
-                return "Initializing receiver";
+                sprintf(buf + strlen(buf), "Initializing receiver");
+                break;
         case wk_init_sender:
-                return "Initializing sender";
+                sprintf(buf + strlen(buf), "Initializing sender");
+                break;
         case wk_wait_receiver:
-                return "Waiting for a peer to connect (receiver)";
+                sprintf(buf + strlen(buf),
+                        "Waiting for a peer to connect (receiver)");
+                break;
         case wk_wait_sender:
-                return "Waiting for a peer to connect (sender)";
+                sprintf(buf + strlen(buf),
+                        "Waiting for a peer to connect (sender)");
+                break;
         case wk_transfurring:
-                sprintf(buf, "Transfurring, %lu chunks", worker_chunks);
-                return buf;
+                sprintf(buf + strlen(buf), "Transfurring, %lu chunks",
+                        worker_chunks);
+                break;
         case wk_done:
-                sprintf(buf, "Transfur complete (%lu chunk%s)", worker_chunks,
-                        worker_chunks > 1 ? "s" : "");
-                return buf;
+                sprintf(buf + strlen(buf), "Transfur complete (%lu chunk%s)",
+                        worker_chunks, worker_chunks > 1 ? "s" : "");
+                break;
         case wk_error:
-                sprintf(buf, "%s failed: %s", step_text(worker_step),
+                sprintf(buf + strlen(buf), "%s failed: %s",
+                        step_text(worker_step),
                         error_text(worker_if, worker_code));
-                return buf;
+                break;
         }
 
-        return "";
+        return;
 }
 
 #if defined(_WIN32)
@@ -344,14 +355,87 @@ static int worker_active(void) {
                worker_state != wk_error;
 }
 
-static void nk_gui(const char *title, struct nk_context *ctx, int width,
-                   int height) {
-        char status[192];
-        char peers_label[64];
-        char ip_label[32];
-        int can_start;
+static void show_lan_discovery(struct nk_context *ctx) {
         int can_scan;
         int can_show_peers;
+        char peers_label[64];
+        char ip_label[32];
+
+        /* Row for title */
+        nk_layout_row_dynamic(ctx, 20, 1);
+
+        nk_label(ctx, "LAN Options (Sender)", NK_TEXT_ALIGN_CENTERED);
+
+        /* Row for LAN peer discovery */
+        nk_layout_row_template_begin(ctx, 20);
+        nk_layout_row_template_push_static(ctx, 180);
+        nk_layout_row_template_push_dynamic(ctx);
+        nk_layout_row_template_push_static(ctx, 180);
+        nk_layout_row_template_end(ctx);
+
+        /* Scanning uses it's own UDP socket, so it is fine even while a
+         * transfur runs */
+        can_scan = discover_ready() && !discover_scanning();
+        if (!can_scan) {
+                nk_widget_disable_begin(ctx);
+        }
+        if (nk_button_label(ctx, discover_scanning() ? "Scanning"
+                                                     : "Scan for receivers")) {
+                discover_scan();
+        }
+        if (!can_scan) {
+                nk_widget_disable_end(ctx);
+        }
+
+        /* Set color for the peers found text */
+        ctx->style.menu_button.normal = nk_style_item_color(
+            (discover_count() > 0) ? nk_rgba(0, 100, 0, 255)
+                                   : nk_rgba(100, 0, 0, 255));
+        ctx->style.menu_button.hover = nk_style_item_color(
+            (discover_count() > 0) ? nk_rgba(0, 80, 0, 255)
+                                   : nk_rgba(80, 0, 0, 255));
+        ctx->style.menu_button.active = nk_style_item_color(
+            (discover_count() > 0) ? nk_rgba(0, 60, 0, 255)
+                                   : nk_rgba(60, 0, 0, 255));
+
+        sprintf(peers_label, "Peers found: %d%s", discover_count(),
+                (discover_count() > 0) ? " (Click to select)" : "");
+        can_show_peers = discover_count() > 0;
+        if (!can_show_peers) {
+                nk_widget_disable_begin(ctx);
+        }
+        if (nk_menu_begin_label(ctx, peers_label, NK_TEXT_CENTERED,
+                                nk_vec2(180, 160))) {
+                int i;
+                char item[32];
+                char ip[16];
+                int port;
+
+                nk_layout_row_dynamic(ctx, 25, 1);
+                for (i = 0; i < discover_count(); i++) {
+                        if (discover_peer(i, ip, sizeof ip, &port) != 0) {
+                                continue;
+                        }
+                        sprintf(item, "%s:%d", ip, port);
+                        if (nk_menu_item_label(ctx, item, NK_TEXT_LEFT)) {
+                                strcpy(sender_options, item);
+                                sender = if_lan;
+                        }
+                }
+                nk_menu_end(ctx);
+        }
+        if (!can_show_peers) {
+                nk_widget_disable_end(ctx);
+        }
+
+        sprintf(ip_label, "Local IP: %s", get_lan_ip());
+        nk_label(ctx, ip_label, NK_TEXT_ALIGN_CENTERED);
+}
+
+static void nk_gui(const char *title, struct nk_context *ctx, int width,
+                   int height) {
+        char status[192]; /* Absolut willkürlich */
+        int can_start;
         int can_close_receiver;
         int can_close_sender;
         int bar_visible;
@@ -584,92 +668,21 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 /* Vertical spacer */
                 nk_layout_row_dynamic(ctx, 10, 1);
 
-                /* Row for LAN peer discovery */
-                nk_layout_row_template_begin(ctx, 20);
-                nk_layout_row_template_push_static(ctx, 180);
-                nk_layout_row_template_push_dynamic(ctx);
-                nk_layout_row_template_push_static(ctx, 180);
-                nk_layout_row_template_end(ctx);
-
-                /* Scanning uses it's own UDP socket, so it is fine even while a
-                 * transfur runs */
-                can_scan = discover_ready() && !discover_scanning();
-                if (!can_scan) {
-                        nk_widget_disable_begin(ctx);
-                }
-                if (nk_button_label(ctx, discover_scanning()
-                                             ? "Scanning"
-                                             : "Scan for receivers")) {
-                        discover_scan();
-                }
-                if (!can_scan) {
-                        nk_widget_disable_end(ctx);
-                }
-
-                /* Set color for the peers found text */
-                ctx->style.menu_button.normal = nk_style_item_color(
-                    (discover_count() > 0) ? nk_rgba(0, 100, 0, 255)
-                                           : nk_rgba(100, 0, 0, 255));
-                ctx->style.menu_button.hover = nk_style_item_color(
-                    (discover_count() > 0) ? nk_rgba(0, 80, 0, 255)
-                                           : nk_rgba(80, 0, 0, 255));
-                ctx->style.menu_button.active = nk_style_item_color(
-                    (discover_count() > 0) ? nk_rgba(0, 60, 0, 255)
-                                           : nk_rgba(60, 0, 0, 255));
-
-                sprintf(peers_label, "Peers found: %d%s", discover_count(),
-                        (discover_count() > 0) ? " (Click to select)" : "");
-                can_show_peers = discover_count() > 0;
-                if (!can_show_peers) {
-                        nk_widget_disable_begin(ctx);
-                }
-                if (nk_menu_begin_label(ctx, peers_label, NK_TEXT_CENTERED,
-                                        nk_vec2(180, 160))) {
-                        int i;
-                        char item[32];
-                        char ip[16];
-                        int port;
-
-                        nk_layout_row_dynamic(ctx, 25, 1);
-                        for (i = 0; i < discover_count(); i++) {
-                                if (discover_peer(i, ip, sizeof ip, &port) !=
-                                    0) {
-                                        continue;
-                                }
-                                sprintf(item, "%s:%d", ip, port);
-                                if (nk_menu_item_label(ctx, item,
-                                                       NK_TEXT_LEFT)) {
-                                        strcpy(sender_options, item);
-                                        sender = if_lan;
-                                }
-                        }
-                        nk_menu_end(ctx);
-                }
-                if (!can_show_peers) {
-                        nk_widget_disable_end(ctx);
-                }
-
-                sprintf(ip_label, "Local IP: %s", get_lan_ip());
-                nk_label(ctx, ip_label, NK_TEXT_ALIGN_CENTERED);
-
-                /* Vertical spacer */
-                nk_layout_row_dynamic(ctx, 10, 1);
-
                 /* Status line (idle / waiting / transfurring / error) */
                 nk_layout_row_dynamic(ctx, 20, 1);
+                status_text(status); /* Writes the status text including
+                                        "Status:" prefix to `status`. */
                 if (worker_state == wk_error) {
-                        nk_label_colored(ctx, status_text(status),
-                                         NK_TEXT_CENTERED, nk_rgb(255, 80, 80));
+                        nk_label_colored(ctx, status, NK_TEXT_CENTERED,
+                                         nk_rgb(255, 80, 80));
                 } else if (worker_state == wk_done) {
-                        nk_label_colored(ctx, status_text(status),
-                                         NK_TEXT_CENTERED, nk_rgb(80, 220, 80));
+                        nk_label_colored(ctx, status, NK_TEXT_CENTERED,
+                                         nk_rgb(80, 220, 80));
                 } else if (worker_active()) {
-                        nk_label_colored(ctx, status_text(status),
-                                         NK_TEXT_CENTERED,
+                        nk_label_colored(ctx, status, NK_TEXT_CENTERED,
                                          nk_rgb(255, 200, 80));
                 } else {
-                        nk_label_colored(ctx, status_text(status),
-                                         NK_TEXT_CENTERED,
+                        nk_label_colored(ctx, status, NK_TEXT_CENTERED,
                                          nk_rgb(180, 180, 180));
                 }
 
@@ -680,17 +693,24 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                  * complete */
                 bar_visible = worker_active() || worker_state == wk_done;
 
-                if (bar_visible) {
-                        if (worker_state == wk_done) {
-                                loading_bar_state = 100;
-                        } else {
-                                loading_bar_state += 5;
-                                if (loading_bar_state > 100) {
-                                        loading_bar_state = 0;
-                                }
+                if (worker_state == wk_done) {
+                        loading_bar_state = 100;
+                } else if (!worker_active()) {
+                        loading_bar_state = 0;
+                } else {
+                        loading_bar_state += 5;
+                        if (loading_bar_state > 100) {
+                                loading_bar_state = 0;
                         }
-                        nk_progress(ctx, &loading_bar_state, 100, nk_false);
                 }
+                nk_progress(ctx, &loading_bar_state, 100, nk_false);
+
+                /* Vertical spacer */
+                nk_layout_row_dynamic(ctx, 10, 1);
+
+                /* LAN peer discovery if sender is if_lan */
+                if (sender == if_lan)
+                        show_lan_discovery(ctx);
         }
         nk_end(ctx);
 }
