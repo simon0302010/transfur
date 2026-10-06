@@ -1,5 +1,5 @@
-#ifndef BASIC_WIDGETS_TEXT_H
-#define BASIC_WIDGETS_TEXT_H
+#ifndef BASIC_WIDGET_TEXT_H
+#define BASIC_WIDGET_TEXT_H
 
 #include "../../core/widget.h"
 #include "../render.h"
