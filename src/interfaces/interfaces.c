@@ -189,3 +189,16 @@ const enum interface *get_supported_interfaces(void) {
 
         return interfaces;
 }
+
+const char *get_error_text(enum interface interface, int code) {
+        switch (interface) {
+        case if_empty:
+                return "Unknown error";
+        case if_file:
+                return get_error_text_file(code);
+        case if_serial:
+                return get_error_text_serial(code);
+        case if_lan:
+                return get_error_text_lan(code);
+        }
+}

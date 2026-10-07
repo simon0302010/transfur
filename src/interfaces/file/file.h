@@ -26,4 +26,6 @@ error.
 */
 int recv_chunk_file(void *conn, struct chunk *chunk);
 
+const char *get_error_text_file(int code);
+
 #endif

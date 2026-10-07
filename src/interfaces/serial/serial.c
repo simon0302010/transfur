@@ -127,9 +127,7 @@ static int serial_port_open(const char *path, unsigned long baud,
         return SERIAL_OK;
 }
 
-static void serial_port_close(serial_handle fd) {
-        (void)close(fd);
-}
+static void serial_port_close(serial_handle fd) { (void)close(fd); }
 
 /* Send bytes to port, retry on EINTR */
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
@@ -250,9 +248,7 @@ static int serial_port_open(const char *path, unsigned long baud,
         return SERIAL_OK;
 }
 
-static void serial_port_close(serial_handle fd) {
-        (void)CloseHandle(fd);
-}
+static void serial_port_close(serial_handle fd) { (void)CloseHandle(fd); }
 
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len) {
@@ -315,9 +311,7 @@ static int serial_port_open(const char *path, unsigned long baud,
         return port;
 }
 
-static void serial_port_close(serial_handle fd) {
-        (void)serial_close(fd);
-}
+static void serial_port_close(serial_handle fd) { (void)serial_close(fd); }
 
 static long serial_port_send(serial_handle fd, const unsigned char *buf,
                              size_t len) {
@@ -623,7 +617,8 @@ int close_conn_serial(void *conn) {
 
         st = (struct serial_state *)conn;
 
-        /* if init_conn_serial fails, it does not save a handle so treat as already closed */
+        /* if init_conn_serial fails, it does not save a handle so treat as
+         * already closed */
         if (st->inited != 1) {
                 return SERIAL_OK;
         }
@@ -662,3 +657,30 @@ int close_conn_serial(void *conn) {
         return SERIAL_ERR_PLATFORM;
 }
 #endif
+
+const char *get_error_text_serial(int code) {
+        switch (code) {
+        case SERIAL_ERR_ARG:
+                return "Bad argument";
+        case SERIAL_ERR_OPTIONS:
+                return "Invalid options (use <path>[:<baud>])";
+        case SERIAL_ERR_STATE:
+                return "Serial slot already initialized";
+        case SERIAL_ERR_OPEN:
+                return "Could not open the serial port";
+        case SERIAL_ERR_CONFIG:
+                return "Could not configure the serial port";
+        case SERIAL_ERR_SEND:
+                return "Send failed";
+        case SERIAL_ERR_RECV:
+                return "Receive failed";
+        case SERIAL_ERR_CLOSED:
+                return "The peer closed the connection";
+        case SERIAL_ERR_FRAME:
+                return "Received a malformed frame";
+        case SERIAL_ERR_PLATFORM:
+                return "Serial is not supported on this system yet";
+        default:
+                return "Unknown serial error";
+        }
+}

@@ -93,6 +93,7 @@ static void build_conn_options(char *dst, enum interface if_type,
                                int is_receiver, const char *raw) {
         dst[0] = '\0';
 
+        /* This is a bad way to handle that */
         if (if_type == if_lan) {
                 strcpy(dst, is_receiver ? "l:" : "c:");
         }
@@ -101,76 +102,10 @@ static void build_conn_options(char *dst, enum interface if_type,
 
 static const char *error_text(int if_type, int code) {
         if (code == -1) {
-                return "could not start the transfer thread";
+                return "Failed to start the transfer thread";
         }
 
-        switch (if_type) {
-        case if_empty:
-                return "no interface selected";
-        case if_file:
-                switch (code) {
-                case 1:
-                        return "bad path or file IO error";
-                case 2:
-                        return "connection slots full (restart application)";
-                default:
-                        return "unknown file error";
-                }
-        case if_lan:
-                switch (code) {
-                case LAN_ERR_ARG:
-                        return "bad argument";
-                case LAN_ERR_OPTIONS:
-                        return "invalid options (use <port> or <ip>:<port>)";
-                case LAN_ERR_STATE:
-                        return "LAN slot already initialized";
-                case LAN_ERR_SOCKET:
-                        return "could not create a socket"; /* 😥 */
-                case LAN_ERR_BIND:
-                        return "could not bind to the address";
-                case LAN_ERR_LISTEN:
-                        return "could not listen on the address";
-                case LAN_ERR_ACCEPT:
-                        return "connection attempt failed";
-                case LAN_ERR_CONNECT:
-                        return "could not connect to the peer";
-                case LAN_ERR_SEND:
-                        return "send failed";
-                case LAN_ERR_RECV:
-                        return "receive failed";
-                case LAN_ERR_FRAME:
-                        return "received a malformed_frame";
-                case LAN_ERR_PLATFORM:
-                        return "LAN is not supported on this system yet";
-                default:
-                        return "unknown LAN error";
-                }
-        case if_serial:
-                switch (code) {
-                case SERIAL_ERR_ARG:
-                        return "bad argument";
-                case SERIAL_ERR_OPTIONS:
-                        return "invalid options (use <path>[:<baud>])";
-                case SERIAL_ERR_STATE:
-                        return "serial slot already initialized";
-                case SERIAL_ERR_OPEN:
-                        return "could not open the serial port";
-                case SERIAL_ERR_CONFIG:
-                        return "could not configure the serial port";
-                case SERIAL_ERR_SEND:
-                        return "send failed";
-                case SERIAL_ERR_RECV:
-                        return "receive failed";
-                case SERIAL_ERR_CLOSED:
-                        return "the peer closed the connection";
-                case SERIAL_ERR_FRAME:
-                        return "received a malformed frame";
-                case SERIAL_ERR_PLATFORM:
-                        return "serial is not supported on this system yet";
-                }
-        }
-
-        return "unknown error";
+        return get_error_text(if_type, code);
 }
 
 static const char *step_text(int step) {

@@ -50,4 +50,6 @@ Returns `0` on success or an error code based on the error
 */
 int close_conn_serial(void *conn);
 
+const char *get_error_text_serial(int code);
+
 #endif

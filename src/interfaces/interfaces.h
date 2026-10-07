@@ -120,4 +120,9 @@ Terminated by `if_empty`.
 */
 const enum interface *get_supported_interfaces(void);
 
+/*
+Returns the description for `code`.
+*/
+const char *get_error_text(enum interface interface, int code);
+
 #endif

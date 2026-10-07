@@ -52,4 +52,6 @@ int close_conn_lan(void *conn);
 /* Just read the function name brochacho */
 const char *get_lan_ip(void);
 
+const char *get_error_text_lan(int code);
+
 #endif

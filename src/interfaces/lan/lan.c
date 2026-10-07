@@ -736,13 +736,14 @@ int close_conn_lan(void *conn) {
         st = (struct lan_state *)conn;
 
         /*
-        init_conn_lan may have failed after the slot was claimmed, 
-        there is no socket to close in that case but the caller still frees the slot.
+        init_conn_lan may have failed after the slot was claimmed,
+        there is no socket to close in that case but the caller still frees the
+        slot.
         */
         if (st->inited != 1) {
                 return LAN_OK;
         }
-        
+
         lan_socket_close(st->fd);
 
         st->fd = LAN_INVALID_SOCK;
@@ -798,4 +799,35 @@ const char *get_lan_ip(void) {
                 lan_resolve_ip(lan_ip, sizeof lan_ip);
         }
         return lan_ip;
+}
+
+const char *get_error_text_lan(int code) {
+        switch (code) {
+        case LAN_ERR_ARG:
+                return "Bad argument";
+        case LAN_ERR_OPTIONS:
+                return "Invalid options (use <port> or <ip>:<port>)";
+        case LAN_ERR_STATE:
+                return "LAN slot already initialized";
+        case LAN_ERR_SOCKET:
+                return "Could not create a socket";
+        case LAN_ERR_BIND:
+                return "Could not bind to the address";
+        case LAN_ERR_LISTEN:
+                return "Could not listen on the address";
+        case LAN_ERR_ACCEPT:
+                return "Connection attempt failed";
+        case LAN_ERR_CONNECT:
+                return "Could not connect to the peer";
+        case LAN_ERR_SEND:
+                return "Send failed";
+        case LAN_ERR_RECV:
+                return "Receive failed";
+        case LAN_ERR_FRAME:
+                return "Received a malformed frame";
+        case LAN_ERR_PLATFORM:
+                return "LAN is not supported on this system yet";
+        default:
+                return "Unknown LAN error";
+        }
 }

@@ -146,3 +146,14 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
 
         return 0;
 }
+
+const char *get_error_text_file(int code) {
+        switch (code) {
+        case 1:
+                return "Bad path or file I/O error";
+        case 2:
+                return "Connection slots full (restart application)";
+        default:
+                return "Unknown file error";
+        }
+}
