@@ -84,7 +84,8 @@ clean:
 test:
 	mkdir -p build
 	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
-	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c
+	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
 	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
+	gcc $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
 
 .PHONY: run clean

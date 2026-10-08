@@ -33,7 +33,7 @@ static unsigned long get_be32(const unsigned char *p) {
 /* No progress for too long */
 static void on_alarm(int sig) {
         static const char msg[] = "timed out";
-        ssize_t ignored;
+        size_t ignored;
 
         (void)sig;
         ignored = write(2, msg, sizeof msg - 1);
