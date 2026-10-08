@@ -21,7 +21,7 @@ int get_public_ip(char *dest, size_t n) {
         struct sockaddr_in addr;
         char request[128];
         char buf[BUF_SIZE];
-        int n, i;
+        int resn, i;
         char *ip;
 
         server = gethostbyname(HOST);
@@ -52,19 +52,20 @@ int get_public_ip(char *dest, size_t n) {
                 PATH, HOST);
         send(sockfd, request, strlen(request), 0);
 
-        n = recv(sockfd, buf, BUF_SIZE - 1, 0);
-        if (n <= 0) {
+        resn = recv(sockfd, buf, BUF_SIZE - 1, 0);
+        close(sockfd);
+        if (resn <= 0) {
                 perror("recv");
                 return 1;
         }
-        buf[n] = '\0';
+        buf[resn] = '\0';
 
         for (i = 0; buf[i] != '\0'; i++) {
                 if (strncmp(&buf[i], "\r\n\r\n", 4) == 0) {
-                        strncpy(dest, &buf[i + 4], n);
+                        strncpy(dest, &buf[i + 4], resn);
+                        return 0;
                 }
         }
 
-        close(sockfd);
-        return 0;
+        return 1;
 }
