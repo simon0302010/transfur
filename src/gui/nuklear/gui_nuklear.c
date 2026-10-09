@@ -9,6 +9,7 @@ Needs to implement all functions defined in `gui.h`
 #include "../../interfaces/interfaces.h"
 #include "../../interfaces/lan/discover.h"
 #include "../../interfaces/lan/lan.h"
+#include "../../interfaces/lan/pip.h"
 #include "../../interfaces/serial/serial.h"
 #include "../gui.h"
 
@@ -46,6 +47,10 @@ static char sender_options[128] = "";
 /* Connection states, set to 1 after init_conn succeeds */
 static volatile int receiver_connected = 0;
 static volatile int sender_connected = 0;
+
+/* State of the ip button for LAN options */
+enum ip_btn_state { btn_local_ip, btn_public_ip };
+static enum ip_btn_state ip_btn_state = btn_local_ip;
 
 /*
 Everything below is owned by the worker thread
@@ -363,8 +368,19 @@ static void show_lan_discovery(struct nk_context *ctx) {
                 nk_widget_disable_end(ctx);
         }
 
-        sprintf(ip_label, "Local IP: %s", get_lan_ip());
-        nk_label(ctx, ip_label, NK_TEXT_ALIGN_CENTERED);
+        switch (ip_btn_state) {
+        case btn_local_ip:
+                sprintf(ip_label, "Local IP: %s", get_lan_ip());
+                break;
+        case btn_public_ip:
+                sprintf(ip_label, "Public IP: %s",
+                        get_public_ip() ? get_public_ip() : "Unavailable");
+                break;
+        }
+
+        if (nk_button_label(ctx, ip_label)) {
+                ip_btn_state = (ip_btn_state + 1) % 2;
+        }
 }
 
 static void nk_gui(const char *title, struct nk_context *ctx, int width,

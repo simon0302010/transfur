@@ -764,7 +764,7 @@ static void lan_resolve_ip(char *out, int out_size) {
         socklen_t srclen;
 #endif
 
-        strncpy(out, "unknown", (size_t)out_size - 1);
+        strncpy(out, "Unavailable", (size_t)out_size - 1);
         out[out_size - 1] = '\0';
 
         sock = lan_socket_open_dgram();
@@ -795,7 +795,7 @@ static void lan_resolve_ip(char *out, int out_size) {
 }
 
 const char *get_lan_ip(void) {
-        if (lan_ip[0] == '\0' || strcmp(lan_ip, "unknown") == 0) {
+        if (lan_ip[0] == '\0' || strcmp(lan_ip, "Unavailable") == 0) {
                 lan_resolve_ip(lan_ip, sizeof lan_ip);
         }
         return lan_ip;
