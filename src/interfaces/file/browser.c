@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(OS_LINUX || OS_MACOS)
-#include <direnet.h>
+#if defined(OS_LINUX) || defined(OS_MACOS)
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -209,7 +209,7 @@ static int browser_read_dir(const char *dir) {
 
         failed = 0;
         browser_parent(parent, sizeof parent, dir);
-        if (strncmp(parent, dir) != 0 && browser_push("..", 1) != 0) {
+        if (strcmp(parent, dir) != 0 && browser_push("..", 1) != 0) {
                 failed = 1;
         }
 
@@ -249,6 +249,7 @@ static int browser_read_dir(const char *dir) {
                         closedir(handle);
                 }
         }
+#endif
 
         /* TODO: Finish Windows implementation */
 }
