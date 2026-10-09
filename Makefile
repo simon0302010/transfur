@@ -14,6 +14,7 @@ SRC = src/main.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/lan/discover.c \
+	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
 	src/misc/console.c \
 	src/misc/debug.c \
