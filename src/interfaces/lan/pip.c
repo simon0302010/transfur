@@ -10,7 +10,9 @@ pip.c – short for public ip
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define BUF_SIZE 512
+#include "pip.h"
+
+#define BUF_SIZE 512 /* Aus'm Ärmel geschüttelt */
 #define HOST "ifconfig.me"
 #define PATH "/ip"
 #define PORT 80
@@ -67,5 +69,5 @@ int get_public_ip(char *dest, size_t n) {
                 }
         }
 
-        return 1;
+        return 1; /* failed to find the 2 newlines */
 }
