@@ -17,5 +17,6 @@ extern const struct color page_background;
 extern const struct color text_color;
 extern const struct color button_color;
 extern const struct color border_color;
+extern const struct color focus_color;
 
 #endif /* DESIGN_H */
