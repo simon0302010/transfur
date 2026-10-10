@@ -12,6 +12,7 @@ TARGET = build/$(OS_NAME)/transfur
 SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
+	src/interfaces/file/browser.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/lan/discover.c \
 	src/interfaces/lan/pip.c \
@@ -88,5 +89,6 @@ test:
 	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
 	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 	gcc $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
+	gcc $(CFLAGS) -I. -o build/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
 
 .PHONY: run clean
