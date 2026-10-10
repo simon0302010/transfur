@@ -10,6 +10,9 @@
 #define TEXT_SIZE_HEADING 2
 #define TEXT_SIZE_REGULAR 1
 
+/* This should be used across all elements */
+#define BORDER_ROUNDED 0.4
+
 extern const struct color page_background;
 extern const struct color text_color;
 extern const struct color button_color;

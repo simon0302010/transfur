@@ -9,3 +9,6 @@ void basic_fill_arc(double cx, double cy, double r, double start, double end,
 
 void basic_draw_circle(double cx, double cy, double r, struct color color);
 void basic_fill_circle(double cx, double cy, double r, struct color color);
+
+void basic_draw_rounded_rect(int x, int y, int width, int height,
+                             double h_rounding_factor, struct color color);
