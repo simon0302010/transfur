@@ -1,8 +1,8 @@
-#include "../../misc/bool.h"
-#include <stdint.h>
-#include "sdl3/basic_wrapper.h"
-#include <string.h>
 #include "text.h"
+#include "../../misc/bool.h"
+#include "sdl3/basic_wrapper.h"
+#include <stdint.h>
+#include <string.h>
 
 extern const unsigned char font_bmp_data[];
 extern const unsigned int font_bmp_size;
@@ -81,14 +81,18 @@ void load_font(void) {
         font_loaded = true;
 }
 
-struct text_metrics draw_text(char *text, int x, int y, int size, struct color color) {
+struct text_metrics draw_text(char *text, int x, int y, int size,
+                              struct color color) {
         int i = 0;
         int row_stride = ((image_width * bitCount / 8 + 3) & ~3);
         struct text_metrics metrics;
 
-        if (!font_loaded) load_font();
+        if (!font_loaded)
+                load_font();
 
-        metrics.width = char_width * size * strlen(text); /* perhaps we should just count manually so we don't iterate this twice */
+        metrics.width = char_width * size *
+                        strlen(text); /* perhaps we should just count manually
+                                         so we don't iterate this twice */
         metrics.height = char_height * size;
 
         while (text[i] != '\0') {
@@ -103,34 +107,48 @@ struct text_metrics draw_text(char *text, int x, int y, int size, struct color c
                 map_y = char_idx / FONT_COLUMNS;
 
                 for (k = 0; k < char_height; k++) {
-                        int bmp_y = (image_height - 1) - (map_y * char_height + k);
+                        int bmp_y =
+                            (image_height - 1) - (map_y * char_height + k);
 
                         for (j = 0; j < char_width; j++) {
-                            int bmp_x = map_x * char_width + j;
-                            int pixel_val;
+                                int bmp_x = map_x * char_width + j;
+                                int pixel_val;
 
-                            /* the included font.bmp is 8bit */
-                            if (bitCount == 8) {
-                                pixel_val = font_bmp_data[image_offset + bmp_y * row_stride + bmp_x];
-                            } /* TODO: consider adding support for other bit sizes */
+                                /* the included font.bmp is 8bit */
+                                if (bitCount == 8) {
+                                        pixel_val =
+                                            font_bmp_data[image_offset +
+                                                          bmp_y * row_stride +
+                                                          bmp_x];
+                                } /* TODO: consider adding support for other bit
+                                     sizes */
 
-                            if (pixel_val != 255) {
-                                double intensity = (255.0 - pixel_val) / 255.0;
-                                struct color pixel_color;
-                                
-                                int screen_x = x + (i * char_width + j) * size;
-                                int screen_y = y + k * size;
+                                if (pixel_val != 255) {
+                                        double intensity =
+                                            (255.0 - pixel_val) / 255.0;
+                                        struct color pixel_color;
 
-                                pixel_color.r = (char)((double)color.r * intensity);
-                                pixel_color.g = (char)((double)color.g * intensity);
-                                pixel_color.b = (char)((double)color.b * intensity);
+                                        int screen_x =
+                                            x + (i * char_width + j) * size;
+                                        int screen_y = y + k * size;
 
-                                if (size > 1) {
-                                        basic_fill_rect(screen_x, screen_y, size, size, pixel_color);
-                                } else {
-                                        basic_set_pixel(screen_x, screen_y, pixel_color);
+                                        pixel_color.r =
+                                            (char)((double)color.r * intensity);
+                                        pixel_color.g =
+                                            (char)((double)color.g * intensity);
+                                        pixel_color.b =
+                                            (char)((double)color.b * intensity);
+
+                                        if (size > 1) {
+                                                basic_fill_rect(
+                                                    screen_x, screen_y, size,
+                                                    size, pixel_color);
+                                        } else {
+                                                basic_set_pixel(screen_x,
+                                                                screen_y,
+                                                                pixel_color);
+                                        }
                                 }
-                            }
                         }
                 }
 
@@ -138,4 +156,14 @@ struct text_metrics draw_text(char *text, int x, int y, int size, struct color c
         }
 
         return metrics;
+}
+
+struct text_metrics measure_text(char *text, int size) {
+        struct text_metrics metrics;
+
+        if (!font_loaded)
+                load_font();
+
+        metrics.width = char_width * size * strlen(text);
+        metrics.height = char_height * size;
 }

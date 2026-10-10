@@ -21,9 +21,7 @@ int basic_render_button_widget(struct widget widget,
         if (button_width <= 0)
                 return 0;
 
-        title_height = draw_text(options->title, details.x + BORDER_WIDTH,
-                                 details.y + BORDER_WIDTH, 1, text_color)
-                           .height;
+        title_height = measure_text(options->title, 1).height;
 
         if (widget.is_focused)
                 basic_fill_rounded_rect(details.x, details.y, button_width,

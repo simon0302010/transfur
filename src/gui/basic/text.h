@@ -10,5 +10,6 @@ struct text_metrics {
 
 struct text_metrics draw_text(char *text, int x, int y, int size,
                               struct color color);
+struct text_metrics measure_text(char *text, int size);
 
 #endif
