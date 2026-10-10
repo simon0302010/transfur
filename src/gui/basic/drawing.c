@@ -26,22 +26,33 @@ void basic_draw_line(int x1, int y1, int x2, int y2, struct color color) {
         }
 }
 
-void basic_draw_circle(int cx, int cy, int r, struct color color) {
+void basic_draw_arc(double cx, double cy, double r, double start, double end,
+                    struct color color) {
         double radians_per_step = 1.0 / (double)r;
         double angle;
 
-        for (angle = 0.0; angle < (2.0 * M_PI); angle += radians_per_step) {
-                basic_set_pixel(cx + (int)(r * cos(angle) + 0.5),
-                                cy + (int)(r * sin(angle) + 0.5), color);
+        for (angle = start; angle < end; angle += radians_per_step) {
+                basic_set_pixel((int)(cx + r * cos(angle) + 0.5),
+                                (int)(cy + r * sin(angle) + 0.5), color);
         }
 }
 
-void basic_fill_circle(int cx, int cy, int r, struct color color) {
+void basic_fill_arc(double cx, double cy, double r, double start, double end,
+                    struct color color) {
         double radians_per_step = 1.0 / (double)r;
         double angle;
 
-        for (angle = 0.0; angle < (2.0 * M_PI); angle += radians_per_step) {
-                basic_draw_line(cx, cy, cx + (int)(r * cos(angle) + 0.5),
-                                cy + (int)(r * sin(angle) + 0.5), color);
+        for (angle = start; angle < end; angle += radians_per_step) {
+                basic_draw_line((int)cx, (int)cy,
+                                (int)(cx + r * cos(angle) + 0.5),
+                                (int)(cy + r * sin(angle) + 0.5), color);
         }
+}
+
+void basic_draw_circle(double cx, double cy, double r, struct color color) {
+        basic_draw_arc(cx, cy, r, 0.0, 2.0 * M_PI, color);
+}
+
+void basic_fill_circle(double cx, double cy, double r, struct color color) {
+        basic_fill_arc(cx, cy, r, 0.0, 2.0 * M_PI, color);
 }
