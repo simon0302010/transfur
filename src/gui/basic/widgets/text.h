@@ -7,4 +7,7 @@
 int basic_render_text_widget(struct widget widget,
                              struct basic_render_details details);
 
+int basic_measure_text_widget(struct widget widget,
+                              struct basic_render_details details);
+
 #endif
