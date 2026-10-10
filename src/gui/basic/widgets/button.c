@@ -1,19 +1,18 @@
 #include "../../core/widgets/button.h"
+#include "../design.h"
 #include "../sdl3/basic_wrapper.h"
 #include "../text.h"
 #include "button.h"
 
 #define BUTTON_PADDING 2
 
-#define ENABLE_EASTER_EGGS
-
 #ifdef ENABLE_EASTER_EGGS
 #include <math.h>
 #endif
 
-static struct color text_color = {255, 255, 255};
+/* static struct color text_color = {255, 255, 255}; */
 static struct color bg_color = {20, 20, 40};
-static struct color border_color = {40, 40, 60};
+/* static struct color border_color = {40, 40, 60}; */
 static struct color focus_border_color = {255, 255, 60};
 
 int basic_render_button_widget(struct widget widget,
@@ -34,16 +33,19 @@ int basic_render_button_widget(struct widget widget,
                            .height;
 
         if (widget.is_focused)
-                basic_fill_rect(details.x, details.y, button_width,
-                                title_height + BUTTON_PADDING + BUTTON_PADDING,
-                                focus_border_color);
+                basic_fill_rounded_rect(details.x, details.y, button_width,
+                                        title_height + BUTTON_PADDING +
+                                            BUTTON_PADDING,
+                                        BORDER_ROUNDED, focus_border_color);
         else
-                basic_fill_rect(details.x, details.y, button_width,
-                                title_height + BUTTON_PADDING + BUTTON_PADDING,
-                                border_color);
-        basic_fill_rect(details.x + BUTTON_PADDING, details.y + BUTTON_PADDING,
-                        button_width - BUTTON_PADDING - BUTTON_PADDING,
-                        title_height, bg_color);
+                basic_fill_rounded_rect(details.x, details.y, button_width,
+                                        title_height + BUTTON_PADDING +
+                                            BUTTON_PADDING,
+                                        BORDER_ROUNDED, border_color);
+        basic_fill_rounded_rect(details.x + BUTTON_PADDING,
+                                details.y + BUTTON_PADDING,
+                                button_width - BUTTON_PADDING - BUTTON_PADDING,
+                                title_height, BORDER_ROUNDED, bg_color);
 
 #ifdef ENABLE_EASTER_EGGS
         for (i = 0; i < button_width - BUTTON_PADDING - BUTTON_PADDING; i++) {
