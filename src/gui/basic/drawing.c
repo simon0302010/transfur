@@ -4,24 +4,71 @@
 #include <math.h>
 #include <stdlib.h>
 
-void basic_draw_line(int x1, int y1, int x2, int y2, struct color color) {
-        double slope = (double)(y2 - y1) / (double)(x2 - x1);
-        double slope_distance = sqrt(slope * slope + 1.0);
-        double total_distance =
-            sqrt(pow((double)(x2 - x1), 2) + pow((double)(y2 - y1), 2));
-        int i;
-        int step = 1;
-        int dx = abs(x2 - x1);
+void basic_draw_line_low(int x1, int y1, int x2, int y2, struct color color) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int yi = 1;
+        int d;
+        int x;
+        int y;
 
-        if (x2 < x1) {
-                step = -1;
+        if (dy < 0) {
+                yi = -1;
+                dy = -dy;
         }
 
-        for (i = 0; i <= dx; i++) {
-                int x = i * step;
-                int y = slope * (x) + 0.5;
+        d = (2 * dy) - dx;
+        y = y1;
 
-                basic_set_pixel(x1 + x, y1 + y, color);
+        for (x = x1; x <= x2; x++) {
+                basic_set_pixel(x, y, color);
+                if (d > 0) {
+                        y = y + yi;
+                        d = d + (2 * (dy - dx));
+                } else {
+                        d = d + 2 * dy;
+                }
+        }
+}
+
+void basic_draw_line_high(int x1, int y1, int x2, int y2, struct color color) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int xi = 1;
+        int d;
+        int x;
+        int y;
+
+        if (dx < 0) {
+                xi = -1;
+                dx = -dx;
+        }
+
+        d = (2 * dx) - dy;
+        x = x1;
+
+        for (y = y1; y <= y2; y++) {
+                basic_set_pixel(x, y, color);
+                if (d > 0) {
+                        x = x + xi;
+                        d = d + (2 * (dx - dy));
+                } else {
+                        d = d + 2 * dx;
+                }
+        }
+}
+
+void basic_draw_line(int x1, int y1, int x2, int y2, struct color color) {
+        if (abs(y2 - y1) < abs(x2 - x1)) {
+                if (x1 > x2)
+                        basic_draw_line_low(x2, y2, x1, y1, color);
+                else
+                        basic_draw_line_low(x1, y1, x2, y2, color);
+        } else {
+                if (y1 > y2)
+                        basic_draw_line_high(x2, y2, x1, y1, color);
+                else
+                        basic_draw_line_high(x1, y1, x2, y2, color);
         }
 }
 
