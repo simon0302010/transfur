@@ -134,3 +134,33 @@ void basic_draw_rounded_rect(int x, int y, int width, int height,
         basic_draw_line(x + width, y + box_size, x + width,
                         y + box_size + straight_h, color);
 }
+
+void basic_fill_rounded_rect(int x, int y, int width, int height,
+                             double h_rounding_factor, struct color color) {
+        int box_size = (int)(h_rounding_factor * height) / 2.0;
+        double r = box_size;
+        int straight_w = width - box_size - box_size;
+        int straight_h = height - box_size - box_size;
+
+        /* middle fill */
+        basic_fill_rect(x + box_size, y + box_size, straight_w, straight_h,
+                        color);
+
+        /* top left corner */
+        basic_fill_arc(x + r, y + r, r, M_PI, 1.5 * M_PI, color);
+        /* top right corner */
+        basic_fill_arc(x + width - r, y + r, r, 1.5 * M_PI, 2.0 * M_PI, color);
+        /* bottom left corner */
+        basic_fill_arc(x + width - r, y + height - r, r, 0.0, 0.5 * M_PI,
+                       color);
+        /* bottom right corner */
+        basic_fill_arc(x + r, y + height - r, r, 0.5 * M_PI, M_PI, color);
+
+        /* straight parts */
+        basic_fill_rect(x + box_size, y, straight_w, box_size, color);
+        basic_fill_rect(x + box_size, y + height - box_size, straight_w,
+                        box_size, color);
+        basic_fill_rect(x, y + box_size, box_size, straight_h, color);
+        basic_fill_rect(x + width - box_size, y + box_size, box_size,
+                        straight_h, color);
+}
