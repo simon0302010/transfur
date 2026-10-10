@@ -1,5 +1,10 @@
 #include "render.h"
+#include "widgets/button.h"
+#include "widgets/loading_bar.h"
+#include "widgets/progress_bar.h"
+#include "widgets/split.h"
 #include "widgets/text.h"
+#include "widgets/text_input.h"
 
 #define BASIC_MARGIN 8
 #define BASIC_SPACING 4
@@ -36,7 +41,12 @@ int basic_render_widget(struct widget widget,
         case WIDGET_BUTTON:
                 return basic_render_button_widget(widget, details);
                 break;
+        case WIDGET_SPLIT:
+                return basic_render_split_widget(widget, details);
+                break;
         default:
                 break;
         }
+
+        return 0;
 }

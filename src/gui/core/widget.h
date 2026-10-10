@@ -10,6 +10,7 @@ enum widget_type {
         WIDGET_LOADING_BAR,
         WIDGET_TEXT_INPUT,
         WIDGET_GROUP, /* this will replace BASIC_PANEL */
+        WIDGET_SPLIT,
         WIDGET_BUTTON
 };
 
