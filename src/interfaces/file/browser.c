@@ -61,15 +61,17 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         }
 
         while ((entry = readdir(dp))) {
-                strcpy((*entries)[*entry_count].name, entry->d_name);
-
                 /* d_type might sometimes be empty. Just hope it isn't. */
                 switch (entry->d_type) {
-                case (1u << 2):
+                case DT_DIR:
+                        if (!(options & BROWSER_DIRECTORIES))
+                                continue;
                         (*entries)[*entry_count].entry_type =
                             browser_entry_directory;
                         break;
-                case (1u << 3):
+                case DT_REG:
+                        if (!(options & BROWSER_FILES))
+                                continue;
                         (*entries)[*entry_count].entry_type =
                             browser_entry_file;
                         break;
@@ -78,6 +80,11 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
                             browser_entry_unknown;
                         break;
                 }
+
+                if (!(options & BROWSER_HIDDEN) && entry->d_name[0] == '.')
+                        continue;
+
+                strcpy((*entries)[*entry_count].name, entry->d_name);
 
                 if (++*entry_count >= entries_capacity) {
                         struct browser_entry *tmp;

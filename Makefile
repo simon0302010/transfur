@@ -54,10 +54,10 @@ ifeq ($(OS),Windows_NT)
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
 	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
-	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
+	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
-	CFLAGS += $(shell pkg-config --cflags sdl2)
+	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
 endif
 

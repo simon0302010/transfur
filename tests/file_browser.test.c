@@ -15,7 +15,8 @@ int main(void) {
         browser_getcwd(&ctx, cwd, sizeof(cwd));
         puts(cwd);
 
-        browser_dir(&ctx, 0, &entries, &entry_count);
+        browser_dir(&ctx, BROWSER_DIRECTORIES | BROWSER_FILES, &entries,
+                    &entry_count);
         for (i = 0; i < entry_count; i++) {
                 printf("name=%s type=%s\n", entries[i].name,
                        (entries[i].entry_type == browser_entry_file)

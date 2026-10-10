@@ -25,6 +25,7 @@ typedef unsigned char browser_options_t;
 /* Possible browser_options */
 #define BROWSER_FILES (1u << 0)
 #define BROWSER_DIRECTORIES (1u << 1)
+#define BROWSER_HIDDEN (1u << 2)
 
 /* I don't think this needs to hold more */
 struct browser_ctx {
