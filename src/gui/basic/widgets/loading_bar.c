@@ -1,10 +1,13 @@
 #include "../../core/widgets/loading_bar.h"
+#include "../../../misc/math.h"
+#include "../drawing.h"
 #include "../sdl3/basic_wrapper.h"
 #include "../text.h"
 #include "loading_bar.h"
 #include <string.h>
 
 #define LOADING_SEGMENT_SIZE 8
+#define LOADING_CIRCLE_RADIUS 12
 
 static const struct color color_set[6] = {
     {255, 0, 0},   /* red */
@@ -14,8 +17,6 @@ static const struct color color_set[6] = {
     {255, 0, 255}, /* magenta */
     {255, 255, 0}  /* yellow */
 };
-
-#define ENABLE_EASTER_EGGS
 
 static struct color text_color = {255, 255, 255};
 
@@ -66,14 +67,11 @@ int basic_render_loading_bar_widget(struct widget widget,
 
                 /* draw wheels */
                 basic_fill_rect(title_width + 3 + details.x + head_position,
-                                details.y + 7, 3, 3,
-                                wheel_color);
+                                details.y + 7, 3, 3, wheel_color);
                 basic_fill_rect(title_width + 3 + details.x + head_position + 4,
-                                details.y + 7, 3, 3,
-                                wheel_color);
+                                details.y + 7, 3, 3, wheel_color);
                 basic_fill_rect(title_width + 3 + details.x + head_position + 8,
-                                details.y + 7, 3, 3,
-                                wheel_color);
+                                details.y + 7, 3, 3, wheel_color);
 
                 /* draw each car */
                 for (j = 1; j < color_set_size; j++) {
@@ -85,22 +83,27 @@ int basic_render_loading_bar_widget(struct widget widget,
                                         8, color_set[j]);
 
                         /* draw wheels */
-                        basic_fill_rect(x,
-                                        details.y + 7, 3, 3,
+                        basic_fill_rect(x, details.y + 7, 3, 3, wheel_color);
+                        basic_fill_rect(x + 4, details.y + 7, 3, 3,
                                         wheel_color);
-                        basic_fill_rect(x + 4,
-                                        details.y + 7, 3, 3,
-                                        wheel_color);
-                        basic_fill_rect(x + 8,
-                                        details.y + 7, 3, 3,
+                        basic_fill_rect(x + 8, details.y + 7, 3, 3,
                                         wheel_color);
                 }
         }
         return EASTER_EGG_SEGMENT_SIZE;
 #else
+        bar_width -= LOADING_CIRCLE_RADIUS - LOADING_CIRCLE_RADIUS;
+        basic_fill_circle(title_width + 3 + details.x + LOADING_CIRCLE_RADIUS,
+                          details.y + LOADING_CIRCLE_RADIUS,
+                          LOADING_CIRCLE_RADIUS, color_set[0]);
+        basic_fill_arc(title_width + 3 + details.x + LOADING_CIRCLE_RADIUS,
+                       details.y + LOADING_CIRCLE_RADIUS, LOADING_CIRCLE_RADIUS,
+                       0.0, (double)(options->offset) / 5.0 * 2.0 * M_PI,
+                       color_set[1]);
         for (i = 0; i < bar_width; i += 1)
                 basic_fill_rect(
-                    title_width + 3 + details.x + i * LOADING_SEGMENT_SIZE,
+                    title_width + 3 + details.x + i * LOADING_SEGMENT_SIZE +
+                        LOADING_CIRCLE_RADIUS + LOADING_CIRCLE_RADIUS,
                     details.y, LOADING_SEGMENT_SIZE, LOADING_SEGMENT_SIZE,
                     color_set[(i + options->offset) % color_set_size]);
 #endif

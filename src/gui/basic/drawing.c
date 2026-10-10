@@ -1,28 +1,27 @@
 #include "drawing.h"
 #include "../../misc/math.h"
 #include "sdl3/basic_wrapper.h"
+#include <math.h>
+#include <stdlib.h>
 
 void basic_draw_line(int x1, int y1, int x2, int y2, struct color color) {
         double slope = (double)(y2 - y1) / (double)(x2 - x1);
         double slope_distance = sqrt(slope * slope + 1.0);
         double total_distance =
             sqrt(pow((double)(x2 - x1), 2) + pow((double)(y2 - y1), 2));
-        int x;
-        int first_x;
-        int final_x;
+        int i;
+        int step = 1;
+        int dx = abs(x2 - x1);
 
-        if (x1 < x2) {
-                first_x = x1;
-                final_x = x2;
-        } else {
-                first_x = x2;
-                final_x = x1;
+        if (x2 < x1) {
+                step = -1;
         }
 
-        for (x = first_x; x < final_x; x++) {
-                int y = (slope * (double)x + 0.5);
+        for (i = 0; i <= dx; i++) {
+                int x = i * step;
+                int y = slope * (x) + 0.5;
 
-                basic_set_pixel(x, y, color);
+                basic_set_pixel(x1 + x, y1 + y, color);
         }
 }
 
