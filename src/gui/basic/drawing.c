@@ -77,7 +77,7 @@ void basic_draw_arc(double cx, double cy, double r, double start, double end,
         double radians_per_step = 1.0 / (double)r;
         double angle;
 
-        for (angle = start; angle < end; angle += radians_per_step) {
+        for (angle = start; angle <= end; angle += radians_per_step) {
                 basic_set_pixel((int)(cx + r * cos(angle) + 0.5),
                                 (int)(cy + r * sin(angle) + 0.5), color);
         }
@@ -88,7 +88,7 @@ void basic_fill_arc(double cx, double cy, double r, double start, double end,
         double radians_per_step = 1.0 / (double)r;
         double angle;
 
-        for (angle = start; angle < end; angle += radians_per_step) {
+        for (angle = start; angle <= end; angle += radians_per_step) {
                 basic_draw_line((int)cx, (int)cy,
                                 (int)(cx + r * cos(angle) + 0.5),
                                 (int)(cy + r * sin(angle) + 0.5), color);
@@ -119,19 +119,20 @@ void basic_draw_rounded_rect(int x, int y, int width, int height,
         /* top left corner */
         basic_draw_arc(x + r, y + r, r, M_PI, 1.5 * M_PI, color);
         /* top right corner */
-        basic_draw_arc(x + width - r, y + r, r, 1.5 * M_PI, 2.0 * M_PI, color);
-        /* bottom left corner */
-        basic_draw_arc(x + width - r, y + height - r, r, 0.0, 0.5 * M_PI,
+        basic_draw_arc(x + width - 1 - r, y + r, r, 1.5 * M_PI, 2.0 * M_PI,
                        color);
         /* bottom right corner */
-        basic_draw_arc(x + r, y + height - r, r, 0.5 * M_PI, M_PI, color);
+        basic_draw_arc(x + width - 1 - r, y + height - 1 - r, r, 0.0,
+                       0.5 * M_PI, color);
+        /* bottom left corner */
+        basic_draw_arc(x + r, y + height - 1 - r, r, 0.5 * M_PI, M_PI, color);
 
         /* straight parts */
         basic_draw_line(x + box_size, y, x + box_size + straight_w, y, color);
-        basic_draw_line(x + box_size, y + height, x + box_size + straight_w,
-                        y + height, color);
+        basic_draw_line(x + box_size, y + height - 1, x + box_size + straight_w,
+                        y + height - 1, color);
         basic_draw_line(x, y + box_size, x, y + box_size + straight_h, color);
-        basic_draw_line(x + width, y + box_size, x + width,
+        basic_draw_line(x + width - 1, y + box_size, x + width - 1,
                         y + box_size + straight_h, color);
 }
 
@@ -149,12 +150,13 @@ void basic_fill_rounded_rect(int x, int y, int width, int height,
         /* top left corner */
         basic_fill_arc(x + r, y + r, r, M_PI, 1.5 * M_PI, color);
         /* top right corner */
-        basic_fill_arc(x + width - r, y + r, r, 1.5 * M_PI, 2.0 * M_PI, color);
-        /* bottom left corner */
-        basic_fill_arc(x + width - r, y + height - r, r, 0.0, 0.5 * M_PI,
+        basic_fill_arc(x + width - 1 - r, y + r, r, 1.5 * M_PI, 2.0 * M_PI,
                        color);
         /* bottom right corner */
-        basic_fill_arc(x + r, y + height - r, r, 0.5 * M_PI, M_PI, color);
+        basic_fill_arc(x + width - 1 - r, y + height - 1 - r, r, 0.0,
+                       0.5 * M_PI, color);
+        /* bottom left corner */
+        basic_fill_arc(x + r, y + height - 1 - r, r, 0.5 * M_PI, M_PI, color);
 
         /* straight parts */
         basic_fill_rect(x + box_size, y, straight_w, box_size, color);
