@@ -123,7 +123,7 @@ struct text_metrics draw_text(char *text, int x, int y, int size,
                                 } /* TODO: consider adding support for other bit
                                      sizes */
 
-                                if (pixel_val != 255) {
+                                if (pixel_val < 200) {
                                         double intensity =
                                             (255.0 - pixel_val) / 255.0;
                                         struct color pixel_color;
