@@ -16,7 +16,7 @@ enum widget_button_styles {
 struct widget_button_options {
         char *title;
         button_callback_t callback;
-        enum widget_button_styles style;
+        enum widget_button_styles *style;
 };
 
 struct widget widget_button(struct widget_button_options *opts, size_t size);
