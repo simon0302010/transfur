@@ -1,7 +1,9 @@
 #include "../../core/widgets/button.h"
 #include "../design.h"
+#include "../images.h"
 #include "../sdl3/basic_wrapper.h"
 #include "../text.h"
+#include "../theme.h"
 #include "button.h"
 
 #ifdef ENABLE_EASTER_EGGS
@@ -27,62 +29,73 @@ int basic_render_button_widget(struct widget widget,
 
         title_height = measure_text(options->title, 1).height;
 
-        if (widget.is_focused)
-                basic_fill_rounded_rect(
-                    details.x + PADDING, details.y + PADDING, button_width,
-                    title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
-                        BUTTON_MARGIN,
-                    BORDER_ROUNDED, focus_color);
-        else
-                basic_fill_rounded_rect(
-                    details.x + PADDING, details.y + PADDING, button_width,
-                    title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
-                        BUTTON_MARGIN,
-                    BORDER_ROUNDED, border_color);
-
         if (options->style != NULL)
                 style = *options->style;
         else
                 style = WIDGET_BUTTON_STYLE_DISABLED;
 
-        switch (style) {
-        case WIDGET_BUTTON_STYLE_PRIMARY:
+        switch (basic_get_theme()) {
+        case THEME_CLASSIC:
         default:
-                button_color = primary_button_color;
-                break;
-        case WIDGET_BUTTON_STYLE_SUCCESS:
-                button_color = success_button_color;
-                break;
-        case WIDGET_BUTTON_STYLE_FAILURE:
-                button_color = failure_button_color;
-                break;
-        case WIDGET_BUTTON_STYLE_DISABLED:
-                button_color = disabled_button_color;
-                break;
-        }
 
-        basic_fill_rounded_rect(details.x + BORDER_WIDTH + PADDING,
-                                details.y + BORDER_WIDTH + PADDING,
-                                button_width - BORDER_WIDTH - BORDER_WIDTH,
-                                title_height + BUTTON_MARGIN + BUTTON_MARGIN,
-                                BORDER_ROUNDED, button_color);
+                if (widget.is_focused)
+                        basic_fill_rounded_rect(
+                            details.x + PADDING, details.y + PADDING,
+                            button_width,
+                            title_height + BORDER_WIDTH + BORDER_WIDTH +
+                                BUTTON_MARGIN + BUTTON_MARGIN,
+                            BORDER_ROUNDED, focus_color);
+                else
+                        basic_fill_rounded_rect(
+                            details.x + PADDING, details.y + PADDING,
+                            button_width,
+                            title_height + BORDER_WIDTH + BORDER_WIDTH +
+                                BUTTON_MARGIN + BUTTON_MARGIN,
+                            BORDER_ROUNDED, border_color);
 
-#ifdef ENABLE_EASTER_EGGS
-        for (i = 0; i < button_width - BORDER_WIDTH - BORDER_WIDTH; i++) {
-                struct color color;
-                color.r = (int)(100.0 * ((sin(i % 9) + 2.0) / 2.0));
-                color.g = (int)(40.0 * ((cos(i / 9) + 2.0) / 2.0));
-                color.b = (int)(40.0 * ((tan(i * 9) + 2.0) / 2.0));
+                switch (style) {
+                case WIDGET_BUTTON_STYLE_PRIMARY:
+                default:
+                        button_color = primary_button_color;
+                        break;
+                case WIDGET_BUTTON_STYLE_SUCCESS:
+                        button_color = success_button_color;
+                        break;
+                case WIDGET_BUTTON_STYLE_FAILURE:
+                        button_color = failure_button_color;
+                        break;
+                case WIDGET_BUTTON_STYLE_DISABLED:
+                        button_color = disabled_button_color;
+                        break;
+                }
 
-                basic_fill_rect(details.x + BORDER_WIDTH + i,
-                                details.y + BORDER_WIDTH, 1, title_height,
-                                color);
-        }
+                basic_fill_rounded_rect(
+                    details.x + BORDER_WIDTH + PADDING,
+                    details.y + BORDER_WIDTH + PADDING,
+                    button_width - BORDER_WIDTH - BORDER_WIDTH,
+                    title_height + BUTTON_MARGIN + BUTTON_MARGIN,
+                    BORDER_ROUNDED, button_color);
+                draw_text(
+                    options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
+                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
+
+                return title_height + BORDER_WIDTH + BORDER_WIDTH +
+                       BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
+                break;
+#ifdef ENABLE_THEMES
+        case THEME_COFFEE:
+                draw_image_scaled(IMAGE_TEST_FONT,
+                                  details.x + BORDER_WIDTH + PADDING,
+                                  details.y + BORDER_WIDTH + PADDING,
+                                  button_width - BORDER_WIDTH - BORDER_WIDTH,
+                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN);
+
+                draw_text(
+                    options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
+                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
+
+                return title_height + BORDER_WIDTH + BORDER_WIDTH +
+                       BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
 #endif
-
-        draw_text(options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
-                  details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
-
-        return title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
-               BUTTON_MARGIN + PADDING + PADDING;
+        }
 }

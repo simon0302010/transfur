@@ -67,6 +67,14 @@ endif
 
 ASM_SRC = src/gui/basic/font.S
 
+ENABLE_THEMES ?= 1
+
+ifeq ($(ENABLE_THEMES), 1)
+	CFLAGS += -DENABLE_THEMES
+	SRC += src/gui/basic/images.c src/gui/basic/theme.c
+	ASM_SRC += src/gui/basic/image_assets.S
+endif
+
 OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
 
 $(TARGET): $(OBJ)
