@@ -17,4 +17,6 @@ void ui_init(struct ui_context *ctx);
 tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event);
 void ui_update(struct ui_context *ctx, double dt);
 
+void ui_set_focus(struct ui_context *ctx, struct widget *target);
+
 #endif /* UI_CORE_H */

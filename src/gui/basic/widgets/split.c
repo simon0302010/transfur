@@ -16,7 +16,7 @@ int basic_render_split_widget(struct widget widget,
         details.width = (int)width_per_child;
 
         for (i = 0; i < widget.content_size; i++) {
-                int increase = basic_render_widget(children[i], details);
+                int increase = basic_render_widget(&children[i], details);
                 if (increase > height)
                         height = increase;
                 details.x += (int)width_per_child;

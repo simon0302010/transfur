@@ -30,6 +30,14 @@ void run_basic(char *title, int width, int height) {
                 case UI_EVENT_QUIT:
                         ui.running = false;
                         break;
+
+                case UI_EVENT_MOUSE_DOWN: /* do not break so the event is passed
+                                             to the widget */
+                {
+                        struct widget *hit =
+                            basic_get_widget_at(event.mouse_x, event.mouse_y);
+                        ui_set_focus(&ui, hit);
+                }
                 default:
                         ui_handle_event(&ui, &event);
                         break;

@@ -19,15 +19,15 @@ tbool widget_handle_button_input(struct widget *widget,
                                  struct ui_event *event) {
         struct widget_button_options *options = widget->content;
 
-        if (event->type == UI_EVENT_KEY_DOWN) {
-                if ((event->key == UI_KEY_CHAR && event->ch == ' ') ||
-                    event->key == UI_KEY_ENTER) {
-                        /* call the callback */
-                        if (options->callback != NULL) {
-                                options->callback();
-                        }
-                        return true;
+        if ((event->type == UI_EVENT_KEY_DOWN &&
+             ((event->key == UI_KEY_CHAR && event->ch == ' ') ||
+              event->key == UI_KEY_ENTER)) ||
+            event->type == UI_EVENT_MOUSE_DOWN) {
+                /* call the callback */
+                if (options->callback != NULL) {
+                        options->callback();
                 }
+                return true;
         }
 
         return false;

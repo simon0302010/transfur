@@ -107,13 +107,15 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
                         if (current_idx == -1)
                                 next_idx = 0;
                         else
-                                next_idx = (current_idx + 1) % (int)num_focusable;
+                                next_idx =
+                                    (current_idx + 1) % (int)num_focusable;
                 } else {
                         if (current_idx == -1)
                                 next_idx = (int)num_focusable - 1;
                         else
-                                next_idx = (current_idx - 1 + (int)num_focusable) %
-                                           (int)num_focusable;
+                                next_idx =
+                                    (current_idx - 1 + (int)num_focusable) %
+                                    (int)num_focusable;
                 }
 
                 focusable[next_idx]->is_focused = true;
@@ -151,4 +153,32 @@ tbool ui_handle_event(struct ui_context *ctx, struct ui_event *event) {
 
 void ui_update(struct ui_context *ctx, double dt) {
         update_widgets(ctx->widgets, ctx->count, dt);
+}
+
+void ui_set_focus(
+    struct ui_context *ctx,
+    struct widget *target) { /* TODO: use this above in ui_handle_event */
+        struct widget *focusable[MAX_FOCUSABLE_WIDGETS];
+        size_t num_focusable = 0;
+        size_t i;
+
+        if (ctx->focused_widget != NULL)
+                ctx->focused_widget->is_focused = false;
+
+        collect_focusable_widgets(ctx->widgets, ctx->count, focusable,
+                                  &num_focusable, MAX_FOCUSABLE_WIDGETS);
+
+        ctx->focused_widget = target;
+        ctx->focus_index = -1;
+
+        if (target != NULL) {
+                target->is_focused = true;
+
+                for (i = 0; i < num_focusable; i++) {
+                        if (focusable[i] == target) {
+                                ctx->focus_index = (int)i;
+                                break;
+                        }
+                }
+        }
 }
