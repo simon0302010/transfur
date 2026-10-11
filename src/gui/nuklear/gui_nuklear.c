@@ -4,6 +4,7 @@ Needs to implement all functions defined in `gui.h`
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../interfaces/interfaces.h"
@@ -16,9 +17,11 @@ Needs to implement all functions defined in `gui.h`
 #include "nuklear.h"
 
 #if defined(__linux__)
+#include "../../interfaces/file/browser.h"
 #include "linux/nuklear_linux.h"
 #include <pthread.h>
-
+#include <pwd.h>
+#include <sys/types.h>
 #elif defined(_WIN32)
 #include "windows/nuklear_windows.h"
 #include <windows.h>
@@ -28,9 +31,9 @@ Needs to implement all functions defined in `gui.h`
 #endif
 
 #elif defined(__APPLE__)
+#include "../../interfaces/file/browser.h"
 #include "macos/nuklear_macos.h"
 #include <pthread.h>
-
 #else
 #error "Unsupported platform"
 
@@ -52,12 +55,16 @@ static volatile int sender_connected = 0;
 enum ip_btn_state { btn_local_ip, btn_public_ip };
 static enum ip_btn_state ip_btn_state = btn_local_ip;
 
+/* File browser context */
+struct browser_ctx browser_ctx_sender;
+struct browser_ctx browser_ctx_receiver;
+
 /*
 Everything below is owned by the worker thread
 
 worker_state is written by the worker and read by the UI.
-The option/interface snapshots below are written by the UI while no worker is
-running, then read by the worker.
+The option/interface snapshots below are written by the UI while no worker
+is running, then read by the worker.
 */
 enum worker_state {
         wk_idle,
@@ -295,6 +302,159 @@ static int worker_active(void) {
                worker_state != wk_error;
 }
 
+static void show_file_receiver_options(struct nk_context *ctx) {
+#if defined(OS_LINUX) || defined(OS_MACOS)
+        char cwd[PATH_MAX + 1];
+        char errmsg[128];
+        int res;
+        int i;
+        struct browser_entry *entries = NULL;
+        size_t entry_count = 0;
+
+        /* Row for title */
+        nk_layout_row_dynamic(ctx, 20, 1);
+
+        nk_label(ctx, "File Options (Receiver)", NK_TEXT_ALIGN_CENTERED);
+
+        res = browser_getcwd(&browser_ctx_receiver, cwd, sizeof(cwd));
+        if (res != 0) {
+                snprintf(errmsg, sizeof(errmsg),
+                         "Error while trying to get working directory: %i",
+                         res);
+                nk_label(ctx, errmsg, NK_TEXT_ALIGN_CENTERED);
+                return;
+        }
+
+        res = browser_dir(&browser_ctx_receiver,
+                          BROWSER_DIRECTORIES | BROWSER_FILES | BROWSER_HIDDEN,
+                          &entries, &entry_count);
+        if (res != 0) {
+                snprintf(errmsg, sizeof(errmsg),
+                         "Error while trying to get contents of %s: %i", cwd,
+                         res);
+                nk_label(ctx, errmsg, NK_TEXT_ALIGN_CENTERED);
+                return;
+        }
+
+        nk_layout_row_dynamic(ctx, 300, 1);
+
+        if (nk_group_begin_titled(ctx, "receiver_files",
+                                  "Receiver File Chooser", NK_WINDOW_BORDER)) {
+                struct nk_style_button style;
+
+                style = ctx->style.button;
+                style.text_alignment = NK_TEXT_ALIGN_LEFT;
+
+                nk_layout_row_dynamic(ctx, 25, 1);
+
+                nk_text(ctx, cwd, strlen(cwd),
+                        NK_TEXT_ALIGN_CENTERED | NK_TEXT_ALIGN_MIDDLE);
+
+                for (i = 0; i < entry_count; i++) {
+
+                        if (nk_button_label_styled(ctx, &style,
+                                                   entries[i].name)) {
+                                if (entries[i].entry_type ==
+                                    browser_entry_directory) {
+                                        browser_cd(&browser_ctx_receiver,
+                                                   entries[i].name, true);
+                                } else if (entries[i].entry_type ==
+                                           browser_entry_file) {
+                                        /* TODO: This will need to be changed
+                                         * for Windows compatibility */
+                                        snprintf(receiver_options,
+                                                 sizeof(receiver_options),
+                                                 "%s/%s", cwd, entries[i].name);
+                                }
+                        }
+                }
+
+                nk_group_end(ctx);
+        }
+
+        free((void *)entries);
+
+        /* Vertical spacer */
+        nk_layout_row_dynamic(ctx, 10, 1);
+#endif
+}
+
+static void show_file_sender_options(struct nk_context *ctx) {
+#if defined(OS_LINUX) || defined(OS_MACOS)
+        char cwd[PATH_MAX + 1];
+        char errmsg[128];
+        int res;
+        int i;
+        struct browser_entry *entries = NULL;
+        size_t entry_count = 0;
+
+        /* Row for title */
+        nk_layout_row_dynamic(ctx, 20, 1);
+
+        nk_label(ctx, "File Options (Sender)", NK_TEXT_ALIGN_CENTERED);
+
+        res = browser_getcwd(&browser_ctx_sender, cwd, sizeof(cwd));
+        if (res != 0) {
+                snprintf(errmsg, sizeof(errmsg),
+                         "Error while trying to get working directory: %i",
+                         res);
+                nk_label(ctx, errmsg, NK_TEXT_ALIGN_CENTERED);
+                return; /* Nothing more to do here ig */
+        }
+
+        res = browser_dir(&browser_ctx_sender,
+                          BROWSER_DIRECTORIES | BROWSER_FILES | BROWSER_HIDDEN,
+                          &entries, &entry_count);
+        if (res != 0) {
+                snprintf(errmsg, sizeof(errmsg),
+                         "Error while trying to get contents of %s: %i", cwd,
+                         res);
+                nk_label(ctx, errmsg, NK_TEXT_ALIGN_CENTERED);
+                return;
+        }
+
+        nk_layout_row_dynamic(ctx, 300, 1);
+
+        if (nk_group_begin_titled(ctx, "sender_files", "Sender File Chooser",
+                                  NK_WINDOW_BORDER)) {
+                struct nk_style_button style;
+
+                style = ctx->style.button;
+                style.text_alignment = NK_TEXT_ALIGN_LEFT;
+
+                nk_layout_row_dynamic(ctx, 25, 1);
+
+                nk_text(ctx, cwd, strlen(cwd),
+                        NK_TEXT_ALIGN_CENTERED | NK_TEXT_ALIGN_MIDDLE);
+
+                for (i = 0; i < entry_count; i++) {
+                        if (nk_button_label_styled(ctx, &style,
+                                                   entries[i].name)) {
+                                if (entries[i].entry_type ==
+                                    browser_entry_directory) {
+                                        browser_cd(&browser_ctx_sender,
+                                                   entries[i].name, true);
+                                } else if (entries[i].entry_type ==
+                                           browser_entry_file) {
+                                        /* TODO: This will need to be changed
+                                         * for Windows compatibility */
+                                        snprintf(sender_options,
+                                                 sizeof(sender_options),
+                                                 "%s/%s", cwd, entries[i].name);
+                                }
+                        }
+                }
+
+                nk_group_end(ctx);
+        }
+
+        free((void *)entries);
+
+        /* Vertical spacer */
+        nk_layout_row_dynamic(ctx, 10, 1);
+#endif
+}
+
 static void show_lan_discovery(struct nk_context *ctx) {
         int can_scan;
         int can_show_peers;
@@ -381,6 +541,9 @@ static void show_lan_discovery(struct nk_context *ctx) {
         if (nk_button_label(ctx, ip_label)) {
                 ip_btn_state = (ip_btn_state + 1) % 2;
         }
+
+        /* Vertical spacer */
+        nk_layout_row_dynamic(ctx, 10, 1);
 }
 
 static void nk_gui(const char *title, struct nk_context *ctx, int width,
@@ -662,8 +825,19 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 /* LAN peer discovery if sender is if_lan */
                 if (sender == if_lan)
                         show_lan_discovery(ctx);
+
+                if (receiver == if_file)
+                        show_file_receiver_options(ctx);
+
+                if (sender == if_file)
+                        show_file_sender_options(ctx);
         }
         nk_end(ctx);
 }
 
-int run_gui(const char *title) { return run_gui_nuklear(title, nk_gui); }
+int run_gui(const char *title) {
+        browser_init_default(&browser_ctx_receiver);
+        browser_init_default(&browser_ctx_sender);
+
+        return run_gui_nuklear(title, nk_gui);
+}
