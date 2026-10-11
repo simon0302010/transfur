@@ -15,7 +15,7 @@ int basic_render_button_widget(struct widget widget,
         short i;
         short color_set_size = 6;
 
-        int button_width = details.width - 3;
+        int button_width = details.width - 3 - PADDING - PADDING;
         int title_height;
 
         if (button_width <= 0)
@@ -24,19 +24,19 @@ int basic_render_button_widget(struct widget widget,
         title_height = measure_text(options->title, 1).height;
 
         if (widget.is_focused)
-                basic_fill_rounded_rect(details.x, details.y, button_width,
-                                        title_height + BORDER_WIDTH +
-                                            BORDER_WIDTH + BUTTON_MARGIN +
-                                            BUTTON_MARGIN,
-                                        BORDER_ROUNDED, focus_color);
+                basic_fill_rounded_rect(
+                    details.x + PADDING, details.y + PADDING, button_width,
+                    title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+                        BUTTON_MARGIN,
+                    BORDER_ROUNDED, focus_color);
         else
-                basic_fill_rounded_rect(details.x, details.y, button_width,
-                                        title_height + BORDER_WIDTH +
-                                            BORDER_WIDTH + BUTTON_MARGIN +
-                                            BUTTON_MARGIN,
-                                        BORDER_ROUNDED, border_color);
-        basic_fill_rounded_rect(details.x + BORDER_WIDTH,
-                                details.y + BORDER_WIDTH,
+                basic_fill_rounded_rect(
+                    details.x + PADDING, details.y + PADDING, button_width,
+                    title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+                        BUTTON_MARGIN,
+                    BORDER_ROUNDED, border_color);
+        basic_fill_rounded_rect(details.x + BORDER_WIDTH + PADDING,
+                                details.y + BORDER_WIDTH + PADDING,
                                 button_width - BORDER_WIDTH - BORDER_WIDTH,
                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN,
                                 BORDER_ROUNDED, button_color);
@@ -57,5 +57,6 @@ int basic_render_button_widget(struct widget widget,
         draw_text(options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
                   details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
 
-        return title_height + BORDER_WIDTH + BORDER_WIDTH;
+        return title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+               BUTTON_MARGIN + PADDING + PADDING;
 }

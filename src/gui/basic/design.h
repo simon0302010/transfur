@@ -12,6 +12,7 @@
 
 /* This should be used across all elements */
 #define BORDER_ROUNDED 0.4
+#define PADDING 2
 
 extern const struct color page_background;
 extern const struct color text_color;
