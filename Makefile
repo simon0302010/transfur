@@ -12,7 +12,6 @@ TARGET = build/$(OS_NAME)/transfur
 SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
-	src/interfaces/file/browser.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/lan/discover.c \
 	src/interfaces/lan/pip.c \
@@ -52,7 +51,7 @@ ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c src/interfaces/file/browser.c
 	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
 	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)

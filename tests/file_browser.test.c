@@ -15,7 +15,7 @@ int main(void) {
         browser_getcwd(&ctx, cwd, sizeof(cwd));
         puts(cwd);
 
-        browser_dir(&ctx, BROWSER_FILES, &entries, &entry_count);
+        browser_dir(&ctx, BROWSER_DIRECTORIES, &entries, &entry_count);
         if (entry_count == 0) {
                 puts("no directories in current folder");
                 return 1;
