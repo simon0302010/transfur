@@ -1,54 +1,43 @@
 #include "../../core/widgets/text_input.h"
+#include "../design.h"
 #include "../sdl3/basic_wrapper.h"
 #include "../text.h"
 #include "text_input.h"
-
-#define INPUT_PADDING 4
-#define INPUT_BORDER_SIZE 2
-
-static struct color text_color = {255, 255, 255};
-static struct color border_color = {255, 255, 255};
-static struct color focus_color = {255, 255, 0};
 
 int basic_render_text_input_widget(struct widget widget,
                                    struct basic_render_details details) {
         struct widget_text_input_options *options = widget.content;
         int text_height;
 
-        /* top border */
-        basic_fill_rect(details.x, details.y, details.width, INPUT_BORDER_SIZE,
-                        border_color);
+        int input_width = details.width - PADDING - PADDING;
 
-        text_height = draw_text(options->buffer,
-                                details.x + INPUT_BORDER_SIZE + INPUT_PADDING,
-                                details.y + INPUT_BORDER_SIZE + INPUT_PADDING,
-                                2, text_color)
-                          .height;
+        if (input_width <= 0)
+                return 0;
 
-        /* left & right borders */
-        basic_fill_rect(details.x, details.y, INPUT_BORDER_SIZE,
-                        INPUT_BORDER_SIZE + INPUT_PADDING + text_height +
-                            INPUT_PADDING,
-                        border_color);
-        basic_fill_rect(details.x + details.width - INPUT_BORDER_SIZE,
-                        details.y, INPUT_BORDER_SIZE,
-                        INPUT_BORDER_SIZE + INPUT_PADDING + text_height +
-                            INPUT_PADDING,
-                        border_color);
+        text_height = measure_text(options->buffer, 2).height;
 
-        /* bottom border */
-        basic_fill_rect(details.x,
-                        details.y + INPUT_BORDER_SIZE + INPUT_PADDING +
-                            text_height + INPUT_PADDING,
-                        details.width, INPUT_BORDER_SIZE, border_color);
+        if (widget.is_focused)
+                basic_fill_rounded_rect(
+                    details.x + PADDING, details.y + PADDING, input_width,
+                    text_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+                        BUTTON_MARGIN,
+                    BORDER_ROUNDED, focus_color);
+        else
+                basic_fill_rounded_rect(
+                    details.x + PADDING, details.y + PADDING, input_width,
+                    text_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+                        BUTTON_MARGIN,
+                    BORDER_ROUNDED, border_color);
 
-        if (widget.is_focused) {
-                basic_draw_rect(details.x + INPUT_BORDER_SIZE,
-                                details.y + INPUT_BORDER_SIZE,
-                                details.width - INPUT_BORDER_SIZE -
-                                    INPUT_BORDER_SIZE,
-                                INPUT_BORDER_SIZE + text_height, focus_color);
-        }
+        basic_fill_rounded_rect(details.x + BORDER_WIDTH + PADDING,
+                                details.y + BORDER_WIDTH + PADDING,
+                                input_width - BORDER_WIDTH - BORDER_WIDTH,
+                                text_height + BUTTON_MARGIN + BUTTON_MARGIN,
+                                BORDER_ROUNDED, primary_button_color);
 
-        return text_height + INPUT_PADDING + INPUT_PADDING + INPUT_BORDER_SIZE + INPUT_BORDER_SIZE;
+        draw_text(options->buffer, details.x + BORDER_WIDTH + BUTTON_MARGIN,
+                  details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
+
+        return text_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+               BUTTON_MARGIN + PADDING + PADDING;
 }
