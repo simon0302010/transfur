@@ -5,7 +5,6 @@
 #include "event.h"
 #include "render.h"
 #include "sdl3/basic_wrapper.h"
-#include "text.h"
 
 void run_basic(char *title, int width, int height) {
         struct color color;
@@ -40,6 +39,7 @@ void run_basic(char *title, int width, int height) {
                 dt = current_time - prev_time;
                 prev_time = current_time;
 
+                app_update(dt);
                 ui_update(&ui, dt);
 
                 basic_begin_frame();

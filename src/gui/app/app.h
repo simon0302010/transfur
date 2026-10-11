@@ -5,4 +5,6 @@
 
 void app_init(struct ui_context *ctx);
 
+void app_update(double dt);
+
 #endif /* APP_H */
