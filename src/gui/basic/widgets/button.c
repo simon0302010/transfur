@@ -20,6 +20,8 @@ int basic_render_button_widget(struct widget widget,
 
         struct color button_color;
 
+        enum widget_button_styles style;
+
         if (button_width <= 0)
                 return 0;
 
@@ -38,7 +40,12 @@ int basic_render_button_widget(struct widget widget,
                         BUTTON_MARGIN,
                     BORDER_ROUNDED, border_color);
 
-        switch (options->style) {
+        if (options->style != NULL)
+                style = *options->style;
+        else
+                style = WIDGET_BUTTON_STYLE_DISABLED;
+
+        switch (style) {
         case WIDGET_BUTTON_STYLE_PRIMARY:
         default:
                 button_color = primary_button_color;
