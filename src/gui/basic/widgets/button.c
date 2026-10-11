@@ -18,6 +18,8 @@ int basic_render_button_widget(struct widget widget,
         int button_width = details.width - 3 - PADDING - PADDING;
         int title_height;
 
+        struct color button_color;
+
         if (button_width <= 0)
                 return 0;
 
@@ -35,6 +37,23 @@ int basic_render_button_widget(struct widget widget,
                     title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
                         BUTTON_MARGIN,
                     BORDER_ROUNDED, border_color);
+
+        switch (options->style) {
+        case WIDGET_BUTTON_STYLE_PRIMARY:
+        default:
+                button_color = primary_button_color;
+                break;
+        case WIDGET_BUTTON_STYLE_SUCCESS:
+                button_color = success_button_color;
+                break;
+        case WIDGET_BUTTON_STYLE_FAILURE:
+                button_color = failure_button_color;
+                break;
+        case WIDGET_BUTTON_STYLE_DISABLED:
+                button_color = disabled_button_color;
+                break;
+        }
+
         basic_fill_rounded_rect(details.x + BORDER_WIDTH + PADDING,
                                 details.y + BORDER_WIDTH + PADDING,
                                 button_width - BORDER_WIDTH - BORDER_WIDTH,

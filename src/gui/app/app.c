@@ -51,11 +51,13 @@ static float progress_bar_value = 0.0f;
 
 void app_init(struct ui_context *ctx) {
         recv_button_opts.title = recv_button_text;
+        recv_button_opts.style = WIDGET_BUTTON_STYLE_FAILURE;
         recv_input_opts.buffer = recv_input_buffer;
         recv_input_opts.max_len = 50;
         recv_input_opts.cursor = 0;
         recv_input_opts.label = recv_input_text;
         recv_close_button_opts.title = recv_close_button_text;
+        recv_close_button_opts.style = WIDGET_BUTTON_STYLE_DISABLED;
 
         recv_group[0] =
             widget_button(&recv_button_opts, sizeof(recv_button_opts));
@@ -65,13 +67,16 @@ void app_init(struct ui_context *ctx) {
                                       sizeof(recv_close_button_opts));
 
         mid_button_opts.title = mid_button_text;
+        mid_button_opts.style = WIDGET_BUTTON_STYLE_DISABLED;
 
         send_button_opts.title = send_button_text;
+        send_button_opts.style = WIDGET_BUTTON_STYLE_FAILURE;
         send_input_opts.buffer = send_input_buffer;
         send_input_opts.max_len = 50;
         send_input_opts.cursor = 0;
         send_input_opts.label = send_input_text;
         send_close_button_opts.title = send_close_button_text;
+        send_close_button_opts.style = WIDGET_BUTTON_STYLE_DISABLED;
 
         send_group[0] =
             widget_button(&send_button_opts, sizeof(send_button_opts));
