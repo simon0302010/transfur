@@ -44,6 +44,7 @@ SRC = src/main.c \
 	src/gui/basic/widgets/progress_bar.c \
 	src/gui/basic/widgets/text_input.c \
 	src/gui/basic/widgets/text.c \
+	src/gui/basic/design.c \
 	src/gui/tui/widgets/button.c \
 	src/gui/basic/widgets/button.c
 
@@ -66,15 +67,15 @@ OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 build/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 build/%.o: src/%.S
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
@@ -84,10 +85,10 @@ clean:
 
 test:
 	mkdir -p build
-	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
-	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
-	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
-	gcc $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
-	gcc $(CFLAGS) -I. -o build/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
+	$(CC) $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
+	$(CC) $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
+	$(CC) $(CFLAGS) -I. -o build/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
 
 .PHONY: run clean
