@@ -9,6 +9,7 @@ struct ui_context {
         struct widget *widgets;
         size_t count;
         int focus_index; /* what widget is current focused */
+        struct widget *focused_widget;
         tbool running;
 };
 

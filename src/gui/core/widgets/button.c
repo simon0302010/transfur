@@ -10,6 +10,8 @@ struct widget widget_button(struct widget_button_options *options,
 
         new_button.content = options;
 
+        new_button.is_focused = false;
+
         return new_button;
 }
 
@@ -21,7 +23,10 @@ tbool widget_handle_button_input(struct widget *widget,
                 if ((event->key == UI_KEY_CHAR && event->ch == ' ') ||
                     event->key == UI_KEY_ENTER) {
                         /* call the callback */
-                        options->callback();
+                        if (options->callback != NULL) {
+                                options->callback();
+                        }
+                        return true;
                 }
         }
 

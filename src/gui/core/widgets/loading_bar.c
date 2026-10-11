@@ -10,6 +10,8 @@ struct widget widget_loading_bar(struct widget_loading_bar_options *options,
 
         new_loading_bar.content = options;
 
+        new_loading_bar.is_focused = false;
+
         return new_loading_bar;
 }
 

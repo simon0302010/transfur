@@ -10,6 +10,8 @@ struct widget widget_text_input(struct widget_text_input_options *options,
 
         new_text_input.content = options;
 
+        new_text_input.is_focused = false;
+
         return new_text_input;
 }
 
@@ -28,9 +30,12 @@ tbool widget_handle_event_text_input(struct widget *widget,
                         options->buffer[options->cursor] = '\0';
                         return true;
                 } else if (event->key == UI_KEY_BACKSPACE) {
-                        options->buffer[options->cursor - 1] = '\0';
-                        options->cursor--;
+                        if (options->cursor > 0) {
+                                options->buffer[options->cursor - 1] = '\0';
+                                options->cursor--;
+                        }
                         /* TODO: shift all chars left */
+                        return true;
                 }
         }
 

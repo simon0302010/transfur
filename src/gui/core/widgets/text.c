@@ -9,5 +9,7 @@ struct widget widget_text(int length, char *content) {
 
         new_text.content = content;
 
+        new_text.is_focused = false;
+
         return new_text;
 }
