@@ -1,5 +1,6 @@
 #include "render.h"
 #include "widgets/button.h"
+#include "widgets/group.h"
 #include "widgets/loading_bar.h"
 #include "widgets/progress_bar.h"
 #include "widgets/split.h"
@@ -14,12 +15,14 @@ void basic_render(struct ui_context *ctx) {
         int height = BASIC_MARGIN;
         struct basic_render_details details;
 
-        details.width = 800 - BASIC_MARGIN - BASIC_MARGIN; /* TODO: Match window */
+        details.width =
+            800 - BASIC_MARGIN - BASIC_MARGIN; /* TODO: Match window */
         details.x = BASIC_MARGIN;
 
         for (i = 0; i < ctx->count; i++) {
                 details.y = height;
-                height += basic_render_widget(ctx->widgets[i], details) + BASIC_SPACING;
+                height += basic_render_widget(ctx->widgets[i], details) +
+                          BASIC_SPACING;
         }
 }
 
@@ -43,6 +46,9 @@ int basic_render_widget(struct widget widget,
                 break;
         case WIDGET_SPLIT:
                 return basic_render_split_widget(widget, details);
+                break;
+        case WIDGET_GROUP:
+                return basic_render_group_widget(widget, details);
                 break;
         default:
                 break;

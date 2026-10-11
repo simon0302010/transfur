@@ -49,7 +49,8 @@ SRC = src/main.c \
 	src/gui/basic/design.c \
 	src/gui/basic/drawing.c \
 	src/gui/basic/widgets/split.c \
-	src/gui/core/widgets/split.c
+	src/gui/core/widgets/split.c \
+	src/gui/basic/widgets/group.c
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
