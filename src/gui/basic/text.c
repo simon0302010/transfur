@@ -166,4 +166,6 @@ struct text_metrics measure_text(char *text, int size) {
 
         metrics.width = char_width * size * strlen(text);
         metrics.height = char_height * size;
+
+        return metrics;
 }
