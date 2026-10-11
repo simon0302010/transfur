@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include "../../misc/bool.h"
+
 #ifdef OS_MSDOS
 /* https://delorie.com/djgpp/doc/rbinter/id/30/28.html */
 #define PATH_MAX 128
@@ -58,6 +60,6 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
                 struct browser_entry **entries, size_t *entry_count);
 
 /* Moves to the specified relative or absolute path */
-int browser_cd(struct browser_ctx *ctx, const char *path);
+int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative);
 
 #endif

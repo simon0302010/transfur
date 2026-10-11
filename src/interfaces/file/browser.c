@@ -4,6 +4,7 @@
 
 #if defined(OS_LINUX) || defined(OS_MACOS)
 #include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -11,22 +12,27 @@
 #include <windows.h>
 #endif
 
+#include "../../misc/bool.h"
 #include "browser.h"
 
 int browser_init_default(struct browser_ctx *ctx) {
         char cwd[PATH_MAX];
 
+        if (ctx == NULL)
+                return EINVAL;
+
         if (getcwd(cwd, PATH_MAX) == NULL)
                 return 1;
 
-        strncpy(ctx->location, cwd, sizeof(cwd));
+        strncpy(ctx->location, cwd, sizeof(ctx->location));
+        ctx->location[sizeof(ctx->location) - 1] = '\0';
 
         return 0;
 }
 
 int browser_getcwd(struct browser_ctx *ctx, char *buf, size_t n) {
-        if (ctx->location[0] == '\0')
-                return 1;
+        if (ctx == NULL || buf == NULL || n == 0 || ctx->location[0] == '\0')
+                return EINVAL;
 
         strncpy(buf, ctx->location, n);
         if (n > 0)
@@ -41,8 +47,9 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         DIR *dp;
         size_t entries_capacity;
 
-        if (ctx->location[0] == '\0')
-                return 1;
+        if (ctx == NULL || entries == NULL || entry_count == NULL ||
+            ctx->location[0] == '\0')
+                return EINVAL;
 
         dp = opendir(ctx->location);
         if (dp == NULL) {
@@ -104,6 +111,45 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         }
 
         closedir(dp);
+
+        return 0;
+}
+
+int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
+        struct stat s = {0};
+        char full_path[PATH_MAX + 1];
+        char real_path[PATH_MAX + 1];
+        int written;
+
+        if (path == NULL || ctx == NULL || path[0] == '\0' ||
+            ctx->location[0] == '\0')
+                return EINVAL;
+
+        if (relative) {
+                written = snprintf(full_path, sizeof(full_path), "%s/%s",
+                                   ctx->location, path);
+        } else {
+                written = snprintf(full_path, sizeof(full_path), "%s", path);
+        }
+
+        if (written < 0 || (size_t)written >= sizeof(full_path))
+                return ENAMETOOLONG;
+
+        if (stat(full_path, &s) == -1) {
+                perror("stat");
+                return errno;
+        }
+
+        if (!S_ISDIR(s.st_mode))
+                return ENOTDIR;
+
+        if (realpath(full_path, real_path) == NULL) {
+                perror("realpath");
+                return errno;
+        }
+
+        strncpy(ctx->location, real_path, PATH_MAX);
+        ctx->location[sizeof(ctx->location) - 1] = '\0';
 
         return 0;
 }

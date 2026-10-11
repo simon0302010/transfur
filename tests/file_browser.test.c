@@ -15,14 +15,19 @@ int main(void) {
         browser_getcwd(&ctx, cwd, sizeof(cwd));
         puts(cwd);
 
-        browser_dir(&ctx, BROWSER_DIRECTORIES | BROWSER_FILES, &entries,
-                    &entry_count);
-        for (i = 0; i < entry_count; i++) {
-                printf("name=%s type=%s\n", entries[i].name,
-                       (entries[i].entry_type == browser_entry_file)
-                           ? "file"
-                           : "directory");
+        browser_dir(&ctx, BROWSER_FILES, &entries, &entry_count);
+        if (entry_count == 0) {
+                puts("no directories in current folder");
+                return 1;
         }
+
+        printf("changing directory to %s\n", entries[0].name);
+
+        printf("browser_cd: %i\n", browser_cd(&ctx, entries[0].name, true));
+
+        browser_getcwd(&ctx, cwd, sizeof(cwd));
+        puts(cwd);
+
         free((void *)entries);
 
         return 0;
