@@ -3,11 +3,12 @@
 #include <string.h>
 
 int main(int argc, char **argv) {
-        if (argc == 3 && strcmp(argv[1], "--relay") == 0)  {
+        if (argc == 3 && strcmp(argv[1], "--relay") == 0) {
                 return run_relay(argv[2]);
         }
         /* All app logic should now be written in `gui/app/` */
 
+#define USE_BASIC_GUI
 
 #ifdef USE_TUI
         run_tui("Transfur");
