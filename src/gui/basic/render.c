@@ -1,4 +1,7 @@
 #include "render.h"
+#include "design.h"
+#include "images.h"
+#include "theme.h"
 #include "widgets/button.h"
 #include "widgets/group.h"
 #include "widgets/loading_bar.h"
@@ -16,6 +19,19 @@ void basic_render(struct ui_context *ctx) {
         int i;
         int height = BASIC_MARGIN;
         struct basic_render_details details;
+
+        switch (basic_get_theme()) {
+        case THEME_CLASSIC:
+        default:
+                basic_clear(page_background);
+                break;
+#ifdef ENABLE_THEMES
+        case THEME_COFFEE:
+                draw_image_tiled(IMAGE_COFFEE_BACKGROUND, 0, 0, 800, 600, 32,
+                                 32);
+                break;
+#endif
+        }
 
         details.width =
             800 - BASIC_MARGIN - BASIC_MARGIN; /* TODO: Match window */
