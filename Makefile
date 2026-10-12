@@ -16,6 +16,8 @@ SRC = src/main.c \
 	src/interfaces/lan/discover.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
+	src/interfaces/wan/wan.c \
+	src/relay/relay.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
@@ -44,6 +46,7 @@ SRC = src/main.c \
 	src/gui/basic/widgets/progress_bar.c \
 	src/gui/basic/widgets/text_input.c \
 	src/gui/basic/widgets/text.c \
+	src/gui/basic/design.c \
 	src/gui/tui/widgets/button.c \
 	src/gui/basic/widgets/button.c \
 	src/gui/basic/design.c \
@@ -56,12 +59,12 @@ ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/gui/basic/sdl3/basic_wrapper.c src/interfaces/file/browser.c
 	LDLIBS += -lX11 -lpthread $(shell pkg-config --libs sdl3)
-	CFLAGS += -D_POSIX_C_SOURCE=199309 $(shell pkg-config --cflags sdl3)
+	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl3)
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
-	CFLAGS += $(shell pkg-config --cflags sdl2)
+	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
 endif
 
@@ -79,15 +82,15 @@ OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 build/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 build/%.o: src/%.S
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
@@ -97,9 +100,10 @@ clean:
 
 test:
 	mkdir -p build
-	gcc $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
-	gcc $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
-	gcc $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
-	gcc $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
+	$(CC) $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
+	$(CC) $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
+	$(CC) $(CFLAGS) -I. -o build/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
 
 .PHONY: run clean

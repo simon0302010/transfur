@@ -12,7 +12,7 @@
 Holds a list of all interface types.
 Must be passed to `init_conn` in interfaces.c.
 */
-enum interface { if_empty, if_lan, if_serial, if_file };
+enum interface { if_empty, if_lan, if_serial, if_file, if_wan };
 
 /*
 Chunk types

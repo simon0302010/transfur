@@ -5,9 +5,7 @@ int main(void) {
         char buf[16];
         int res;
 
-        res = get_public_ip(buf, sizeof(buf));
-
-        printf("%s\n", buf);
+        printf("%s\n", get_public_ip()); /* Could be NULL but idc */
 
         return res;
 }
