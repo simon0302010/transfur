@@ -420,7 +420,7 @@ static int parse_ip(const char *s, size_t len, unsigned long *out) {
 
 /* Resolve IPv4 address or hostname into host order ip */
 static int resolve_host(const char *host, unsigned long *out) {
-        struct hostenv *he;
+        struct hostent *he;
 
         if (parse_ip(host, strlen(host), out) == 0) {
                 return 0;
@@ -674,7 +674,7 @@ int close_conn_wan(void *conn) {
 const char *get_error_text_wan(int code) {
         switch (code) {
         case WAN_ERR_ARG:
-                return "Bad argument"; // me when flat earth 🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣
+                return "Bad argument"; /* me when flat earth 🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣 */
         case WAN_ERR_OPTIONS:
                 return "Invalid options (use w:<host>:<port>:<room>)";
         case WAN_ERR_STATE:

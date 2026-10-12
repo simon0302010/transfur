@@ -18,7 +18,7 @@ relay copies bytes from peer to other peer
 #include <netinet/in.h>
 #include <signal.h>
 #include <sys/select.h>
-#include <sys/sockets.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -66,7 +66,7 @@ static struct relay_client clients[RELAY_MAX_CLIENTS];
 static int relay_net_init(void);
 static relay_sock relay_socket_open(void);
 static int relay_socket_close(relay_sock socket);
-static int relay_socket_reuseaddr(relay_socket socket);
+static int relay_socket_reuseaddr(relay_sock socket);
 static int relay_socket_bind(relay_sock socket, unsigned long ip, unsigned short port);
 static int relay_socket_listen(relay_sock socket);
 static relay_sock relay_socket_accept(relay_sock socket);
@@ -359,7 +359,7 @@ static void relay_send_error(struct relay_client *c, const char *reason) {
 static int relay_find_waiting(const char *room, int exclude) {
         int i;
 
-        for (i = 0; i < RELAY_MAX_CLIENT; i++) {
+        for (i = 0; i < RELAY_MAX_CLIENTS; i++) {
                 if (i == exclude || !clients[i].used) {
                         continue;
                 }
@@ -374,13 +374,13 @@ static int relay_find_waiting(const char *room, int exclude) {
 /* Handshake arrived for client, what to do? */
 static void relay_handle_handshake(int i) {
         struct relay_client *c;
-        int j; // no i :<
+        int j; /* no i :< */
         char paired[] = "PAIRED\n";
 
         c = &clients[i];
         
         if (strncmp(c->line, "TFR-WAN1 ", 9) != 0 || c->line[9] == '\0') {
-                relay_send_error(c, "bad handshake"); // ok so this was going to be a joke but i can't think of it
+                relay_send_error(c, "bad handshake"); /* ok so this was going to be a joke but i can't think of it */
                 relay_close_client(i);
                 return;
         }
@@ -467,7 +467,7 @@ int run_relay(const char *port_str) {
 
                         if (c->state == RELAY_ST_HANDSHAKE || c->state == RELAY_ST_WAITING) {
                                 FD_SET(c->fd, &rfds);
-                        } else if (c->state == RELAY_ST_PAIRED && c->peer >= 0 && clients[c->peer].used && !client[c->peer].closing && clients[c->peer].outlen < RELAY_OUTBUF) {
+                        } else if (c->state == RELAY_ST_PAIRED && c->peer >= 0 && clients[c->peer].used && !clients[c->peer].closing && clients[c->peer].outlen < RELAY_OUTBUF) {
                                 FD_SET(c->fd, &rfds);
                         } 
 
@@ -519,7 +519,7 @@ int run_relay(const char *port_str) {
                                 }
                         }
 
-                        if (!FD_ISSET(c->fd, rfds)) {
+                        if (!FD_ISSET(c->fd, &rfds)) {
                                 continue;
                         }
 
@@ -527,7 +527,7 @@ int run_relay(const char *port_str) {
                                 size_t space;
 
                                 space = (size_t)(RELAY_LINE_MAX - 1 - c->linelen);
-                                got = relay_socket_recv(c-> fd, (unsigned char *)(c->line + c->linelen), space);
+                                got = relay_socket_recv(c->fd, (unsigned char *)(c->line + c->linelen), space);
 
                                 if (got <= 0) {
                                         relay_close_client(i);
@@ -536,18 +536,28 @@ int run_relay(const char *port_str) {
                                         c->line[c->linelen] = '\0';
                                         if (strchr(c->line, '\n') != NULL) {
                                                 relay_handle_handshake(i);
-                                        } else if (c->state == RELAY_ST_WAITING) {
-                                                got = relay_socket_recv(c->fd, (unsigned char *)buf, sizeof buf);
-                                                if (got <= 0) {
-                                                        relay_close_client(i);
-                                                        continue;
-                                                }
-                                                if (peer >= 0 && clients[peer].used) {
-                                                        relay_enqueue(&clients[peer], (unsigned char *)buf, (size_t)got);
-                                                }
+                                        } else if (c->linelen >= RELAY_LINE_MAX - 1) {
+                                                relay_close_client(i);
                                         }
                                 }
-                        }
+                        } else if (c->state == RELAY_ST_WAITING) {
+                                got = relay_socket_recv(c->fd, (unsigned char *)buf, sizeof buf);
+                                if (got <= 0) {
+                                        relay_close_client(i);
+                                }
+                        } else if (c->state == RELAY_ST_PAIRED) {
+                                int peer;
+
+                                peer = c->peer;
+                                got = relay_socket_recv(c->fd, (unsigned char *)buf, sizeof buf);
+                                if (got <= 0) {
+                                        relay_close_client(i);
+                                        continue;
+                                }
+                                if (peer >= 0 && clients[peer].used) {
+                                        relay_enqueue(&clients[peer], (unsigned char *)buf, (size_t)got);
+                                }
+                        }                       
                 }
         }
 
