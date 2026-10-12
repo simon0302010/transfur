@@ -89,6 +89,7 @@ void draw_image_scaled_cropped(basic_image_id_t id, int x, int y, int w, int h,
         struct image_entry *img;
         int row_stride;
         int dy, dx;
+        tbool skip_division;
 
         if (id < 0 || id >= IMAGE_COUNT || w <= 0 || h <= 0)
                 return;
@@ -100,10 +101,12 @@ void draw_image_scaled_cropped(basic_image_id_t id, int x, int y, int w, int h,
         if (!img->loaded || img->width <= 0 || img->height <= 0)
                 return;
 
+        skip_division = (w == img->width && h == img->height);
+
         row_stride = ((img->width * (img->bpp / 8) + 3) & ~3);
 
         for (dy = 0; dy < h; dy++) {
-                int src_y = (dy * img->height) / h;
+                int src_y = skip_division ? dy : (dy * img->height) / h;
                 /* bmp is stored bottom to top, so reverse it */
                 int bmp_y = (img->height - 1) - src_y;
 
@@ -111,7 +114,7 @@ void draw_image_scaled_cropped(basic_image_id_t id, int x, int y, int w, int h,
                         continue;
 
                 for (dx = 0; dx < w; dx++) {
-                        int src_x = (dx * img->width) / w;
+                        int src_x = skip_division ? dx : (dx * img->width) / w;
                         int pixel_index = img->offset + bmp_y * row_stride +
                                           src_x * (img->bpp / 8);
                         struct color pixel_color;
