@@ -9,3 +9,4 @@ CompileFlags:
     - -Wno-empty-translation-unit
     - "-include"
     - "src/platform.h"
+    - -DENABLE_THEMES

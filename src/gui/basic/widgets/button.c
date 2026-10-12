@@ -24,10 +24,15 @@ int basic_render_button_widget(struct widget widget,
 
         enum widget_button_styles style;
 
+        int h;
+
         if (button_width <= 0)
                 return 0;
 
         title_height = measure_text(options->title, 1).height;
+
+        h = title_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
+            BUTTON_MARGIN;
 
         if (options->style != NULL)
                 style = *options->style;
@@ -41,17 +46,11 @@ int basic_render_button_widget(struct widget widget,
                 if (widget.is_focused)
                         basic_fill_rounded_rect(
                             details.x + PADDING, details.y + PADDING,
-                            button_width,
-                            title_height + BORDER_WIDTH + BORDER_WIDTH +
-                                BUTTON_MARGIN + BUTTON_MARGIN,
-                            BORDER_ROUNDED, focus_color);
+                            button_width, h, BORDER_ROUNDED, focus_color);
                 else
                         basic_fill_rounded_rect(
                             details.x + PADDING, details.y + PADDING,
-                            button_width,
-                            title_height + BORDER_WIDTH + BORDER_WIDTH +
-                                BUTTON_MARGIN + BUTTON_MARGIN,
-                            BORDER_ROUNDED, border_color);
+                            button_width, h, BORDER_ROUNDED, border_color);
 
                 switch (style) {
                 case WIDGET_BUTTON_STYLE_PRIMARY:
@@ -85,6 +84,7 @@ int basic_render_button_widget(struct widget widget,
 #ifdef ENABLE_THEMES
         case THEME_COFFEE: {
                 basic_image_id_t image;
+                int image_height;
 
                 switch (style) {
                 case WIDGET_BUTTON_STYLE_PRIMARY:
@@ -102,10 +102,38 @@ int basic_render_button_widget(struct widget widget,
                         break;
                 }
 
-                draw_image_scaled(image, details.x + BORDER_WIDTH + PADDING,
-                                  details.y + BORDER_WIDTH + PADDING,
-                                  button_width - BORDER_WIDTH - BORDER_WIDTH,
-                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN);
+                draw_image_tiled(image, details.x + BORDER_WIDTH + PADDING,
+                                 details.y + BORDER_WIDTH + PADDING,
+                                 button_width - BORDER_WIDTH - BORDER_WIDTH,
+                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN,
+                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN,
+                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN);
+
+                draw_image_tiled(IMAGE_COFFEE_BORDERS_HORIZONTAL,
+                                 details.x + PADDING, details.y + PADDING,
+                                 details.width - PADDING - PADDING,
+                                 title_height + BORDER_WIDTH + BORDER_WIDTH +
+                                     BUTTON_MARGIN + BUTTON_MARGIN,
+                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN +
+                                     BORDER_WIDTH + BORDER_WIDTH,
+                                 title_height + BUTTON_MARGIN + BUTTON_MARGIN +
+                                     BORDER_WIDTH + BORDER_WIDTH);
+
+                /* left */
+                draw_image_scaled_cropped(
+                    IMAGE_COFFEE_BORDERS_VERTICAL, details.x + PADDING,
+                    details.y + PADDING, h, h, details.x + PADDING,
+                    details.y + PADDING, details.x + PADDING + h / 2,
+                    details.y + PADDING + h);
+
+                /* right */
+                draw_image_scaled_cropped(
+                    IMAGE_COFFEE_BORDERS_VERTICAL,
+                    details.x + details.width - PADDING - h,
+                    details.y + PADDING, h, h,
+                    details.x + details.width - PADDING - h / 2,
+                    details.y + PADDING, details.x + details.width - PADDING,
+                    details.y + PADDING + h);
 
                 draw_text(
                     options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,

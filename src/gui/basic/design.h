@@ -5,10 +5,10 @@
 
 #define BORDER_WIDTH 2
 #define CONTAINER_MARGIN 8
-#define BUTTON_MARGIN 4
-#define TEXT_SIZE_TITLE 3
-#define TEXT_SIZE_HEADING 2
-#define TEXT_SIZE_REGULAR 1
+#define BUTTON_MARGIN 8
+#define TEXT_SIZE_TITLE 4
+#define TEXT_SIZE_HEADING 3
+#define TEXT_SIZE_REGULAR 2
 
 /* This should be used across all elements */
 #define BORDER_ROUNDED 0.4
