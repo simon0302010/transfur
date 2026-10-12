@@ -14,6 +14,10 @@
     .long \name\()_bmp_end - \name\()_bmp_data
 .endm
 
-EMBED_IMAGE test_font, "font.bmp"
+EMBED_IMAGE coffee_background, "assets/coffee_background.bmp"
+EMBED_IMAGE coffee_button_disabled, "assets/coffee_button_disabled.bmp"
+EMBED_IMAGE coffee_button_failure, "assets/coffee_button_failure.bmp"
+EMBED_IMAGE coffee_button_success, "assets/coffee_button_success.bmp"
+EMBED_IMAGE coffee_button_primary, "assets/coffee_button_primary.bmp"
 
 #endif

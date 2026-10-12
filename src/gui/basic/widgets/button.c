@@ -83,9 +83,26 @@ int basic_render_button_widget(struct widget widget,
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE:
-                draw_image_scaled(IMAGE_TEST_FONT,
-                                  details.x + BORDER_WIDTH + PADDING,
+        case THEME_COFFEE: {
+                basic_image_id_t image;
+
+                switch (style) {
+                case WIDGET_BUTTON_STYLE_PRIMARY:
+                default:
+                        image = IMAGE_COFFEE_BUTTON_PRIMARY;
+                        break;
+                case WIDGET_BUTTON_STYLE_SUCCESS:
+                        image = IMAGE_COFFEE_BUTTON_SUCCESS;
+                        break;
+                case WIDGET_BUTTON_STYLE_FAILURE:
+                        image = IMAGE_COFFEE_BUTTON_FAILURE;
+                        break;
+                case WIDGET_BUTTON_STYLE_DISABLED:
+                        image = IMAGE_COFFEE_BUTTON_DISABLED;
+                        break;
+                }
+
+                draw_image_scaled(image, details.x + BORDER_WIDTH + PADDING,
                                   details.y + BORDER_WIDTH + PADDING,
                                   button_width - BORDER_WIDTH - BORDER_WIDTH,
                                   title_height + BUTTON_MARGIN + BUTTON_MARGIN);
@@ -96,6 +113,7 @@ int basic_render_button_widget(struct widget widget,
 
                 return title_height + BORDER_WIDTH + BORDER_WIDTH +
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
+        }
 #endif
         }
 }

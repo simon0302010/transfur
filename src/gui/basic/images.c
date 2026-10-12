@@ -4,11 +4,11 @@
 
 #ifdef ENABLE_THEMES
 
-/* i think this will work, if my understanding of enums is right */
-#define IMAGE_COUNT IMAGE_END
-
-extern const unsigned char test_font_bmp_data[];
-extern const unsigned int test_font_bmp_size;
+#define X_EXTERN(id, name)                                                     \
+        extern const unsigned char name##_bmp_data[];                          \
+        extern const unsigned int name##_bmp_size;
+IMAGE_LIST(X_EXTERN)
+#undef X_EXTERN
 
 struct image_entry {
         const unsigned char *raw_data;
@@ -20,8 +20,10 @@ struct image_entry {
         uint16_t bpp;
 };
 
-static struct image_entry image_registry[IMAGE_COUNT] = {
-    {test_font_bmp_data, &test_font_bmp_size, false, 0, 0, 0, 0}};
+#define X_ENTRY(id, name)                                                      \
+        {name##_bmp_data, &name##_bmp_size, false, 0, 0, 0, 0},
+static struct image_entry image_registry[IMAGE_COUNT] = {IMAGE_LIST(X_ENTRY)};
+#undef X_ENTRY
 
 static void load_image(basic_image_id_t id) {
         struct image_entry *img;
