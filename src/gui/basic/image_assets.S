@@ -21,5 +21,9 @@ EMBED_IMAGE coffee_button_success, "assets/coffee_button_success.bmp"
 EMBED_IMAGE coffee_button_primary, "assets/coffee_button_primary.bmp"
 EMBED_IMAGE coffee_borders_horizontal, "assets/coffee_borders_horizontal.bmp"
 EMBED_IMAGE coffee_borders_vertical, "assets/coffee_borders_vertical.bmp"
+EMBED_IMAGE coffee_input, "assets/coffee_input.bmp"
+EMBED_IMAGE coffee_progress_bar_background, "assets/coffee_progress_bar_background.bmp"
+EMBED_IMAGE coffee_progress_bar_segment, "assets/coffee_progress_bar_segment.bmp"
+EMBED_IMAGE coffee_progress_bar_end, "assets/coffee_progress_bar_end.bmp"
 
 #endif

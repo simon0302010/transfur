@@ -13,7 +13,11 @@
         X(COFFEE_BUTTON_SUCCESS, coffee_button_success)                        \
         X(COFFEE_BUTTON_FAILURE, coffee_button_failure)                        \
         X(COFFEE_BORDERS_HORIZONTAL, coffee_borders_horizontal)                \
-        X(COFFEE_BORDERS_VERTICAL, coffee_borders_vertical)
+        X(COFFEE_BORDERS_VERTICAL, coffee_borders_vertical)                    \
+        X(COFFEE_INPUT, coffee_input)                                          \
+        X(COFFEE_PROGRESS_BAR_BACKGROUND, coffee_progress_bar_background)      \
+        X(COFFEE_PROGRESS_BAR_SEGMENT, coffee_progress_bar_segment)            \
+        X(COFFEE_PROGRESS_BAR_END, coffee_progress_bar_end)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;

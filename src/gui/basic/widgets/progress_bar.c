@@ -1,6 +1,8 @@
 #include "progress_bar.h"
 #include "../../core/widgets/progress_bar.h"
+#include "../images.h"
 #include "../sdl3/basic_wrapper.h"
+#include "../theme.h"
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,11 +36,36 @@ int basic_render_progress_bar_widget(struct widget widget,
             draw_text(progress_string, details.x, details.y, 1, text_color);
         remaining_width = details.width - heading_width;
 
-        basic_fill_rect(details.x + heading_width, details.y, remaining_width,
-                        BAR_HEIGHT, bar_color);
-        basic_fill_rect(details.x + heading_width, details.y,
+        switch (basic_get_theme()) {
+        case THEME_CLASSIC:
+        default:
+
+                basic_fill_rect(details.x + heading_width, details.y,
+                                remaining_width, BAR_HEIGHT, bar_color);
+                basic_fill_rect(
+                    details.x + heading_width, details.y,
+                    (int)((double)remaining_width * *options->progress),
+                    BAR_HEIGHT, progress_color);
+                break;
+#ifdef ENABLE_THEMES
+        case THEME_COFFEE:
+                draw_image_tiled(IMAGE_COFFEE_PROGRESS_BAR_BACKGROUND,
+                                 details.x + heading_width, details.y,
+                                 remaining_width, BAR_HEIGHT, BAR_HEIGHT,
+                                 BAR_HEIGHT);
+                draw_image_tiled(
+                    IMAGE_COFFEE_PROGRESS_BAR_SEGMENT,
+                    details.x + heading_width, details.y,
+                    (int)((double)remaining_width * *options->progress),
+                    BAR_HEIGHT, BAR_HEIGHT, BAR_HEIGHT);
+                draw_image_scaled_cropped(
+                    IMAGE_COFFEE_PROGRESS_BAR_END,
+                    details.x + heading_width +
                         (int)((double)remaining_width * *options->progress),
-                        BAR_HEIGHT, progress_color);
+                    details.y, BAR_HEIGHT, BAR_HEIGHT, 0, 0,
+                    details.x + details.width, details.y + BAR_HEIGHT);
+#endif
+        }
 
         return BAR_HEIGHT;
 }
