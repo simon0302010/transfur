@@ -2,11 +2,20 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_render.h>
+#include <bits/stdint-uintn.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static SDL_Window *s_window = NULL;
 static SDL_Renderer *s_renderer = NULL;
+
+static SDL_Texture *s_texture = NULL;
+static uint32_t *s_framebuffer = NULL;
+static int s_width = 0;
+static int s_height = 0;
 
 int basic_init(const char *title, int width, int height) {
         SDL_Init(SDL_INIT_VIDEO);
@@ -14,10 +23,32 @@ int basic_init(const char *title, int width, int height) {
         SDL_CreateWindowAndRenderer(title, width, height, 0, &s_window,
                                     &s_renderer);
 
+        s_width = width;
+        s_height = height;
+
+        s_framebuffer = (uint32_t *)malloc(width * height * sizeof(uint32_t));
+
+        if (!s_framebuffer)
+                return -1;
+
+        s_texture =
+            SDL_CreateTexture(s_renderer, SDL_PIXELFORMAT_XRGB8888,
+                              SDL_TEXTUREACCESS_STREAMING, width, height);
+
         return 0;
 }
 
 void basic_cleanup(void) {
+        if (s_framebuffer) {
+                free(s_framebuffer);
+                s_framebuffer = NULL;
+        }
+
+        if (s_texture) {
+                SDL_DestroyTexture(s_texture);
+                s_texture = NULL;
+        }
+
         SDL_DestroyRenderer(s_renderer);
         s_renderer = NULL;
 
@@ -28,8 +59,20 @@ void basic_cleanup(void) {
 }
 
 void basic_clear(struct color color) {
-        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, 255);
-        SDL_RenderClear(s_renderer);
+        int i, total;
+        uint32_t pixel;
+
+        if (!s_framebuffer)
+                return;
+
+        pixel = ((uint32_t)(unsigned char)color.r << 16) |
+                ((uint32_t)(unsigned char)color.g << 8) |
+                (uint32_t)(unsigned char)color.b;
+
+        total = s_width * s_height;
+        for (i = 0; i < total; i++) {
+                s_framebuffer[i] = pixel;
+        }
 }
 
 void basic_begin_frame(void) {
@@ -41,35 +84,62 @@ void basic_begin_frame(void) {
         basic_clear(bg);
 }
 
-void basic_present(void) { SDL_RenderPresent(s_renderer); }
+void basic_present(void) {
+        if (s_texture && s_framebuffer) {
+                SDL_UpdateTexture(s_texture, NULL, s_framebuffer,
+                                  s_width * sizeof(uint32_t));
+                SDL_RenderTexture(s_renderer, s_texture, NULL, NULL);
+        }
+        SDL_RenderPresent(s_renderer);
+}
 
 void basic_set_pixel(int x, int y, struct color color) {
-        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, 255);
-        SDL_RenderPoint(s_renderer, (float)x, (float)y);
+        if (x >= 0 && x < s_width && y >= 0 && y < s_height && s_framebuffer) {
+                s_framebuffer[y * s_width + x] =
+                    ((uint32_t)(unsigned char)color.r << 16) |
+                    ((uint32_t)(unsigned char)color.g << 8) |
+                    (uint32_t)(unsigned char)color.b;
+        }
+}
+
+/* note: these functions could be moved out of the wrapper */
+void basic_fill_rect(int x, int y, int w, int h, struct color color) {
+        int row, col;
+        int x1, y1, x2, y2;
+        uint32_t pixel;
+
+        if (!s_framebuffer || w <= 0 || h <= 0)
+                return;
+
+        /* this will ensure we draw within screen boundary */
+        x1 = (x < 0) ? 0 : x;
+        y1 = (y < 0) ? 0 : y;
+        x2 = (x + w > s_width) ? s_width : x + w;
+        y2 = (y + h > s_height) ? s_height : y + h;
+
+        if (x1 >= x2 || y1 >= y2)
+                return;
+
+        pixel = ((uint32_t)(unsigned char)color.r << 16) |
+                ((uint32_t)(unsigned char)color.g << 8) |
+                (uint32_t)(unsigned char)color.b;
+
+        for (row = y1; row < y2; row++) {
+                int row_offset = row * s_width;
+                for (col = x1; col < x2; col++) {
+                        s_framebuffer[row_offset + col] = pixel;
+                }
+        }
 }
 
 void basic_draw_rect(int x, int y, int w, int h, struct color color) {
-        SDL_FRect rect;
+        if (w <= 0 || h <= 0)
+                return;
 
-        rect.x = (float)x;
-        rect.y = (float)y;
-        rect.w = (float)w;
-        rect.h = (float)h;
-
-        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, 255);
-        SDL_RenderRect(s_renderer, &rect);
-}
-
-void basic_fill_rect(int x, int y, int w, int h, struct color color) {
-        SDL_FRect rect;
-
-        rect.x = (float)x;
-        rect.y = (float)y;
-        rect.w = (float)w;
-        rect.h = (float)h;
-
-        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, 255);
-        SDL_RenderFillRect(s_renderer, &rect);
+        basic_fill_rect(x, y, w, 1, color);
+        basic_fill_rect(x, y + h - 1, w, 1, color);
+        basic_fill_rect(x, y, 1, h, color);
+        basic_fill_rect(x + w - 1, y, 1, h, color);
 }
 
 double basic_get_time(void) { return (double)SDL_GetTicksNS() / 1e9; }
