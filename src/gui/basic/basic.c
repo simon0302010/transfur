@@ -1,5 +1,6 @@
 #include "basic.h"
 #include "../../misc/bool.h"
+#include "../../misc/ttime.h"
 #include "../app/app.h"
 #include "../core/ui_core.h"
 #include "event.h"
@@ -11,7 +12,8 @@ void run_basic(char *title, int width, int height) {
         struct color color;
         struct ui_context ui;
         struct ui_event event;
-        double prev_time, current_time, dt;
+        double prev_time, current_time, dt, remaining_time;
+        double time_per_frame = 1.0 / 30.0;
 
         color.r = 255;
         color.b = 0;
@@ -64,6 +66,12 @@ void run_basic(char *title, int width, int height) {
                 basic_render(&ui);
 
                 basic_present();
+
+                remaining_time =
+                    time_per_frame - (basic_get_time() - prev_time);
+
+                if (remaining_time > 0)
+                        sleep_ms((unsigned int)(remaining_time * 1000));
         }
 
         basic_cleanup();
