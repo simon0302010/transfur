@@ -11,7 +11,6 @@ Needs to implement all functions defined in `gui.h`
 #include "../../interfaces/lan/discover.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
-#include "../../interfaces/serial/serial.h"
 #include "../gui.h"
 
 #include "nuklear.h"
@@ -191,9 +190,10 @@ static void *transfer_worker(void *arg)
         /* Both sides are initialized because init_conn can block but must not
          * freeze UI */
         if (!receiver_inited) {
-                worker_state = (receiver_conn_if == if_lan ||
-                                receiver_conn_if == if_wan) ? wk_wait_receiver
-                                                            : wk_init_receiver;
+                worker_state =
+                    (receiver_conn_if == if_lan || receiver_conn_if == if_wan)
+                        ? wk_wait_receiver
+                        : wk_init_receiver;
                 r = init_conn(&receiver_conn, receiver_conn_if,
                               receiver_conn_opts);
 
@@ -217,9 +217,10 @@ static void *transfer_worker(void *arg)
         }
 
         if (!sender_inited) {
-                worker_state = (sender_conn_if == if_lan ||
-                                sender_conn_if == if_wan) ? wk_wait_sender
-                                                          : wk_init_sender;
+                worker_state =
+                    (sender_conn_if == if_lan || sender_conn_if == if_wan)
+                        ? wk_wait_sender
+                        : wk_init_sender;
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
                 if (r != 0) {

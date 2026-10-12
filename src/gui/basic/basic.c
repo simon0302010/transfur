@@ -3,12 +3,13 @@
 #include "../../misc/ttime.h"
 #include "../app/app.h"
 #include "../core/ui_core.h"
+#include "../gui.h"
 #include "event.h"
 #include "render.h"
 #include "sdl3/basic_wrapper.h"
 #include "theme.h"
 
-void run_basic(char *title, int width, int height) {
+int run_basic(char *title) {
         struct color color;
         struct ui_context ui;
         struct ui_event event;
@@ -25,7 +26,7 @@ void run_basic(char *title, int width, int height) {
 
         prev_time = basic_get_time();
 
-        basic_init(title, width, height);
+        basic_init(title, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         while (ui.running) {
                 while ((event = basic_poll_ui_event()).type != UI_EVENT_NONE) {
@@ -79,5 +80,5 @@ void run_basic(char *title, int width, int height) {
 
         basic_cleanup();
 
-        return;
+        return 0;
 }

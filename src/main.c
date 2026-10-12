@@ -1,5 +1,6 @@
 #include "gui/gui.h"
 #include "relay/relay.h"
+#include <stdio.h>
 #include <string.h>
 
 int main(int argc, char **argv) {
@@ -11,12 +12,14 @@ int main(int argc, char **argv) {
 #define USE_BASIC_GUI
 
 #ifdef USE_TUI
-        run_tui("Transfur");
+        if (run_tui("Transfur") != 0)
+                perror("run_tui");
 #elif defined(USE_BASIC_GUI)
-        run_basic("Transfur", 800, 600); /* TODO: Make size dynamic */
+        if (run_basic("Transfur") != 0)
+                perror("run_basic");
 #else
         if (run_gui("Transfur") != 0)
-                perror("gui_init");
+                perror("run_gui");
 #endif
 
         return 0;
