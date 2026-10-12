@@ -31,6 +31,12 @@ void tui_render_widget(struct widget widget, int width) {
         case WIDGET_BUTTON:
                 tui_render_button_widget(widget, width);
                 break;
+        case WIDGET_SPLIT:
+                tui_render_split_widget(widget, width);
+                break;
+        case WIDGET_GROUP:
+                tui_render_group_widget(widget, width);
+                break;
         default:
                 break;
         }
