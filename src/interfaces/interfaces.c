@@ -5,6 +5,7 @@
 #include "interfaces.h"
 
 #include "file/file.h"
+#include "wan/wan.h"
 #include "lan/lan.h"
 #include "serial/serial.h"
 
@@ -71,6 +72,8 @@ int init_conn(int *conn, enum interface interface, void *options) {
                 return init_conn_serial(context, (const char *)options);
         case if_lan:
                 return init_conn_lan(context, (const char *)options);
+        case if_wan:
+                return init_conn_wan(context, (const char *)options);
         }
 
         return 1;
@@ -90,6 +93,8 @@ int send_chunk(const int *conn, const struct chunk *chunk) {
                 return send_chunk_serial(context, chunk);
         case if_lan:
                 return send_chunk_lan(context, chunk);
+        case if_wan:
+                return send_chunk_wan(context, chunk);
         }
 
         return 1;
@@ -108,6 +113,8 @@ int recv_chunk(const int *conn, struct chunk *chunk) {
         case if_serial:
                 return recv_chunk_serial(context, chunk);
         case if_lan:
+                return recv_chunk_lan(context, chunk);
+        case if_wan:
                 return recv_chunk_lan(context, chunk);
         }
 
@@ -134,6 +141,9 @@ int close_conn(const int *conn) {
         case if_lan:
                 r = close_conn_lan(context);
                 break;
+        case if_wan:
+                r = close_conn_wan(context);
+                break;
         }
 
         /* This probably creates a bunch of memory leaks lmao */
@@ -151,6 +161,8 @@ const char *get_receiver_text(enum interface interface) {
                 return "Read from file";
         case if_lan:
                 return "Receive over LAN";
+        case if_wan:
+                return "Receive over WAN";
         case if_serial:
                 return "Receive over serial";
         }
@@ -164,6 +176,8 @@ const char *get_sender_text(enum interface interface) {
                 return "Write to file";
         case if_lan:
                 return "Send over LAN";
+        case if_wan:
+                return "Send over WAN";
         case if_serial:
                 return "Send over serial";
         }
@@ -171,10 +185,10 @@ const char *get_sender_text(enum interface interface) {
 
 const enum interface *get_supported_interfaces(void) {
 #if defined(OS_LINUX)
-        static const enum interface interfaces[] = {if_file, if_lan, if_serial,
+        static const enum interface interfaces[] = {if_file, if_lan, if_wan, if_serial,
                                                     if_empty};
 #elif defined(OS_WINDOWS)
-        static const enum interface interfaces[] = {if_file, if_lan, if_serial,
+        static const enum interface interfaces[] = {if_file, if_lan, if_wan, if_serial,
                                                     if_empty};
 #elif defined(OS_MACOS)
         static const enum interface interfaces[] = {if_file, if_empty};
@@ -200,5 +214,7 @@ const char *get_error_text(enum interface interface, int code) {
                 return get_error_text_serial(code);
         case if_lan:
                 return get_error_text_lan(code);
+        case if_wan:
+                return get_error_text_wan(code);
         }
 }
