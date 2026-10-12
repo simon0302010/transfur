@@ -2,6 +2,7 @@
 
 const struct color page_background = {0, 0, 0};
 const struct color text_color = {255, 255, 255};
+const struct color text_color_inverted = {0, 0, 0};
 const struct color primary_button_color = {0, 100, 200};
 const struct color success_button_color = {50, 200, 50};
 const struct color failure_button_color = {200, 50, 50};

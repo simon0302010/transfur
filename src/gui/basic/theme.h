@@ -1,7 +1,12 @@
 #ifndef BASIC_THEME_H
 #define BASIC_THEME_H
 
-typedef enum { THEME_CLASSIC, THEME_COFFEE, THEME_END } basic_theme_t;
+typedef enum {
+        THEME_CLASSIC,
+        THEME_COFFEE,
+        THEME_PASTEL,
+        THEME_END
+} basic_theme_t;
 
 #ifdef ENABLE_THEMES
 

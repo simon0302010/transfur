@@ -16,6 +16,7 @@
 
 extern const struct color page_background;
 extern const struct color text_color;
+extern const struct color text_color_inverted;
 extern const struct color primary_button_color;
 extern const struct color failure_button_color;
 extern const struct color success_button_color;

@@ -82,23 +82,32 @@ int basic_render_button_widget(struct widget widget,
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE: {
+        case THEME_COFFEE:
+        case THEME_PASTEL: {
                 basic_image_id_t image;
                 int image_height;
 
                 switch (style) {
                 case WIDGET_BUTTON_STYLE_PRIMARY:
                 default:
-                        image = IMAGE_COFFEE_BUTTON_PRIMARY;
+                        image = (basic_get_theme() == THEME_COFFEE)
+                                    ? IMAGE_COFFEE_BUTTON_PRIMARY
+                                    : IMAGE_PASTEL_BUTTON_PRIMARY;
                         break;
                 case WIDGET_BUTTON_STYLE_SUCCESS:
-                        image = IMAGE_COFFEE_BUTTON_SUCCESS;
+                        image = (basic_get_theme() == THEME_COFFEE)
+                                    ? IMAGE_COFFEE_BUTTON_SUCCESS
+                                    : IMAGE_PASTEL_BUTTON_SUCCESS;
                         break;
                 case WIDGET_BUTTON_STYLE_FAILURE:
-                        image = IMAGE_COFFEE_BUTTON_FAILURE;
+                        image = (basic_get_theme() == THEME_COFFEE)
+                                    ? IMAGE_COFFEE_BUTTON_FAILURE
+                                    : IMAGE_PASTEL_BUTTON_FAILURE;
                         break;
                 case WIDGET_BUTTON_STYLE_DISABLED:
-                        image = IMAGE_COFFEE_BUTTON_DISABLED;
+                        image = (basic_get_theme() == THEME_COFFEE)
+                                    ? IMAGE_COFFEE_BUTTON_DISABLED
+                                    : IMAGE_PASTEL_BUTTON_DISABLED;
                         break;
                 }
 
@@ -109,7 +118,9 @@ int basic_render_button_widget(struct widget widget,
                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN,
                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN);
 
-                draw_image_tiled(IMAGE_COFFEE_BORDERS_HORIZONTAL,
+                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
+                                     ? IMAGE_COFFEE_BORDERS_HORIZONTAL
+                                     : IMAGE_PASTEL_BORDERS_HORIZONTAL,
                                  details.x + PADDING, details.y + PADDING,
                                  details.width - PADDING - PADDING,
                                  title_height + BORDER_WIDTH + BORDER_WIDTH +
@@ -121,14 +132,18 @@ int basic_render_button_widget(struct widget widget,
 
                 /* left */
                 draw_image_scaled_cropped(
-                    IMAGE_COFFEE_BORDERS_VERTICAL, details.x + PADDING,
-                    details.y + PADDING, h, h, details.x + PADDING,
-                    details.y + PADDING, details.x + PADDING + h / 2,
-                    details.y + PADDING + h);
+                    (basic_get_theme() == THEME_COFFEE)
+                        ? IMAGE_COFFEE_BORDERS_VERTICAL
+                        : IMAGE_PASTEL_BORDERS_VERTICAL,
+                    details.x + PADDING, details.y + PADDING, h, h,
+                    details.x + PADDING, details.y + PADDING,
+                    details.x + PADDING + h / 2, details.y + PADDING + h);
 
                 /* right */
                 draw_image_scaled_cropped(
-                    IMAGE_COFFEE_BORDERS_VERTICAL,
+                    (basic_get_theme() == THEME_COFFEE)
+                        ? IMAGE_COFFEE_BORDERS_VERTICAL
+                        : IMAGE_PASTEL_BORDERS_VERTICAL,
                     details.x + details.width - PADDING - h,
                     details.y + PADDING, h, h,
                     details.x + details.width - PADDING - h / 2,
@@ -137,7 +152,9 @@ int basic_render_button_widget(struct widget widget,
 
                 draw_text(
                     options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
-                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
+                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1,
+                    (basic_get_theme() == THEME_COFFEE) ? text_color
+                                                        : text_color_inverted);
 
                 return title_height + BORDER_WIDTH + BORDER_WIDTH +
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;

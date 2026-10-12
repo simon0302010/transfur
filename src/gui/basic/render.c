@@ -30,6 +30,11 @@ void basic_render(struct ui_context *ctx) {
                 draw_image_tiled(IMAGE_COFFEE_BACKGROUND, 0, 0, 800, 600, 32,
                                  32);
                 break;
+        case THEME_PASTEL:
+                draw_image_tiled(IMAGE_PASTEL_BACKGROUND, 0, 0, 800, 600, 32,
+                                 32);
+                break;
+                break;
 #endif
         }
 

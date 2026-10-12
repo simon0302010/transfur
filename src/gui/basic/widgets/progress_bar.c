@@ -1,5 +1,6 @@
 #include "progress_bar.h"
 #include "../../core/widgets/progress_bar.h"
+#include "../design.h"
 #include "../images.h"
 #include "../sdl3/basic_wrapper.h"
 #include "../theme.h"
@@ -9,7 +10,6 @@
 
 #define BAR_HEIGHT 8
 
-static struct color text_color = {255, 255, 255};
 static struct color bar_color = {0, 20, 0};
 static struct color progress_color = {0, 255, 0};
 
@@ -32,8 +32,10 @@ int basic_render_progress_bar_widget(struct widget widget,
         /* Calculate the widths now that we have progress_string
          */
 
-        heading_width =
-            draw_text(progress_string, details.x, details.y, 1, text_color);
+        heading_width = draw_text(progress_string, details.x, details.y, 1,
+                                  (basic_get_theme() != THEME_PASTEL)
+                                      ? text_color
+                                      : text_color_inverted);
         remaining_width = details.width - heading_width;
 
         switch (basic_get_theme()) {
@@ -49,21 +51,29 @@ int basic_render_progress_bar_widget(struct widget widget,
                 break;
 #ifdef ENABLE_THEMES
         case THEME_COFFEE:
-                draw_image_tiled(IMAGE_COFFEE_PROGRESS_BAR_BACKGROUND,
+        case THEME_PASTEL:
+                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
+                                     ? IMAGE_COFFEE_PROGRESS_BAR_BACKGROUND
+                                     : IMAGE_PASTEL_PROGRESS_BAR_BACKGROUND,
                                  details.x + heading_width, details.y,
                                  remaining_width, BAR_HEIGHT, BAR_HEIGHT,
                                  BAR_HEIGHT);
                 draw_image_tiled(
-                    IMAGE_COFFEE_PROGRESS_BAR_SEGMENT,
+                    (basic_get_theme() == THEME_COFFEE)
+                        ? IMAGE_COFFEE_PROGRESS_BAR_SEGMENT
+                        : IMAGE_COFFEE_PROGRESS_BAR_SEGMENT,
                     details.x + heading_width, details.y,
                     (int)((double)remaining_width * *options->progress),
                     BAR_HEIGHT, BAR_HEIGHT, BAR_HEIGHT);
                 draw_image_scaled_cropped(
-                    IMAGE_COFFEE_PROGRESS_BAR_END,
+                    (basic_get_theme() == THEME_COFFEE)
+                        ? IMAGE_COFFEE_PROGRESS_BAR_END
+                        : IMAGE_COFFEE_PROGRESS_BAR_END,
                     details.x + heading_width +
                         (int)((double)remaining_width * *options->progress),
                     details.y, BAR_HEIGHT, BAR_HEIGHT, 0, 0,
                     details.x + details.width, details.y + BAR_HEIGHT);
+                break;
 #endif
         }
 
