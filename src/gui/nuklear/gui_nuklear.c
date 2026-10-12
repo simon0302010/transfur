@@ -191,7 +191,8 @@ static void *transfer_worker(void *arg)
         /* Both sides are initialized because init_conn can block but must not
          * freeze UI */
         if (!receiver_inited) {
-                worker_state = (receiver_conn_if == if_lan) ? wk_wait_receiver
+                worker_state = (receiver_conn_if == if_lan ||
+                                receiver_conn_if == if_wan) ? wk_wait_receiver
                                                             : wk_init_receiver;
                 r = init_conn(&receiver_conn, receiver_conn_if,
                               receiver_conn_opts);
@@ -216,7 +217,8 @@ static void *transfer_worker(void *arg)
         }
 
         if (!sender_inited) {
-                worker_state = (sender_conn_if == if_lan) ? wk_wait_sender
+                worker_state = (sender_conn_if == if_lan ||
+                                sender_conn_if == if_wan) ? wk_wait_sender
                                                           : wk_init_sender;
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
