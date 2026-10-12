@@ -17,11 +17,11 @@ A TUI & GUI that only need the bare minimum features to run.
 
 Current modes of information transfer:
 - LAN transfer: Supported by Windows and Linux
+- WAN transfer: Supported by Windows and Linux
 - Serial transfer: Supported by Windows and Linux
 
 Future planned modes of information transfer:
 - Bluetooth transfer
-- P2P transfer: meaning if the devices are close enough, one can establish itself a local network allowing other peers to connect to it without Routers or the Internet
 
 Tested and working:
 - LAN has been tested with loopback and with local devices on Windows and Linux (WSL2 Ubuntu)
@@ -68,6 +68,9 @@ Then, click Initalize Connection. After that, open Transfur on your sending comp
 
 - Sending Interface: Click on the Sending Interface button and select `Send over LAN`
 - Sending Interface Input: Enter the receiving system's IP address and the port selected on the receiving system like this `<ip>:<port>`
+
+Or, instead on the sending computer, press `Scan for receivers` which will send a broadcast to all local devices running transfur, after that, you can click `Peers Found` if any peers were found and click your receiving computer's IP!  
+This way, you don't need to look at IPs and whatnot!
 
 Make sure to start the receiving side of the transfur first!
 
