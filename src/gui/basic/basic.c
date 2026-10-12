@@ -28,30 +28,33 @@ void run_basic(char *title, int width, int height) {
         basic_init(title, width, height);
 
         while (ui.running) {
-                event = basic_poll_ui_event();
-                switch (event.type) {
-                case UI_EVENT_QUIT:
-                        ui.running = false;
-                        break;
-                case UI_EVENT_KEY_DOWN:
-                        if (event.key == UI_KEY_CHAR && event.ch == 't') {
-                                /* TODO: make ui handle this first (so, e.g.,
-                                 * you can type "t" in an input) */
-                                basic_toggle_theme();
+                while ((event = basic_poll_ui_event()).type != UI_EVENT_NONE) {
+                        switch (event.type) {
+                        case UI_EVENT_QUIT:
+                                ui.running = false;
+                                break;
+                        case UI_EVENT_KEY_DOWN:
+                                if (event.key == UI_KEY_CHAR &&
+                                    event.ch == 't') {
+                                        /* TODO: make ui handle this first (so,
+                                         * e.g., you can type "t" in an input)
+                                         */
+                                        basic_toggle_theme();
+                                        break;
+                                }
+                                ui_handle_event(&ui, &event);
+                                break;
+                        case UI_EVENT_MOUSE_DOWN: {
+                                struct widget *hit = basic_get_widget_at(
+                                    event.mouse_x, event.mouse_y);
+                                ui_set_focus(&ui, hit);
+                                ui_handle_event(&ui, &event);
                                 break;
                         }
-                        ui_handle_event(&ui, &event);
-                        break;
-                case UI_EVENT_MOUSE_DOWN: {
-                        struct widget *hit =
-                            basic_get_widget_at(event.mouse_x, event.mouse_y);
-                        ui_set_focus(&ui, hit);
-                        ui_handle_event(&ui, &event);
-                        break;
-                }
-                default:
-                        ui_handle_event(&ui, &event);
-                        break;
+                        default:
+                                ui_handle_event(&ui, &event);
+                                break;
+                        }
                 }
 
                 current_time = basic_get_time();
