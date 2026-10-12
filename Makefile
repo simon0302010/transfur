@@ -16,6 +16,8 @@ SRC = src/main.c \
 	src/interfaces/lan/discover.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
+	src/interfaces/wan/wan.c \
+	src/relay/relay.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
