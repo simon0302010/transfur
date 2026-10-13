@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 
-void tui_render_loading_bar_widget(struct widget widget, int width) {
+char **tui_render_loading_bar_widget(struct widget widget, int width) {
         struct widget_loading_bar_options *options = widget.content;
 
         short i;

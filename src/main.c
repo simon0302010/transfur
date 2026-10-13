@@ -9,7 +9,8 @@ int main(int argc, char **argv) {
         }
         /* All app logic should now be written in `gui/app/` */
 
-#define USE_BASIC_GUI
+/*#define USE_BASIC_GUI*/
+#define USE_TUI
 
 #ifdef USE_TUI
         if (run_tui("Transfur") != 0)

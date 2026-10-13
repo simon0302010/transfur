@@ -3,7 +3,7 @@
 #include "loading_bar.h"
 #include <malloc.h>
 
-void tui_render_text_input_widget(struct widget widget, int width) {
+char **tui_render_text_input_widget(struct widget widget, int width) {
         struct widget_text_input_options *options = widget.content;
 
         if (widget.is_focused) {

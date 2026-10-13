@@ -1,7 +1,7 @@
 #include "../../core/widget.h"
 #include "../render.h"
 
-void tui_render_split_widget(struct widget widget, int width) {
+char **tui_render_split_widget(struct widget widget, int width) {
         int i;
         int width_per_width = width / widget.content_size;
 

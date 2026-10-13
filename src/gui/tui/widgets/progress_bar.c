@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void tui_render_progress_bar_widget(struct widget widget, int width) {
+char **tui_render_progress_bar_widget(struct widget widget, int width) {
         /*
         TODO: Add alignment of options and multiple renderables
         in a row.
