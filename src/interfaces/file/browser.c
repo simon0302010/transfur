@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #elif defined(OS_WINDOWS)
+#include <direct.h>
 #include <windows.h>
 #endif
 
@@ -21,8 +22,13 @@ int browser_init_default(struct browser_ctx *ctx) {
         if (ctx == NULL)
                 return EINVAL;
 
+#ifdef OS_WINDOWS
+        if (_getcwd(cwd, PATH_MAX) == NULL) /* Untested */
+                return 1;
+#else
         if (getcwd(cwd, PATH_MAX) == NULL)
                 return 1;
+#endif
 
         strncpy(ctx->location, cwd, sizeof(ctx->location));
         ctx->location[sizeof(ctx->location) - 1] = '\0';
@@ -41,16 +47,30 @@ int browser_getcwd(struct browser_ctx *ctx, char *buf, size_t n) {
         return 0;
 }
 
+/*
+Windows implementation based on:
+https://stackoverflow.com/questions/2314542/listing-directory-contents-using-c-and-windows
+*/
 int browser_dir(struct browser_ctx *ctx, browser_options_t options,
                 struct browser_entry **entries, size_t *entry_count) {
+#ifdef OS_WINDOWS
+        WIN32_FIND_DATA fd_file;
+        HANDLE h_find = NULL;
+        struct dirent *entry;
+        size_t entries_capacity;
+#else
         struct dirent *entry;
         DIR *dp;
         size_t entries_capacity;
+#endif
 
         if (ctx == NULL || entries == NULL || entry_count == NULL ||
             ctx->location[0] == '\0')
                 return EINVAL;
 
+#ifdef OS_WINDOWS
+
+#else
         dp = opendir(ctx->location);
         if (dp == NULL) {
                 perror("opendir");
@@ -111,6 +131,7 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         }
 
         closedir(dp);
+#endif
 
         return 0;
 }
