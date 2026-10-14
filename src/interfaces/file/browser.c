@@ -191,53 +191,16 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         return 0;
 }
 
-/* Resolves \.. and \. in paths */
-static int windows_resolve_path(char *path) {
-        int i, b;
-        int pathlen = strlen(path);
-
-        for (i = 0; i < pathlen; i++) {
-                if (strncmp(&path[i], "\\..", 3) == 0 &&
-                    (i + 3 >= pathlen || path[i + 3] == '\\' ||
-                     path[i + 3] == '\0')) {
-                        if (i < 3) {
-                                if (path[i + 3] == '\0') {
-                                        path[i + 1] = '\0';
-                                } else {
-                                        memmove(&path[i], &path[i + 3],
-                                                pathlen - (i + 3) + 1);
-                                }
-                        } else {
-                                for (b = i - 1; b > 0 && path[b] != '\\'; b--)
-                                        ;
-
-                                if (path[i + 3] == '\0') {
-                                        path[b + 1] = '\0';
-                                } else {
-                                        memmove(&path[b], &path[i + 3],
-                                                pathlen - (i + 3) + 1);
-                                }
-
-                                pathlen = strlen(path);
-                                i = b - 1;
-                        }
-                } else if (strncmp(&path[i], "\\.", 2) == 0 &&
-                           (i + 2 >= pathlen || path[i + 2] == '\\' ||
-                            path[i + 2] == '\0')) {
-                        memmove(&path[i], &path[i + 2], pathlen - (i + 2) + 1);
-                        pathlen = strlen(path);
-                        i--;
-                }
-        }
-
-        return 0;
-}
-
 int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
 #ifdef OS_WINDOWS
         DWORD dw_attrib;
         char full_path[PATH_MAX + 1];
+        char real_path[PATH_MAX + 1];
         int written;
+
+        if (path == NULL || ctx == NULL || path[0] == '\0' ||
+            ctx->location[0] == '\0')
+                return EINVAL;
 
         if (relative) {
                 /* Points to current browser location */
@@ -265,10 +228,15 @@ int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
                 return ENOTDIR;
         }
 
-        windows_resolve_path(full_path);
+        written =
+            GetFullPathName(full_path, sizeof(real_path), real_path, NULL);
 
-        strncpy(ctx->location, full_path, PATH_MAX);
-        ctx->location[sizeof(ctx->location) - 1] = '\0';
+        if (written == 0)
+                return ENOENT;
+
+        if (written >= sizeof(real_path)) {
+                return ENAMETOOLONG;
+        }
 #else
         struct stat s = {0};
         char full_path[PATH_MAX + 1];
@@ -301,10 +269,10 @@ int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
                 perror("realpath");
                 return errno;
         }
+#endif
 
         strncpy(ctx->location, real_path, PATH_MAX);
         ctx->location[sizeof(ctx->location) - 1] = '\0';
-#endif
 
         return 0;
 }
