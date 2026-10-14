@@ -29,6 +29,8 @@
 #elif defined(OS_MACOS)
 #include <pthread.h>
 
+#elif defined(OS_MSDOS)
+
 #else
 #error "Unsupported platform"
 
@@ -218,6 +220,8 @@ static void status_text(char *buf) {
 
 #if defined(_WIN32)
 static DWORD WINAPI transfer_worker(LPVOID arg)
+#elif defined(OS_MSDOS)
+static int transfer_worker(void *arg)
 #else
 static void *transfer_worker(void *arg)
 #endif
@@ -244,7 +248,7 @@ static void *transfer_worker(void *arg)
                         worker_step = STEP_INIT_RECEIVER;
                         worker_code = r;
                         worker_state = wk_error;
-#if defined(_WIN32)
+#if defined(OS_WINDOWS) || defined(OS_MSDOS)
                         return 0;
 #else
                         return NULL;
@@ -267,7 +271,7 @@ static void *transfer_worker(void *arg)
                         worker_step = STEP_INIT_SENDER;
                         worker_code = r;
                         worker_state = wk_error;
-#if defined(_WIN32)
+#if defined(OS_WINDOWS) || defined(OS_MSDOS)
                         return 0;
 #else
                         return NULL;
@@ -309,7 +313,7 @@ static void *transfer_worker(void *arg)
                 }
         }
 
-#if defined(_WIN32)
+#if defined(OS_WINDOWS) || defined(OS_MSDOS)
         return 0;
 #else
         return NULL;
@@ -325,6 +329,10 @@ static int start_transfer_worker(void) {
                 return -1;
         }
         CloseHandle(thread);
+#elif defined(OS_MSDOS)
+        transfer_worker(NULL);
+
+        return 0;
 #else
         pthread_t thread;
 

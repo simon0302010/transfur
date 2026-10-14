@@ -30,6 +30,8 @@ enum chunk_type {
 #pragma pack(push, 1)
 #elif defined(__GNUC__) || defined(__clang__)
 #define PACKED __attribute__((packed))
+#elif defined(__WATCOMC__)
+#pragma pack(1)
 #else
 #error "Compiler not supported"
 #endif
@@ -76,6 +78,8 @@ struct chunk {
 #pragma option -a
 #elif defined(_MSC_VER)
 #pragma pack(pop)
+#elif defined(__WATCOMC__)
+#pragma pack()
 #endif
 
 /*
