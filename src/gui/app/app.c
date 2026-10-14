@@ -16,17 +16,17 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 #include <pthread.h>
 
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 #include <windows.h>
 
 #ifdef interface
 #undef interface
 #endif
 
-#elif defined(__APPLE__)
+#elif defined(OS_MACOS)
 #include <pthread.h>
 
 #else

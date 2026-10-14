@@ -15,13 +15,13 @@ Needs to implement all functions defined in `gui.h`
 
 #include "nuklear.h"
 
-#if defined(__linux__)
+#if defined(OS_LINUX)
 #include "../../interfaces/file/browser.h"
 #include "linux/nuklear_linux.h"
 #include <pthread.h>
 #include <pwd.h>
 #include <sys/types.h>
-#elif defined(_WIN32)
+#elif defined(OS_WINDOWS)
 #include "windows/nuklear_windows.h"
 #include <windows.h>
 
