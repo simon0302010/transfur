@@ -191,7 +191,63 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         return 0;
 }
 
+static int windows_resolve_path(char *path) {
+        int i, b;
+        int pathlen = strlen(path);
+
+        for (i = 0; i < pathlen; i++) {
+                if (strncmp(&path[i], "\\..", 3) == 0 &&
+                    (i + 3 >= pathlen || path[i + 3] == '\\' ||
+                     path[i + 3] == '\0')) {
+                        for (b = i - 1; b > 0 && path[b] != '\\'; b--)
+                                ;
+
+                        memmove(&path[b], &path[i + 3], pathlen - (i + 3) + 1);
+                        pathlen = strlen(path);
+                        i = b - 1;
+                }
+        }
+
+        return 0;
+}
+
 int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
+#ifdef OS_WINDOWS
+        DWORD dw_attrib;
+        char full_path[PATH_MAX + 1];
+        int written;
+
+        if (relative) {
+                /* Points to current browser location */
+                if (strcmp(path, '.') == 0)
+                        return 0;
+                written = snprintf(full_path, sizeof(full_path), "%s\\%s",
+                                   ctx->location, path);
+        } else {
+                /* Points to current browser location */
+                if (strcmp(path, ctx->location) == 0)
+                        return 0;
+                written = snprintf(full_path, sizeof(full_path), "%s", path);
+        }
+
+        if (written < 0 || (size_t)written >= sizeof(full_path))
+                return ENAMETOOLONG;
+
+        dw_attrib = GetFileAttributes(full_path);
+
+        if (dw_attrib == INVALID_FILE_ATTRIBUTES) {
+                return ENOENT; /* Probably the right error code for this */
+        }
+
+        if (!(dw_attrib & FILE_ATTRIBUTE_DIRECTORY)) {
+                return ENOTDIR;
+        }
+
+        windows_resolve_path(full_path);
+
+        strncpy(ctx->location, full_path, PATH_MAX);
+        ctx->location[sizeof(ctx->location) - 1] = '\0';
+#else
         struct stat s = {0};
         char full_path[PATH_MAX + 1];
         char real_path[PATH_MAX + 1];
@@ -226,6 +282,7 @@ int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
 
         strncpy(ctx->location, real_path, PATH_MAX);
         ctx->location[sizeof(ctx->location) - 1] = '\0';
+#endif
 
         return 0;
 }
