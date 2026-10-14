@@ -108,6 +108,8 @@ static void build_conn_options(char *dst, enum interface if_type,
         /* I know */
         if (if_type == if_lan || if_type == if_bluetooth) {
                 strcpy(dst, is_receiver ? "l:" : "c:");
+        } else if (if_type == if_wan) {
+                strcpy(dst, "w:");
         }
         strcat(dst, raw);
 }
