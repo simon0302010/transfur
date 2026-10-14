@@ -105,7 +105,8 @@ static void build_conn_options(char *dst, enum interface if_type,
         dst[0] = '\0';
 
         /* This is a bad way to handle that */
-        if (if_type == if_lan) {
+        /* I know */
+        if (if_type == if_lan || if_type == if_bluetooth) {
                 strcpy(dst, is_receiver ? "l:" : "c:");
         }
         strcat(dst, raw);
@@ -190,10 +191,10 @@ static void *transfer_worker(void *arg)
         /* Both sides are initialized because init_conn can block but must not
          * freeze UI */
         if (!receiver_inited) {
-                worker_state =
-                    (receiver_conn_if == if_lan || receiver_conn_if == if_wan)
-                        ? wk_wait_receiver
-                        : wk_init_receiver;
+                worker_state = (receiver_conn_if == if_lan ||
+                                receiver_conn_if == if_wan ||
+                                receiver_conn_if == if_bluetooth) ? wk_wait_receiver
+                                                            : wk_init_receiver;
                 r = init_conn(&receiver_conn, receiver_conn_if,
                               receiver_conn_opts);
 
@@ -217,10 +218,17 @@ static void *transfer_worker(void *arg)
         }
 
         if (!sender_inited) {
+<<<<<<< HEAD
                 worker_state =
                     (sender_conn_if == if_lan || sender_conn_if == if_wan)
                         ? wk_wait_sender
                         : wk_init_sender;
+=======
+                worker_state = (sender_conn_if == if_lan ||
+                                sender_conn_if == if_wan ||
+                                sender_conn_if == if_bluetooth) ? wk_wait_sender
+                                                          : wk_init_sender;
+>>>>>>> 145ae08 (feat(gui): integrate bluetooth into gui)
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
                 if (r != 0) {
