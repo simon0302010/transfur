@@ -58,6 +58,7 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         HANDLE h_find = NULL;
         struct dirent *entry;
         size_t entries_capacity;
+        char s_path[PATH_MAX];
 #else
         struct dirent *entry;
         DIR *dp;
@@ -69,7 +70,61 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
                 return EINVAL;
 
 #ifdef OS_WINDOWS
+        snprintf(s_path, sizeof(s_path), "%s\\*.*", ctx->location);
 
+        if ((h_find = FindFirstFile(s_path, &fd_file)) ==
+            INVALID_HANDLE_VALUE) {
+                fprintf(stderr, "FindFirstFile: No such file or directory\n");
+                return ENOENT;
+        }
+
+        *entry_count = 0;
+        entries_capacity = 64;
+
+        *entries = malloc(entries_capacity * sizeof(**entries));
+        if (*entries == NULL) {
+                FindClose(h_find);
+                perror("malloc");
+                return 1;
+        }
+
+        do {
+                char *name = (*entries)[*entry_count].name;
+
+                if (fd_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                        if (!(options & BROWSER_DIRECTORIES))
+                                continue;
+                        (*entries)[*entry_count].entry_type =
+                            browser_entry_directory;
+                } else {
+                        if (!(options & BROWSER_FILES))
+                                continue;
+                        (*entries)[*entry_count].entry_type =
+                            browser_entry_file;
+                }
+
+                strncpy(name, fd_file.cFileName, sizeof(name) - 1);
+                name[sizeof(name) - 1] = '\0';
+
+                if (++*entry_count >= entries_capacity) {
+                        struct browser_entry *tmp;
+
+                        entries_capacity *= 2;
+                        tmp = realloc(*entries,
+                                      entries_capacity * sizeof(**entries));
+
+                        if (tmp == NULL) {
+                                FindClose(h_find);
+
+                                free(*entries);
+                                return 1;
+                        }
+
+                        *entries = tmp;
+                }
+        } while (FindNextFile(h_find, &fd_file));
+
+        FindClose(h_find);
 #else
         dp = opendir(ctx->location);
         if (dp == NULL) {
