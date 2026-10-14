@@ -191,6 +191,7 @@ int browser_dir(struct browser_ctx *ctx, browser_options_t options,
         return 0;
 }
 
+/* Resolves \.. and \. in paths */
 static int windows_resolve_path(char *path) {
         int i, b;
         int pathlen = strlen(path);
@@ -199,12 +200,33 @@ static int windows_resolve_path(char *path) {
                 if (strncmp(&path[i], "\\..", 3) == 0 &&
                     (i + 3 >= pathlen || path[i + 3] == '\\' ||
                      path[i + 3] == '\0')) {
-                        for (b = i - 1; b > 0 && path[b] != '\\'; b--)
-                                ;
+                        if (i < 3) {
+                                if (path[i + 3] == '\0') {
+                                        path[i + 1] = '\0';
+                                } else {
+                                        memmove(&path[i], &path[i + 3],
+                                                pathlen - (i + 3) + 1);
+                                }
+                        } else {
+                                for (b = i - 1; b > 0 && path[b] != '\\'; b--)
+                                        ;
 
-                        memmove(&path[b], &path[i + 3], pathlen - (i + 3) + 1);
+                                if (path[i + 3] == '\0') {
+                                        path[b + 1] = '\0';
+                                } else {
+                                        memmove(&path[b], &path[i + 3],
+                                                pathlen - (i + 3) + 1);
+                                }
+
+                                pathlen = strlen(path);
+                                i = b - 1;
+                        }
+                } else if (strncmp(&path[i], "\\.", 2) == 0 &&
+                           (i + 2 >= pathlen || path[i + 2] == '\\' ||
+                            path[i + 2] == '\0')) {
+                        memmove(&path[i], &path[i + 2], pathlen - (i + 2) + 1);
                         pathlen = strlen(path);
-                        i = b - 1;
+                        i--;
                 }
         }
 
