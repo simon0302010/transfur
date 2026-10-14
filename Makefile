@@ -17,7 +17,7 @@ SRC = src/main.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
 	src/interfaces/wan/wan.c \
-	src/interfaces/bluetooth/bluetooth.c \ 
+	src/interfaces/bluetooth/bluetooth.c \
 	src/relay/relay.c \
 	src/misc/console.c \
 	src/misc/debug.c \

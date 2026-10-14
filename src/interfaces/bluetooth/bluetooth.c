@@ -14,8 +14,13 @@ Apple and Windows are not implemented
 
 #if defined(OS_LINUX)
 
+#define inline __inline__
+
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+
+#undef inline
+
 #include <errno.h>
 #include <signal.h>
 #include <sys/socket.h>
@@ -432,7 +437,7 @@ int send_chunk_bluetooth(void *conn, const struct chunk *chunk) {
         }
 
         r = write_frame(st->fd, chunk);
-        if (r == BT_OK && chunk-type == chunk_type_ping) {
+        if (r == BT_OK && chunk->type == chunk_type_ping) {
                 st->ping_outstanding = 1;
         }
 
@@ -558,7 +563,7 @@ int recv_chunk_bluetooth(void *conn, struct chunk *chunk) {
         return BT_ERR_PLATFORM;
 }
 
-int close_close_bluetooth(void *conn) {
+int close_conn_bluetooth(void *conn) {
         (void)conn;
         return BT_OK;
 }
@@ -567,3 +572,5 @@ const char *get_error_text_bluetooth(int code) {
         (void)code;
         return "Bluetooth is not supported on this system yet";
 }
+
+#endif
