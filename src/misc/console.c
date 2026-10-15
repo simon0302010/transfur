@@ -17,10 +17,15 @@ struct consolesize get_console_size(void) {
         cs.rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
         cs.columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 #elif defined(OS_MSDOS)
+#if defined(__WATCOMC__)
+        cs.rows = 25;
+        cs.columns = 80;
+#else
         struct text_info info;
         gettextinfo(&info);
         cs.rows = info.screenheight;
         cs.columns = info.screenwidth;
+#endif
 #else
         struct winsize max;
         if (ioctl(0, TIOCGWINSZ, &max) < 0)

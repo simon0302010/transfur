@@ -8,7 +8,7 @@
 #elif defined(__APPLE__) && defined(__MACH__)
 #define OS_MACOS
 #elif defined(__MSDOS__) || defined(__TURBOC__) || defined(__BORLANDC__) ||    \
-    defined(__WATCOMC__)
+    defined(__DOS__)
 #define OS_MSDOS
 #else
 #define OS_UNKNOWN

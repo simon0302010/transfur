@@ -4,7 +4,7 @@ export EDPATH := $(WATCOM)/eddat
 export INCLUDE := $(WATCOM)/h
 
 CC := owcc -b dos
-CFLAGS := -std=c89 -mcmodel=l -O2 -Wall -include src/platform.h -DTRANSFUR_DEBUG
+CFLAGS := -std=c89 -mcmodel=s -O3 -Wall -Wno-n138 -Wno-n131 -Wno-n308 -Wno-n107 -Wno-n303 -include src/platform.h -DTRANSFUR_DEBUG
 LDLIBS :=
 TARGET := build/dos/transfur.exe
 
@@ -12,6 +12,8 @@ SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
 	src/interfaces/serial/serial.c \
+	src/interfaces/lan/lan.c \
+	src/interfaces/wan/wan.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
@@ -32,22 +34,7 @@ SRC = src/main.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
 	src/misc/debug.c \
-	src/gui/basic/basic.c \
-	src/gui/basic/render.c \
-	src/gui/basic/event.c \
-	src/gui/basic/text.c \
-	src/gui/basic/widgets/loading_bar.c \
-	src/gui/basic/widgets/progress_bar.c \
-	src/gui/basic/widgets/text_input.c \
-	src/gui/basic/widgets/text.c \
-	src/gui/basic/design.c \
-	src/gui/tui/widgets/button.c \
-	src/gui/basic/widgets/button.c \
-	src/gui/basic/design.c \
-	src/gui/basic/drawing.c \
-	src/gui/basic/widgets/split.c \
 	src/gui/core/widgets/split.c \
-	src/gui/basic/widgets/group.c \
 	src/gui/tui/widgets/split.c \
 	src/gui/tui/widgets/group.c
 

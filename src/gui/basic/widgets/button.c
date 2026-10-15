@@ -1,9 +1,9 @@
 #include "../../core/widgets/button.h"
 #include "../design.h"
 #include "../images.h"
-#include "../sdl3/basic_wrapper.h"
 #include "../text.h"
 #include "../theme.h"
+#include "../wrappers/basic_wrapper.h"
 #include "button.h"
 
 #ifdef ENABLE_EASTER_EGGS

@@ -1,7 +1,7 @@
 #ifndef DESIGN_H
 #define DESIGN_H
 
-#include "sdl3/basic_wrapper.h"
+#include "wrappers/basic_wrapper.h"
 
 #define BORDER_WIDTH 2
 #define CONTAINER_MARGIN 8

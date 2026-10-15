@@ -2,8 +2,8 @@
 #include "../../core/widgets/progress_bar.h"
 #include "../design.h"
 #include "../images.h"
-#include "../sdl3/basic_wrapper.h"
 #include "../theme.h"
+#include "../wrappers/basic_wrapper.h"
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>

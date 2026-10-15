@@ -1,8 +1,8 @@
 #include "../../core/widgets/loading_bar.h"
 #include "../../../misc/math.h"
 #include "../drawing.h"
-#include "../sdl3/basic_wrapper.h"
 #include "../text.h"
+#include "../wrappers/basic_wrapper.h"
 #include "loading_bar.h"
 #include <string.h>
 

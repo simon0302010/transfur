@@ -1,6 +1,6 @@
 #include "drawing.h"
 #include "../../misc/math.h"
-#include "sdl3/basic_wrapper.h"
+#include "wrappers/basic_wrapper.h"
 #include <math.h>
 #include <stdlib.h>
 

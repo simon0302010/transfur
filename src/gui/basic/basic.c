@@ -6,8 +6,8 @@
 #include "../gui.h"
 #include "event.h"
 #include "render.h"
-#include "sdl3/basic_wrapper.h"
 #include "theme.h"
+#include "wrappers/basic_wrapper.h"
 
 int run_basic(char *title) {
         struct color color;

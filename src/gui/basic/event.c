@@ -1,5 +1,5 @@
 #include "event.h"
-#include "sdl3/basic_wrapper.h"
+#include "wrappers/basic_wrapper.h"
 
 struct ui_event basic_poll_ui_event(void) {
         struct basic_event basic_event;

@@ -1,7 +1,7 @@
 #ifndef BASIC_IMAGES_H
 #define BASIC_IMAGES_H
 
-#include "sdl3/basic_wrapper.h"
+#include "wrappers/basic_wrapper.h"
 
 #ifdef ENABLE_THEMES
 

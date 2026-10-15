@@ -1,7 +1,7 @@
 #ifndef BASIC_TEXT_H
 #define BASIC_TEXT_H
 
-#include "sdl3/basic_wrapper.h"
+#include "wrappers/basic_wrapper.h"
 
 struct text_metrics {
         int width;

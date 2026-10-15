@@ -1,9 +1,9 @@
 #include "../../core/widgets/text_input.h"
 #include "../design.h"
 #include "../images.h"
-#include "../sdl3/basic_wrapper.h"
 #include "../text.h"
 #include "../theme.h"
+#include "../wrappers/basic_wrapper.h"
 #include "text_input.h"
 
 int basic_render_text_input_widget(struct widget widget,

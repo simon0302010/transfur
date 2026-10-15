@@ -18,6 +18,9 @@ connect
 */
 
 #include "lan.h"
+
+#if defined(OS_LINUX) || defined(OS_WINDOWS) /* Supported systems */
+
 #include <string.h>
 
 /* TODO: i'm not sure if apple supports these libs, so check and add accordingly
@@ -831,3 +834,5 @@ const char *get_error_text_lan(int code) {
                 return "Unknown LAN error";
         }
 }
+
+#endif
