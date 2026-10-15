@@ -1,5 +1,5 @@
-/* 
-Transfer data via a relay server 
+/*
+Transfer data via a relay server
 Both peers connect out to a relay
 
 The connection options are:
@@ -9,15 +9,18 @@ Apple is not implemented yet.
 */
 
 /*
-gethostbyname and friends are not exposed under plain _POSIX_C_SOURCE, so ask glibc nicely like the good boy you are,
-This must come before any system header
+gethostbyname and friends are not exposed under plain _POSIX_C_SOURCE, so ask
+glibc nicely like the good boy you are, This must come before any system header
 */
-
 #if defined(OS_LINUX)
 #define _DEFAULT_SOURCE 1
 #endif
 
 #include "wan.h"
+
+#if defined(OS_LINUX) ||                                                       \
+    defined(OS_WINDOWS) /* Compile guards for the whole logic in here */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -51,8 +54,10 @@ static const unsigned char wan_zeroes[CHUNK_SIZE] = {0};
 static int wan_net_init(void);
 static wan_sock wan_socket_open(void);
 static int wan_socket_close(wan_sock socket);
-static int wan_socket_connect(wan_sock socket, unsigned long ip, unsigned short port);
-static long wan_socket_send(wan_sock socket, const unsigned char *buf, size_t len);
+static int wan_socket_connect(wan_sock socket, unsigned long ip,
+                              unsigned short port);
+static long wan_socket_send(wan_sock socket, const unsigned char *buf,
+                            size_t len);
 static long wan_socket_recv(wan_sock socket, unsigned char *buf, size_t len);
 static void wan_socket_nosigpipe(wan_sock socket);
 
@@ -83,7 +88,8 @@ static int wan_socket_close(wan_sock socket) {
 }
 
 /* Connect to the relay, ip and port are in host byte order */
-static int wan_socket_connect(wan_sock socket, unsigned long ip, unsigned short port) {
+static int wan_socket_connect(wan_sock socket, unsigned long ip,
+                              unsigned short port) {
         struct sockaddr_in socket_address;
 
         memset(&socket_address, 0, sizeof socket_address);
@@ -91,10 +97,14 @@ static int wan_socket_connect(wan_sock socket, unsigned long ip, unsigned short 
         socket_address.sin_port = htons(port);
         socket_address.sin_addr.s_addr = htonl(ip);
 
-        return connect(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return connect(socket, (struct sockaddr *)&socket_address,
+                       sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
-static long wan_socket_send(wan_sock socket, const unsigned char *buf, size_t len) {
+static long wan_socket_send(wan_sock socket, const unsigned char *buf,
+                            size_t len) {
         ssize_t n;
 
         do {
@@ -167,18 +177,23 @@ static int wan_socket_close(wan_sock socket) {
         return closesocket(socket) == 0 ? 0 : -1;
 }
 
-static int wan_socket_connect(wan_sock socket, unsigned long ip, unsigned short port) {
+static int wan_socket_connect(wan_sock socket, unsigned long ip,
+                              unsigned short port) {
         struct sockaddr_in socket_address;
-        
+
         memset(&socket_address, 0, sizeof socket_address);
         socket_address.sin_family = AF_INET;
         socket_address.sin_port = htonl(port);
         socket_address.sin_addr.s_addr = htonl(ip);
 
-        return connect(socket, (struct sockaddr *)&socket_address, (int)sizeof socket_address) == 0 ? 0 : -1;
+        return connect(socket, (struct sockaddr *)&socket_address,
+                       (int)sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
-static long wan_socket_send(wan_sock socket, const unsigned char *buf, size_t len) {
+static long wan_socket_send(wan_sock socket, const unsigned char *buf,
+                            size_t len) {
         int n;
 
         do {
@@ -199,9 +214,7 @@ static long wan_socket_recvv(wan_sock socket, unsigned char *buf, size_t len) {
 }
 
 /* winsock has no SIGPIPE */
-static void wan_socket_nosigpipe(wan_sock socket) {
-        (void)socket;
-}
+static void wan_socket_nosigpipe(wan_sock socket) { (void)socket; }
 
 #endif
 
@@ -231,7 +244,7 @@ static int send_all(wan_sock socket, const unsigned char *buf, size_t len) {
                 if (n <= 0) {
                         return WAN_ERR_SEND;
                 }
-                sent += (size_t)n; 
+                sent += (size_t)n;
         }
 
         return WAN_OK;
@@ -265,7 +278,9 @@ static void put_u32(unsigned char *dst, unsigned long v) {
 }
 
 static unsigned long get_u32(const unsigned char *src) {
-        return ((unsigned char)src[0] << 24) | ((unsigned long)src[1] << 16) | ((unsigned long)src[2] << 8) | ((unsigned long)src[2] << 8) | (unsigned long)src[3];
+        return ((unsigned char)src[0] << 24) | ((unsigned long)src[1] << 16) |
+               ((unsigned long)src[2] << 8) | ((unsigned long)src[2] << 8) |
+               (unsigned long)src[3];
 }
 
 static int write_frame(wan_sock socket, const struct chunk *c) {
@@ -289,7 +304,7 @@ static int write_frame(wan_sock socket, const struct chunk *c) {
         if (r != WAN_OK) {
                 return r;
         }
-        
+
         if (c->type != chunk_type_data) {
                 return send_all(socket, wan_zeroes, CHUNK_SIZE);
         }
@@ -380,7 +395,7 @@ static int parse_ip(const char *s, size_t len, unsigned long *out) {
 
         while (i < len) {
                 octet = 0;
-                start = 1; 
+                start = 1;
                 while (i < len && s[i] != '.') {
                         if (s[i] < '0' || s[i] > '9') {
                                 return -1;
@@ -391,7 +406,7 @@ static int parse_ip(const char *s, size_t len, unsigned long *out) {
                         }
                         i++;
                 }
-                
+
                 /* empty octet */
                 if (i == start) {
                         return -1;
@@ -427,7 +442,8 @@ static int resolve_host(const char *host, unsigned long *out) {
         }
 
         he = gethostbyname(host);
-        if (he == NULL || he->h_addr_list == NULL || he->h_addr_list[0] == NULL) {
+        if (he == NULL || he->h_addr_list == NULL ||
+            he->h_addr_list[0] == NULL) {
                 return -1;
         }
 
@@ -436,7 +452,8 @@ static int resolve_host(const char *host, unsigned long *out) {
 }
 
 /* Parse host, port and room from options */
-static int parse_options(const char *options, char *host, size_t host_size, unsigned short *port, char *room, size_t room_size) {
+static int parse_options(const char *options, char *host, size_t host_size,
+                         unsigned short *port, char *room, size_t room_size) {
         const char *rest;
         const char *colon1;
         const char *colon2;
@@ -472,11 +489,13 @@ static int parse_options(const char *options, char *host, size_t host_size, unsi
                 return -1;
         }
 
-        if (parse_port(colon1 + 1, (size_t)(colon2 - (colon1 + 1)), port) != 0) {
+        if (parse_port(colon1 + 1, (size_t)(colon2 - (colon1 + 1)), port) !=
+            0) {
                 return -1;
         }
 
-        /* The room ends up in a newline terminated handshake line, so it must not contain whitespaces */
+        /* The room ends up in a newline terminated handshake line, so it must
+         * not contain whitespaces */
         for (i = 0; i < room_len; i++) {
                 char ch;
 
@@ -492,7 +511,7 @@ static int parse_options(const char *options, char *host, size_t host_size, unsi
         room[room_len] = '\0';
 
         return 0;
-} 
+}
 
 static int recv_line(wan_sock socket, char *buf, size_t size) {
         size_t i;
@@ -516,7 +535,7 @@ static int recv_line(wan_sock socket, char *buf, size_t size) {
                         buf[i] = '\0';
                         return WAN_OK;
                 }
-                
+
                 i++;
         }
 }
@@ -540,7 +559,8 @@ int init_conn_wan(void *conn, const char *options) {
                 return WAN_ERR_STATE;
         }
 
-        if (parse_options(options, host, sizeof host, &port, room, sizeof room) != 0) {
+        if (parse_options(options, host, sizeof host, &port, room,
+                          sizeof room) != 0) {
                 return WAN_ERR_OPTIONS;
         }
 
@@ -638,8 +658,9 @@ int recv_chunk_wan(void *conn, struct chunk *chunk) {
                         st->ping_outstanding = 0;
                         return WAN_OK;
                 }
-                
-                /* write_frame directly so the ping does not set ping outstanding and truninguihuhjeheri*/
+
+                /* write_frame directly so the ping does not set ping
+                 * outstanding and truninguihuhjeheri*/
                 r = write_frame(st->fd, chunk);
                 if (r != WAN_OK) {
                         return r;
@@ -656,13 +677,14 @@ int close_conn_wan(void *conn) {
 
         st = (struct wan_state *)conn;
 
-        /* init_conn_wan may have failed after the slot was claimed, there is no socket to close in that case */
+        /* init_conn_wan may have failed after the slot was claimed, there is no
+         * socket to close in that case */
         if (st->inited != 1) {
                 return WAN_OK;
         }
 
         wan_socket_close(st->fd);
-        
+
         st->fd = WAN_INVALID_SOCK;
         st->port = 0;
         st->ping_outstanding = 0;
@@ -671,10 +693,26 @@ int close_conn_wan(void *conn) {
         return WAN_OK;
 }
 
+#else /* For unsupported targets */
+
+int init_conn_wan(void *conn, const char *options) { return WAN_ERR_PLATFORM; }
+
+int send_chunk_wan(void *conn, const struct chunk *chunk) {
+        return WAN_ERR_PLATFORM;
+}
+
+int recv_chunk_wan(void *conn, struct chunk *chunk) { return WAN_ERR_PLATFORM; }
+
+int close_conn_wan(void *conn) { return WAN_ERR_PLATFORM; }
+
+#endif
+
 const char *get_error_text_wan(int code) {
         switch (code) {
         case WAN_ERR_ARG:
-                return "Bad argument"; /* me when flat earth 🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣 */
+                return "Bad argument"; /* me when flat earth
+                                          🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣🤣
+                                        */
         case WAN_ERR_OPTIONS:
                 return "Invalid options (use w:<host>:<port>:<room>)";
         case WAN_ERR_STATE:

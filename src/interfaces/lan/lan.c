@@ -19,6 +19,8 @@ connect
 
 #include "lan.h"
 
+#include <stddef.h>
+
 #if defined(OS_LINUX) || defined(OS_WINDOWS) /* Supported systems */
 
 #include <string.h>
@@ -804,6 +806,23 @@ const char *get_lan_ip(void) {
         return lan_ip;
 }
 
+#else /* Any unsupported systen */
+
+int init_conn_lan(void *conn, const char *ip) { return LAN_ERR_PLATFORM; }
+
+int send_chunk_lan(void *conn, const struct chunk *chunk) {
+        return LAN_ERR_PLATFORM;
+}
+
+int recv_chunk_lan(void *conn, struct chunk *chunk) { return LAN_ERR_PLATFORM; }
+
+int close_conn_lan(void *conn) { return LAN_ERR_PLATFORM; }
+
+const char *get_lan_ip(void) { return NULL; }
+
+#endif
+
+/* This shouldn't be need on unsupported systems but works ig */
 const char *get_error_text_lan(int code) {
         switch (code) {
         case LAN_ERR_ARG:
@@ -834,5 +853,3 @@ const char *get_error_text_lan(int code) {
                 return "Unknown LAN error";
         }
 }
-
-#endif

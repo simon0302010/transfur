@@ -12,6 +12,7 @@ SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
 	src/interfaces/serial/serial.c \
+  src/interfaces/serial/dos_serial/dos_serial.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/wan/wan.c \
 	src/misc/console.c \

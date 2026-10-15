@@ -1,6 +1,6 @@
 /*
-tiny relay server 
-run 
+tiny relay server
+run
 peer conects to relay and other peer also does
 relay copies bytes from peer to other peer
 */
@@ -45,7 +45,8 @@ typedef SOCKET relay_sock;
 #define RELAY_ST_PAIRED 2
 
 /*
-Each client has an output buffer holding bytes that are destined for its peer but could not be written yet.
+Each client has an output buffer holding bytes that are destined for its peer
+but could not be written yet.
 */
 struct relay_client {
         relay_sock fd;
@@ -67,11 +68,14 @@ static int relay_net_init(void);
 static relay_sock relay_socket_open(void);
 static int relay_socket_close(relay_sock socket);
 static int relay_socket_reuseaddr(relay_sock socket);
-static int relay_socket_bind(relay_sock socket, unsigned long ip, unsigned short port);
+static int relay_socket_bind(relay_sock socket, unsigned long ip,
+                             unsigned short port);
 static int relay_socket_listen(relay_sock socket);
 static relay_sock relay_socket_accept(relay_sock socket);
-static long relay_socket_send(relay_sock socket, const unsigned char *buf, size_t len);
-static long relay_socket_recv(relay_sock socket, unsigned char *buf, size_t len);
+static long relay_socket_send(relay_sock socket, const unsigned char *buf,
+                              size_t len);
+static long relay_socket_recv(relay_sock socket, unsigned char *buf,
+                              size_t len);
 static void relay_socket_nosigpipe(relay_sock socket);
 
 #if defined(OS_LINUX)
@@ -80,7 +84,7 @@ static int relay_net_init(void) {
 #if !defined(MSG_NOSIGNAL) && !defined(SO_NOSIGPIPE) && defined(SIGPIPE)
         signal(SIGPIPE, SIG_IGN)
 #endif
-        return 0;
+            return 0;
 }
 
 static relay_sock relay_socket_open(void) {
@@ -102,10 +106,13 @@ static int relay_socket_close(relay_sock socket) {
 static int relay_socket_reuseaddr(relay_sock socket) {
         int on = 1;
 
-        return setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) == 0 ? 0 : -1;
+        return setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) == 0
+                   ? 0
+                   : -1;
 }
 
-static int relay_socket_bind(relay_sock socket, unsigned long ip, unsigned short port) {
+static int relay_socket_bind(relay_sock socket, unsigned long ip,
+                             unsigned short port) {
         struct sockaddr_in socket_address;
 
         memset(&socket_address, 0, sizeof socket_address);
@@ -113,7 +120,10 @@ static int relay_socket_bind(relay_sock socket, unsigned long ip, unsigned short
         socket_address.sin_port = htons(port);
         socket_address.sin_addr.s_addr = htonl(ip);
 
-        return bind(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return bind(socket, (struct sockaddr *)&socket_address,
+                    sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
 static int relay_socket_listen(relay_sock socket) {
@@ -132,7 +142,8 @@ static relay_sock relay_socket_accept(relay_sock socket) {
         return fd;
 }
 
-static long relay_socket_send(relay_sock socket, const unsigned char *buf, size_t len) {
+static long relay_socket_send(relay_sock socket, const unsigned char *buf,
+                              size_t len) {
         ssize_t n;
 
         do {
@@ -140,13 +151,14 @@ static long relay_socket_send(relay_sock socket, const unsigned char *buf, size_
                 n = send(socket, buf, len, MSG_NOSIGNAL);
 #else
                 n = send(socket, buf, len, 0);
-#endif 
+#endif
         } while (n < 0 && errno == EINTR);
 
         return (long)n;
 }
 
-static long relay_socket_recv(relay_sock socket, unsigned char *buf, size_t len) {
+static long relay_socket_recv(relay_sock socket, unsigned char *buf,
+                              size_t len) {
         ssize_t n;
 
         do {
@@ -200,18 +212,25 @@ static int relay_socket_cloe(relay_sock socket) {
 static int relay_socket_reuseaddr(relay_sock socket) {
         int on = 1;
 
-        return setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, (int)sizeof on) == 0 ? 0 : -1;
+        return setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&on,
+                          (int)sizeof on) == 0
+                   ? 0
+                   : -1;
 }
 
-static int relay_socket_bind(relay_sock socket, unsigned long ip, unsigned short port) {
+static int relay_socket_bind(relay_sock socket, unsigned long ip,
+                             unsigned short port) {
         struct sockaddr_in socket_address;
-        
+
         memset(&socket_address, 0, sizeof socket_address);
         socket_address.sin_family = AF_INET;
         socket_address.sin_port = htons(port);
         socket_address.sin_addr.s_addr = htonl(ip);
 
-        return bind(socket, (struct sockaddr *)&socket_address, (int)sizeof socket_address) == 0 ? 0 : -1;
+        return bind(socket, (struct sockaddr *)&socket_address,
+                    (int)sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
 static int relay_socket_listen(relay_sock socket) {
@@ -229,7 +248,8 @@ static relay_sock relay_socket_accept(relay_sock socket) {
         return fd;
 }
 
-static long relay_socket_send(relay_sock socket, const unsigned char *buf, size_t len) {
+static long relay_socket_send(relay_sock socket, const unsigned char *buf,
+                              size_t len) {
         int n;
 
         do {
@@ -239,9 +259,10 @@ static long relay_socket_send(relay_sock socket, const unsigned char *buf, size_
         return (long)n;
 }
 
-static long relay_socket_recv(relay_sock socket, unsigned char *buf, size_t len) {
+static long relay_socket_recv(relay_sock socket, unsigned char *buf,
+                              size_t len) {
         int n;
-        
+
         do {
                 n = recv(socket, (char *)buf, (int)len, 0);
         } while (n == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
@@ -249,9 +270,7 @@ static long relay_socket_recv(relay_sock socket, unsigned char *buf, size_t len)
         return (long)n;
 }
 
-static void relay_socket_nosigpipe(relay_sock socket) {
-        (void)socket;
-}
+static void relay_socket_nosigpipe(relay_sock socket) { (void)socket; }
 
 #endif
 
@@ -290,10 +309,12 @@ static int parse_port(const char *s, unsigned short *out) {
 }
 
 /* Queue bytes for client, compacting buffer first */
-static int relay_enqueue(struct relay_client *c, const unsigned char *data, size_t len) {
+static int relay_enqueue(struct relay_client *c, const unsigned char *data,
+                         size_t len) {
         if (c->outoff > 0) {
                 if (c->outoff < c->outlen) {
-                        memmove(c->out, c->out + c->outoff, c->outlen - c->outoff);
+                        memmove(c->out, c->out + c->outoff,
+                                c->outlen - c->outoff);
                 }
                 c->outlen -= c->outoff;
                 c->outoff = 0;
@@ -305,13 +326,13 @@ static int relay_enqueue(struct relay_client *c, const unsigned char *data, size
 
         memcpy(c->out + c->outlen, data, len);
         c->outlen += len;
-        
+
         return 0;
 }
 
-static int relay_alloc_client(relay_sock fd){
+static int relay_alloc_client(relay_sock fd) {
         int i;
-        
+
         for (i = 0; i < RELAY_MAX_CLIENTS; i++) {
                 if (!clients[i].used) {
                         memset(&clients[i], 0, sizeof clients[i]);
@@ -338,13 +359,13 @@ static void relay_close_client(int i) {
 
         relay_socket_close(clients[i].fd);
         clients[i].used = 0;
-        clients[i].fd = RELAY_INVALID_SOCK;        
+        clients[i].fd = RELAY_INVALID_SOCK;
         clients[i].peer = -1;
 
         if (peer >= 0 && clients[peer].used) {
                 clients[peer].closing = 1;
                 clients[peer].peer = -1;
-        }        
+        }
 }
 
 static void relay_send_error(struct relay_client *c, const char *reason) {
@@ -363,7 +384,8 @@ static int relay_find_waiting(const char *room, int exclude) {
                 if (i == exclude || !clients[i].used) {
                         continue;
                 }
-                if (clients[i].state == RELAY_ST_WAITING && strcmp(clients[i].room, room) == 0){
+                if (clients[i].state == RELAY_ST_WAITING &&
+                    strcmp(clients[i].room, room) == 0) {
                         return i;
                 }
         }
@@ -378,9 +400,11 @@ static void relay_handle_handshake(int i) {
         char paired[] = "PAIRED\n";
 
         c = &clients[i];
-        
+
         if (strncmp(c->line, "TFR-WAN1 ", 9) != 0 || c->line[9] == '\0') {
-                relay_send_error(c, "bad handshake"); /* ok so this was going to be a joke but i can't think of it */
+                relay_send_error(
+                    c, "bad handshake"); /* ok so this was going to be a joke
+                                            but i can't think of it */
                 relay_close_client(i);
                 return;
         }
@@ -400,7 +424,8 @@ static void relay_handle_handshake(int i) {
         clients[j].peer = i;
 
         relay_enqueue(c, (const unsigned char *)paired, strlen(paired));
-        relay_enqueue(&clients[j], (const unsigned char *)paired, strlen(paired));
+        relay_enqueue(&clients[j], (const unsigned char *)paired,
+                      strlen(paired));
 }
 
 int run_relay(const char *port_str) {
@@ -465,11 +490,15 @@ int run_relay(const char *port_str) {
                                 maxfd = c->fd;
                         }
 
-                        if (c->state == RELAY_ST_HANDSHAKE || c->state == RELAY_ST_WAITING) {
+                        if (c->state == RELAY_ST_HANDSHAKE ||
+                            c->state == RELAY_ST_WAITING) {
                                 FD_SET(c->fd, &rfds);
-                        } else if (c->state == RELAY_ST_PAIRED && c->peer >= 0 && clients[c->peer].used && !clients[c->peer].closing && clients[c->peer].outlen < RELAY_OUTBUF) {
+                        } else if (c->state == RELAY_ST_PAIRED &&
+                                   c->peer >= 0 && clients[c->peer].used &&
+                                   !clients[c->peer].closing &&
+                                   clients[c->peer].outlen < RELAY_OUTBUF) {
                                 FD_SET(c->fd, &rfds);
-                        } 
+                        }
 
                         if (c->outoff < c->outlen) {
                                 FD_SET(c->fd, &wfds);
@@ -503,7 +532,9 @@ int run_relay(const char *port_str) {
                         }
 
                         if (FD_ISSET(c->fd, &wfds)) {
-                                got = relay_socket_send(c->fd, c->out + c->outoff, c->outlen - c->outoff);
+                                got =
+                                    relay_socket_send(c->fd, c->out + c->outoff,
+                                                      c->outlen - c->outoff);
                                 if (got <= 0) {
                                         relay_close_client(i);
                                         continue;
@@ -526,8 +557,12 @@ int run_relay(const char *port_str) {
                         if (c->state == RELAY_ST_HANDSHAKE) {
                                 size_t space;
 
-                                space = (size_t)(RELAY_LINE_MAX - 1 - c->linelen);
-                                got = relay_socket_recv(c->fd, (unsigned char *)(c->line + c->linelen), space);
+                                space =
+                                    (size_t)(RELAY_LINE_MAX - 1 - c->linelen);
+                                got = relay_socket_recv(
+                                    c->fd,
+                                    (unsigned char *)(c->line + c->linelen),
+                                    space);
 
                                 if (got <= 0) {
                                         relay_close_client(i);
@@ -536,12 +571,14 @@ int run_relay(const char *port_str) {
                                         c->line[c->linelen] = '\0';
                                         if (strchr(c->line, '\n') != NULL) {
                                                 relay_handle_handshake(i);
-                                        } else if (c->linelen >= RELAY_LINE_MAX - 1) {
+                                        } else if (c->linelen >=
+                                                   RELAY_LINE_MAX - 1) {
                                                 relay_close_client(i);
                                         }
                                 }
                         } else if (c->state == RELAY_ST_WAITING) {
-                                got = relay_socket_recv(c->fd, (unsigned char *)buf, sizeof buf);
+                                got = relay_socket_recv(
+                                    c->fd, (unsigned char *)buf, sizeof buf);
                                 if (got <= 0) {
                                         relay_close_client(i);
                                 }
@@ -549,15 +586,18 @@ int run_relay(const char *port_str) {
                                 int peer;
 
                                 peer = c->peer;
-                                got = relay_socket_recv(c->fd, (unsigned char *)buf, sizeof buf);
+                                got = relay_socket_recv(
+                                    c->fd, (unsigned char *)buf, sizeof buf);
                                 if (got <= 0) {
                                         relay_close_client(i);
                                         continue;
                                 }
                                 if (peer >= 0 && clients[peer].used) {
-                                        relay_enqueue(&clients[peer], (unsigned char *)buf, (size_t)got);
+                                        relay_enqueue(&clients[peer],
+                                                      (unsigned char *)buf,
+                                                      (size_t)got);
                                 }
-                        }                       
+                        }
                 }
         }
 

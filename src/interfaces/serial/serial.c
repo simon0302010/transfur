@@ -53,6 +53,8 @@ typedef int serial_handle;
 static speed_t lookup_baud(unsigned long v);
 #elif defined(OS_WINDOWS)
 static unsigned long lookup_baud(unsigned long v);
+#elif defined(OS_MSDOS)
+static unsigned long lookup_baud(unsigned long v);
 #endif
 static int serial_port_open(const char *path, unsigned long baud,
                             serial_handle *out);
@@ -284,6 +286,32 @@ static long serial_port_recv(serial_handle fd, unsigned char *buf, size_t len) {
 }
 
 #elif defined(OS_MSDOS)
+
+/* Verify baud rate */
+static unsigned long lookup_baud(unsigned long v) {
+        switch (v) {
+        case 50:
+        case 75:
+        case 110:
+        case 150:
+        case 200:
+        case 300:
+        case 600:
+        case 1200:
+        case 2400:
+        case 4800:
+        case 9600:
+        case 14400:
+        case 19200:
+        case 28800:
+        case 38400:
+        case 57600:
+        case 115200:
+                return v;
+        default:
+                return 0;
+        }
+}
 
 static int serial_port_open(const char *path, unsigned long baud,
                             serial_handle *out) {

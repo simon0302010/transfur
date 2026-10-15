@@ -5,9 +5,13 @@
 
 int main(int argc, char **argv) {
         if (argc == 3 && strcmp(argv[1], "--relay") == 0) {
+#if defined(OS_WINDOWS) || defined(OS_LINUX)
                 return run_relay(argv[2]);
+#else
+                fprintf(stderr, "Relay mode is unsupported on this platform\n");
+                return 1;
+#endif
         }
-        /* All app logic should now be written in `gui/app/` */
 
 #define USE_TUI
 
