@@ -8,11 +8,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Breaks on old compilers */
+typedef unsigned int framebuffer_pixel;
+
 static SDL_Window *s_window = NULL;
 static SDL_Renderer *s_renderer = NULL;
 
 static SDL_Texture *s_texture = NULL;
-static unsigned long *s_framebuffer = NULL;
+static framebuffer_pixel *s_framebuffer = NULL;
 static int s_width = 0;
 static int s_height = 0;
 
@@ -25,8 +28,8 @@ int basic_init(const char *title, int width, int height) {
         s_width = width;
         s_height = height;
 
-        s_framebuffer =
-            (unsigned long *)malloc(width * height * sizeof(unsigned long));
+        s_framebuffer = (framebuffer_pixel *)malloc(width * height *
+                                                    sizeof(framebuffer_pixel));
 
         if (!s_framebuffer)
                 return -1;
@@ -60,14 +63,14 @@ void basic_cleanup(void) {
 
 void basic_clear(struct color color) {
         int i, total;
-        unsigned long pixel;
+        framebuffer_pixel pixel;
 
         if (!s_framebuffer)
                 return;
 
-        pixel = ((unsigned long)(unsigned char)color.r << 16) |
-                ((unsigned long)(unsigned char)color.g << 8) |
-                (unsigned long)(unsigned char)color.b;
+        pixel = ((framebuffer_pixel)(unsigned char)color.r << 16) |
+                ((framebuffer_pixel)(unsigned char)color.g << 8) |
+                (framebuffer_pixel)(unsigned char)color.b;
 
         total = s_width * s_height;
         for (i = 0; i < total; i++) {
@@ -87,7 +90,7 @@ void basic_begin_frame(void) {
 void basic_present(void) {
         if (s_texture && s_framebuffer) {
                 SDL_UpdateTexture(s_texture, NULL, s_framebuffer,
-                                  s_width * sizeof(unsigned long));
+                                  s_width * sizeof(framebuffer_pixel));
                 SDL_RenderTexture(s_renderer, s_texture, NULL, NULL);
         }
         SDL_RenderPresent(s_renderer);
@@ -96,9 +99,9 @@ void basic_present(void) {
 void basic_set_pixel(int x, int y, struct color color) {
         if (x >= 0 && x < s_width && y >= 0 && y < s_height && s_framebuffer) {
                 s_framebuffer[y * s_width + x] =
-                    ((unsigned long)(unsigned char)color.r << 16) |
-                    ((unsigned long)(unsigned char)color.g << 8) |
-                    (unsigned long)(unsigned char)color.b;
+                    ((framebuffer_pixel)(unsigned char)color.r << 16) |
+                    ((framebuffer_pixel)(unsigned char)color.g << 8) |
+                    (framebuffer_pixel)(unsigned char)color.b;
         }
 }
 
@@ -106,7 +109,7 @@ void basic_set_pixel(int x, int y, struct color color) {
 void basic_fill_rect(int x, int y, int w, int h, struct color color) {
         int row, col;
         int x1, y1, x2, y2;
-        unsigned long pixel;
+        framebuffer_pixel pixel;
 
         if (!s_framebuffer || w <= 0 || h <= 0)
                 return;
@@ -120,9 +123,9 @@ void basic_fill_rect(int x, int y, int w, int h, struct color color) {
         if (x1 >= x2 || y1 >= y2)
                 return;
 
-        pixel = ((unsigned long)(unsigned char)color.r << 16) |
-                ((unsigned long)(unsigned char)color.g << 8) |
-                (unsigned long)(unsigned char)color.b;
+        pixel = ((framebuffer_pixel)(unsigned char)color.r << 16) |
+                ((framebuffer_pixel)(unsigned char)color.g << 8) |
+                (framebuffer_pixel)(unsigned char)color.b;
 
         for (row = y1; row < y2; row++) {
                 int row_offset = row * s_width;
