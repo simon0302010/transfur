@@ -57,7 +57,7 @@ build/dos/%.o: src/%.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(TARGET)
-	./$(TARGET)
+	dosbox $(TARGET)
 
 clean:
 	rm -rf build

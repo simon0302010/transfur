@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define USE_BASIC_GUI
-
 int main(int argc, char **argv) {
         if (argc == 3 && strcmp(argv[1], "--relay") == 0) {
 #if defined(OS_WINDOWS) || defined(OS_LINUX)

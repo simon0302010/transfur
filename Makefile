@@ -71,6 +71,14 @@ else ifeq ($(shell uname -s),Darwin)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
 endif
 
+ifeq ($(GUI),basic)
+    CFLAGS += -DUSE_BASIC_GUI
+    SRC += $(BASIC_SRC)
+else ifeq ($(GUI),tui)
+    CFLAGS += -DUSE_TUI
+    SRC += $(TUI_SRC)
+endif
+
 ASM_SRC = src/gui/basic/font.S
 
 ENABLE_THEMES ?= 1
