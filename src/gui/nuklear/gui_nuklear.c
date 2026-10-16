@@ -220,17 +220,10 @@ static void *transfer_worker(void *arg)
         }
 
         if (!sender_inited) {
-<<<<<<< HEAD
-                worker_state =
-                    (sender_conn_if == if_lan || sender_conn_if == if_wan)
-                        ? wk_wait_sender
-                        : wk_init_sender;
-=======
                 worker_state = (sender_conn_if == if_lan ||
                                 sender_conn_if == if_wan ||
                                 sender_conn_if == if_bluetooth) ? wk_wait_sender
                                                           : wk_init_sender;
->>>>>>> 145ae08 (feat(gui): integrate bluetooth into gui)
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
                 if (r != 0) {
