@@ -81,17 +81,17 @@ ifeq ($(ENABLE_THEMES), 1)
 	ASM_SRC += src/gui/basic/image_assets.S
 endif
 
-OBJ = $(SRC:src/%.c=build/%.o) $(ASM_SRC:src/%.S=build/%.o)
+OBJ = $(SRC:src/%.c=build/$(OS_NAME)/%.o) $(ASM_SRC:src/%.S=build/$(OS_NAME)/%.o)
 
 $(TARGET): $(OBJ)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
-build/%.o: src/%.c
+build/$(OS_NAME)/%.o: src/%.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/%.o: src/%.S
+build/$(OS_NAME)/%.o: src/%.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -102,11 +102,11 @@ clean:
 	rm -rf build
 
 test:
-	mkdir -p build
-	$(CC) $(CFLAGS) -I. -o build/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
-	$(CC) $(CFLAGS) -I. -o build/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
-	$(CC) $(CFLAGS) -I. -o build/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
-	$(CC) $(CFLAGS) -I. -o build/test_pip tests/pip.test.c src/interfaces/lan/pip.c
-	$(CC) $(CFLAGS) -I. -o build/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
+	mkdir -p build/$(OS_NAME)
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_pip tests/pip.test.c src/interfaces/lan/pip.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
 
 .PHONY: run clean

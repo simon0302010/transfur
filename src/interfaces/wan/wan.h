@@ -39,7 +39,7 @@ int recv_chunk_wan(void *conn, struct chunk *chunk);
 /*
 Closes the relay connection and resets the connection state
 */
-int close_conn_lan(void *conn);
+int close_conn_wan(void *conn);
 
 const char *get_error_text_wan(int code);
 

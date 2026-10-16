@@ -2,7 +2,8 @@
 Transfer data over Bluetooth RFCOMM
 
 The connection options are:
-- "l:<channel>" >>> listen on <channel> on all local adapters and wait for a peer to connect
+- "l:<channel>" >>> listen on <channel> on all local adapters and wait for a
+peer to connect
 - "l:<bdaddr>:<channel>" >>> listen to one specific adapter
 - "c:<bdaddr>:<channel>" >>> connect to peer
 
@@ -10,9 +11,10 @@ Apple and Windows are not implemented
 */
 
 #include "bluetooth.h"
-#include <string.h>
 
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) /* Supported systems */
+
+#include <string.h>
 
 #define inline __inline__
 
@@ -37,11 +39,14 @@ static const unsigned char bt_zeroes[CHUNK_SIZE] = {0};
 static int bt_net_init(void);
 static bt_sock bt_socket_open(void);
 static int bt_socket_close(bt_sock socket);
-static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr, unsigned int channel);
+static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr,
+                          unsigned int channel);
 static int bt_socket_listen(bt_sock socket);
 static bt_sock bt_socket_accept(bt_sock socket);
-static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr, unsigned int channel);
-static long bt_socket_send(bt_sock socket, const unsigned char *buf, size_t len);
+static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr,
+                             unsigned int channel);
+static long bt_socket_send(bt_sock socket, const unsigned char *buf,
+                           size_t len);
 static long bt_socket_recv(bt_sock socket, unsigned char *buf, size_t len);
 static void bt_socket_nosigpipe(bt_sock socket);
 
@@ -70,7 +75,8 @@ static int bt_socket_close(bt_sock socket) {
 }
 
 /* Bind a listening socket, addr = BDADDR_ANY binds to all adapters */
-static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr, unsigned int channel) {
+static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr,
+                          unsigned int channel) {
         struct sockaddr_rc socket_address;
 
         memset(&socket_address, 0, sizeof socket_address);
@@ -78,7 +84,10 @@ static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr, unsigned int cha
         socket_address.rc_bdaddr = *addr;
         socket_address.rc_channel = (unsigned char)channel;
 
-        return bind(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return bind(socket, (struct sockaddr *)&socket_address,
+                    sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
 static int bt_socket_listen(bt_sock socket) {
@@ -98,7 +107,8 @@ static bt_sock bt_socket_accept(bt_sock socket) {
 }
 
 /* Connect to Mister Peer */
-static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr, unsigned int channel) {
+static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr,
+                             unsigned int channel) {
         struct sockaddr_rc socket_address;
 
         memset(&socket_address, 0, sizeof socket_address);
@@ -106,11 +116,15 @@ static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr, unsigned int 
         socket_address.rc_bdaddr = *addr;
         socket_address.rc_channel = (unsigned char)channel;
 
-        return connect(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return connect(socket, (struct sockaddr *)&socket_address,
+                       sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
 /* Send bytes to peer */
-static long bt_socket_send(bt_sock socket, const unsigned char *buf, size_t len) {
+static long bt_socket_send(bt_sock socket, const unsigned char *buf,
+                           size_t len) {
         ssize_t n;
 
         do {
@@ -213,7 +227,8 @@ static void put_u32(unsigned char *dst, unsigned long v) {
 }
 
 static unsigned long get_u32(const unsigned char *src) {
-        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) | ((unsigned long)src[2] << 8) | (unsigned long)src[3];
+        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) |
+               ((unsigned long)src[2] << 8) | (unsigned long)src[3];
 }
 
 static int write_frame(bt_sock socket, const struct chunk *c) {
@@ -256,9 +271,9 @@ static int read_frame(bt_sock socket, struct chunk *c) {
         unsigned char hdr[BT_HDR_SIZE];
         unsigned long len;
         int r;
-        
+
         r = recv_all(socket, hdr, sizeof hdr);
-        if (r != BT_OK ) {
+        if (r != BT_OK) {
                 return r;
         }
 
@@ -312,7 +327,8 @@ static int parse_channel(const char *s, size_t len, unsigned int *out) {
         return 0;
 }
 
-static int parse_options(const char *options, unsigned char *role, bdaddr_t *addr, unsigned int *channel) {
+static int parse_options(const char *options, unsigned char *role,
+                         bdaddr_t *addr, unsigned int *channel) {
         const char *rest;
         const char *colon;
         char text[18];
@@ -358,14 +374,14 @@ static int parse_options(const char *options, unsigned char *role, bdaddr_t *add
 }
 
 int init_conn_bluetooth(void *conn, const char *options) {
-        struct bt_state * st;
+        struct bt_state *st;
         unsigned char role;
         bdaddr_t addr;
         unsigned int channel;
         bt_sock fd;
         bt_sock listener;
         int r;
-        
+
         if (conn == NULL) {
                 return BT_ERR_ARG;
         }
@@ -473,7 +489,8 @@ int recv_chunk_bluetooth(void *conn, struct chunk *chunk) {
                         return BT_OK;
                 }
 
-                /* write_frame directly so the ping does not set ping_outstanding and turn into our own ping */
+                /* write_frame directly so the ping does not set
+                 * ping_outstanding and turn into our own ping */
                 r = write_frame(st->fd, chunk);
                 if (r != BT_OK) {
                         return r;
@@ -490,7 +507,7 @@ int close_conn_bluetooth(void *conn) {
 
         st = (struct bt_state *)conn;
 
-        /* 
+        /*
         init_conn_bluetooth may have failed after the slot was claimed, there
         is no socket to close in that case but the caller still frees the slot
         */
@@ -507,6 +524,24 @@ int close_conn_bluetooth(void *conn) {
 
         return BT_OK;
 }
+
+#else /* Unsupported systems */
+
+int init_conn_bluetooth(void *conn, const char *options) {
+        return BT_ERR_PLATFORM;
+}
+
+int send_chunk_bluetooth(void *conn, const struct chunk *chunk) {
+        return BT_ERR_PLATFORM;
+}
+
+int recv_chunk_bluetooth(void *conn, struct chunk *chunk) {
+        return BT_ERR_PLATFORM;
+}
+
+int close_conn_bluetooth(void *conn) { return BT_ERR_PLATFORM; }
+
+#endif
 
 const char *get_error_text_bluetooth(int code) {
         switch (code) {
@@ -542,35 +577,3 @@ const char *get_error_text_bluetooth(int code) {
                 return "Unknown bluetooth error";
         }
 }
-
-#else /* stub */
-
-int init_conn_bluetooth(void *conn, const char *options) {
-        (void)conn;
-        (void)options;
-        return BT_ERR_PLATFORM;
-}
-
-int send_chunk_bluetooth(void *conn, const struct chunk *chunk) {
-        (void)conn;
-        (void)chunk;
-        return BT_ERR_PLATFORM;
-}
-
-int recv_chunk_bluetooth(void *conn, struct chunk *chunk) {
-        (void)conn;
-        (void)chunk;
-        return BT_ERR_PLATFORM;
-}
-
-int close_conn_bluetooth(void *conn) {
-        (void)conn;
-        return BT_OK;
-}
-
-const char *get_error_text_bluetooth(int code) {
-        (void)code;
-        return "Bluetooth is not supported on this system yet";
-}
-
-#endif

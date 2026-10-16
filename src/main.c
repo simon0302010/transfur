@@ -15,8 +15,6 @@ int main(int argc, char **argv) {
 #endif
         }
 
-#define USE_BASIC_GUI
-
 #ifdef USE_TUI
         if (run_tui("Transfur") != 0)
                 perror("run_tui");

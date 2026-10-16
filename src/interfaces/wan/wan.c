@@ -21,6 +21,9 @@ glibc nicely like the good boy you are, This must come before any system header
 #endif
 
 #include "wan.h"
+
+#if defined(OS_LINUX) || defined(OS_WINDOWS) /* Supported systems */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -874,6 +877,20 @@ int close_conn_wan(void *conn) {
 
         return WAN_OK;
 }
+
+#else /* Unsupported systems */
+
+int init_conn_wan(void *conn, const char *options) { return WAN_ERR_PLATFORM; }
+
+int send_chunk_wan(void *conn, const struct chunk *chunk) {
+        return WAN_ERR_PLATFORM;
+}
+
+int recv_chunk_wan(void *conn, struct chunk *chunk) { return WAN_ERR_PLATFORM; }
+
+int close_conn_wan(void *conn) { return WAN_ERR_PLATFORM; }
+
+#endif
 
 const char *get_error_text_wan(int code) {
         switch (code) {

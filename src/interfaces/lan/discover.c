@@ -1,5 +1,7 @@
 #include "discover.h"
 
+#if defined(OS_LINUX) || defined(OS_WINDOWS) /* Supported systems */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -374,3 +376,23 @@ int discover_peer(int index, char *ip, int ip_size, int *port) {
 
         return 0;
 }
+
+#else /* Unsupported systems */
+
+int discover_init(void) { return -1; }
+
+int discover_ready(void) { return -1; }
+
+void discover_set_listener_opts(const char *options) { return; }
+
+void discover_scan(void) { return; }
+
+void discover_frame(void) { return; }
+
+int discover_scanning(void) { return -1; }
+
+int discover_count(void) { return -1; }
+
+int discover_peer(int index, char *ip, int ip_size, int *port) { return -1; }
+
+#endif
