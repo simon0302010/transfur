@@ -17,6 +17,9 @@
 #define WAN_ERR_FRAME 11  /* frame gave a length more than CHUNK_SIZE */
 #define WAN_ERR_PLATFORM                                                       \
         12 /* this platform does not have a working implementation yet */
+#define WAN_ERR_BIND 13
+#define WAN_ERR_LISTEN 14
+#define WAN_ERR_ACCEPT 15
 
 /*
 Builds a two-way connection to another device via a relay server
