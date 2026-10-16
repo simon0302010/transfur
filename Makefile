@@ -31,6 +31,12 @@ SRC = src/main.c \
 	src/gui/core/widgets/text.c \
 	src/gui/core/widgets/text_input.c \
 	src/gui/core/widgets/button.c \
+	src/misc/debug.c \
+	src/gui/core/widgets/split.c
+
+TUI_SRC = src/gui/tui/widgets/split.c \
+	src/gui/tui/widgets/group.c \
+	src/gui/tui/widgets/button.c \
 	src/gui/tui/raw.c \
 	src/gui/tui/render.c \
 	src/gui/tui/input.c \
@@ -38,9 +44,9 @@ SRC = src/main.c \
 	src/gui/tui/widgets/loading_bar.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
-	src/gui/tui/widgets/text.c \
-	src/misc/debug.c \
-	src/gui/basic/basic.c \
+	src/gui/tui/widgets/text.c
+
+BASIC_SRC = src/gui/basic/basic.c \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
 	src/gui/basic/text.c \
@@ -49,15 +55,19 @@ SRC = src/main.c \
 	src/gui/basic/widgets/text_input.c \
 	src/gui/basic/widgets/text.c \
 	src/gui/basic/design.c \
-	src/gui/tui/widgets/button.c \
 	src/gui/basic/widgets/button.c \
 	src/gui/basic/design.c \
 	src/gui/basic/drawing.c \
 	src/gui/basic/widgets/split.c \
-	src/gui/core/widgets/split.c \
-	src/gui/basic/widgets/group.c \
-	src/gui/tui/widgets/split.c \
-	src/gui/tui/widgets/group.c
+	src/gui/basic/widgets/group.c
+
+ifeq ($(GUI),basic)
+    CFLAGS += -DUSE_BASIC_GUI
+    SRC += $(BASIC_SRC)
+else ifeq ($(GUI),tui)
+    CFLAGS += -DUSE_TUI
+    SRC += $(TUI_SRC)
+endif
 
 ifeq ($(OS),Windows_NT)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
@@ -70,14 +80,6 @@ else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
-endif
-
-ifeq ($(GUI),basic)
-    CFLAGS += -DUSE_BASIC_GUI
-    SRC += $(BASIC_SRC)
-else ifeq ($(GUI),tui)
-    CFLAGS += -DUSE_TUI
-    SRC += $(TUI_SRC)
 endif
 
 ASM_SRC = src/gui/basic/font.S
