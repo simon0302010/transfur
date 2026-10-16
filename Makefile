@@ -64,6 +64,11 @@ BASIC_SRC = src/gui/basic/basic.c \
 ifeq ($(GUI),basic)
     CFLAGS += -DUSE_BASIC_GUI
     SRC += $(BASIC_SRC) src/gui/basic/wrappers/sdl3.c
+
+    ifeq ($(shell uname -s),Linux)
+        LDLIBS += $(shell pkg-config --libs sdl3)
+        CFLAGS += $(shell pkg-config --cflags sdl3)
+    endif
 else ifeq ($(GUI),tui)
     CFLAGS += -DUSE_TUI
     SRC += $(TUI_SRC)
@@ -74,8 +79,8 @@ ifeq ($(OS),Windows_NT)
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c
-	LDLIBS += -lX11 -lpthread -lbluetooth $(shell pkg-config --libs sdl3)
-	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl3)
+	LDLIBS += -lX11 -lpthread -lbluetooth
+	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
@@ -84,7 +89,7 @@ endif
 
 ASM_SRC = src/gui/basic/font.S
 
-ENABLE_THEMES ?= 1
+ENABLE_THEMES ?= 0
 
 ifeq ($(ENABLE_THEMES), 1)
 	CFLAGS += -DENABLE_THEMES
