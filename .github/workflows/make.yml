@@ -18,9 +18,14 @@ jobs:
                 steps:
                         - uses: actions/checkout@v4
 
+                        - uses: libsdl-org/setup-sdl@main
+                          with:
+                                  version: 3-latest
+                                  install-linux-dependencies: true
+
                         - name: Install dependencies (Linux)
                           if: runner.os == 'Linux'
-                          run: sudo apt update && sudo apt install -y build-essential cmake pkg-config libbluetooth-dev libsdl3-dev
+                          run: sudo apt-get update && sudo apt-get install -y libbluetooth-dev
 
                         - name: make
                           run: make
