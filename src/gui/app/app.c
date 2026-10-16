@@ -4,6 +4,7 @@
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../../interfaces/serial/serial.h"
+#include "../../misc/be32.h"
 #include "../core/widget.h"
 #include "../core/widgets/button.h"
 #include "../core/widgets/group.h"
@@ -286,6 +287,7 @@ static void *transfer_worker(void *arg)
 
         /* Send chunks from the receiver into the sender until done */
         for (;;) {
+                printf("before recv\n");
                 r = recv_chunk(&receiver_conn, &chunk);
                 if (r != 0) {
                         worker_if = (int)receiver_conn_if;
@@ -294,7 +296,10 @@ static void *transfer_worker(void *arg)
                         worker_state = wk_error;
                         break;
                 }
+                printf("after recv: %d type=%d len=%lu\n", r, chunk.type,
+                       get_be32(chunk.length));
 
+                printf("before send\n");
                 r = send_chunk(&sender_conn, &chunk);
                 if (r != 0) {
                         worker_if = (int)sender_conn_if;
@@ -303,6 +308,7 @@ static void *transfer_worker(void *arg)
                         worker_state = wk_error;
                         break;
                 }
+                printf("after send: %d\n", r);
 
                 worker_chunks++;
 

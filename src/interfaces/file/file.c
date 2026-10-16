@@ -16,6 +16,7 @@ chunk types 1 and 2.
 #include <stdio.h>
 #include <string.h>
 
+#include "../../misc/be32.h"
 #include "../../misc/debug.h"
 #include "../interfaces.h"
 
@@ -33,18 +34,6 @@ struct file_state {
 };
 
 typedef char file_state_fits[sizeof(struct file_state) <= 512 ? 1 : -1];
-
-static void put_be32(unsigned char *dst, unsigned long v) {
-        dst[0] = (unsigned char)(v >> 24);
-        dst[1] = (unsigned char)(v >> 16);
-        dst[2] = (unsigned char)(v >> 8);
-        dst[3] = (unsigned char)(v >> 0);
-}
-
-static unsigned long get_be32(const unsigned char *src) {
-        return ((unsigned long)src[0] << 24) | ((unsigned long)src[1] << 16) |
-               ((unsigned long)src[2] << 8) | (unsigned long)src[3];
-}
 
 int init_conn_file(void *conn, const char *file_path) {
         struct file_state *st;
@@ -130,7 +119,11 @@ int recv_chunk_file(void *conn, struct chunk *chunk) {
         if (file == NULL) {
                 return 1;
         }
-        fseek(file, (long)st->offset, SEEK_SET);
+
+        if (fseek(file, (long)st->offset, SEEK_SET) != 0) {
+                fclose(file);
+                return 1;
+        }
 
         got = fread(chunk->data, 1, sizeof chunk->data, file);
         fclose(file);

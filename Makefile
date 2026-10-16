@@ -22,6 +22,7 @@ SRC = src/main.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
+	src/misc/be32.c \
 	src/gui/app/app.c \
 	src/gui/core/ui_core.c \
 	src/gui/core/widgets/group.c \
