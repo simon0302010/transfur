@@ -218,7 +218,7 @@ static void status_text(char *buf) {
         return;
 }
 
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
 static DWORD WINAPI transfer_worker(LPVOID arg)
 #elif defined(OS_MSDOS)
 static int transfer_worker(void *arg)
@@ -321,7 +321,7 @@ static void *transfer_worker(void *arg)
 }
 
 static int start_transfer_worker(void) {
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
         HANDLE thread;
 
         thread = CreateThread(NULL, 0, transfer_worker, NULL, 0, NULL);

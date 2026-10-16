@@ -29,7 +29,7 @@ Needs to implement all functions defined in `gui.h`
 #undef interface
 #endif
 
-#elif defined(__APPLE__)
+#elif defined(OS_MACOS)
 #include "../../interfaces/file/browser.h"
 #include "macos/nuklear_macos.h"
 #include <pthread.h>
@@ -179,7 +179,7 @@ static void status_text(char *buf) {
         return;
 }
 
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
 static DWORD WINAPI transfer_worker(LPVOID arg)
 #else
 static void *transfer_worker(void *arg)
@@ -193,10 +193,11 @@ static void *transfer_worker(void *arg)
         /* Both sides are initialized because init_conn can block but must not
          * freeze UI */
         if (!receiver_inited) {
-                worker_state = (receiver_conn_if == if_lan ||
-                                receiver_conn_if == if_wan ||
-                                receiver_conn_if == if_bluetooth) ? wk_wait_receiver
-                                                            : wk_init_receiver;
+                worker_state =
+                    (receiver_conn_if == if_lan || receiver_conn_if == if_wan ||
+                     receiver_conn_if == if_bluetooth)
+                        ? wk_wait_receiver
+                        : wk_init_receiver;
                 r = init_conn(&receiver_conn, receiver_conn_if,
                               receiver_conn_opts);
 
@@ -209,7 +210,7 @@ static void *transfer_worker(void *arg)
                         worker_step = STEP_INIT_RECEIVER;
                         worker_code = r;
                         worker_state = wk_error;
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
                         return 0;
 #else
                         return NULL;
@@ -220,10 +221,11 @@ static void *transfer_worker(void *arg)
         }
 
         if (!sender_inited) {
-                worker_state = (sender_conn_if == if_lan ||
-                                sender_conn_if == if_wan ||
-                                sender_conn_if == if_bluetooth) ? wk_wait_sender
-                                                          : wk_init_sender;
+                worker_state =
+                    (sender_conn_if == if_lan || sender_conn_if == if_wan ||
+                     sender_conn_if == if_bluetooth)
+                        ? wk_wait_sender
+                        : wk_init_sender;
                 r = init_conn(&sender_conn, sender_conn_if, sender_conn_opts);
 
                 if (r != 0) {
@@ -234,7 +236,7 @@ static void *transfer_worker(void *arg)
                         worker_step = STEP_INIT_SENDER;
                         worker_code = r;
                         worker_state = wk_error;
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
                         return 0;
 #else
                         return NULL;
@@ -276,7 +278,7 @@ static void *transfer_worker(void *arg)
                 }
         }
 
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
         return 0;
 #else
         return NULL;
@@ -284,7 +286,7 @@ static void *transfer_worker(void *arg)
 }
 
 static int start_transfer_worker(void) {
-#if defined(_WIN32)
+#if defined(OS_WINDOWS)
         HANDLE thread;
 
         thread = CreateThread(NULL, 0, transfer_worker, NULL, 0, NULL);
