@@ -18,7 +18,6 @@ SRC = src/main.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
 	src/interfaces/bluetooth/bluetooth.c \
-	src/relay/relay.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
@@ -75,10 +74,10 @@ else ifeq ($(GUI),tui)
 endif
 
 ifeq ($(OS),Windows_NT)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c src/relay/relay.c
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c
+	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c src/relay/relay.c
 	LDLIBS += -lX11 -lpthread -lbluetooth
 	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
 else ifeq ($(shell uname -s),Darwin)

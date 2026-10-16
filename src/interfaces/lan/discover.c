@@ -27,7 +27,7 @@ typedef int discover_sock;
 
 typedef SOCKET discover_sock;
 
-#define DISCOVER_INVALID_SOCK INVALID_SOCK
+#define DISCOVER_INVALID_SOCK INVALID_SOCKET
 
 #endif
 
