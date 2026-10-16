@@ -56,16 +56,18 @@ static int peer_count = 0;
 static void discover_close_sock(discover_sock sock);
 static int discover_open(discover_sock *out, unsigned short port);
 static int discover_wait(discover_sock sock, int timeout_ms);
-static long discover_recv(discover_sock sock, char *buf, int buf_size, struct sockaddr_in *from);
+static long discover_recv(discover_sock sock, char *buf, int buf_size,
+                          struct sockaddr_in *from);
 static void discover_send_probe(discover_sock sock);
-static void discover_send_reply(discover_sock sock, const char *reply_id, const struct sockaddr_in *to);
+static void discover_send_reply(discover_sock sock, const char *reply_id,
+                                const struct sockaddr_in *to);
 static void discover_drain(discover_sock sock);
 static void discover_add_peer(const char *ip, int port);
 
 static void discover_close_sock(discover_sock sock) {
-#if defined(OS_WINDOWS) 
+#if defined(OS_WINDOWS)
         (void)closesocket(sock);
-#else  
+#else
         (void)close(sock);
 #endif
 }
@@ -81,8 +83,10 @@ static int discover_open(discover_sock *out, unsigned short port) {
                 return -1;
         }
 
-        (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof on);
-        (void)setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (const char *)&on, sizeof on);
+        (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&on,
+                         sizeof on);
+        (void)setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (const char *)&on,
+                         sizeof on);
 
         memset(&addr, 0, sizeof addr);
         addr.sin_family = AF_INET;
@@ -122,8 +126,9 @@ static int discover_wait(discover_sock sock, int timeout_ms) {
 }
 
 /* Read one datagram and null-terminate it */
-static long discover_recv(discover_sock sock, char *buf, int buf_size, struct sockaddr_in *from) {
-#if defined(OS_WINDOWS) 
+static long discover_recv(discover_sock sock, char *buf, int buf_size,
+                          struct sockaddr_in *from) {
+#if defined(OS_WINDOWS)
         int fromlen;
 #else
         socklen_t fromlen;
@@ -131,7 +136,8 @@ static long discover_recv(discover_sock sock, char *buf, int buf_size, struct so
         long n;
 
         fromlen = (int)sizeof *from;
-        n = (long)recvfrom(sock, buf, (size_t)buf_size - 1, 0, (struct sockaddr *)from, &fromlen);
+        n = (long)recvfrom(sock, buf, (size_t)buf_size - 1, 0,
+                           (struct sockaddr *)from, &fromlen);
 
         if (n < 0) {
                 return -1;
@@ -149,20 +155,23 @@ static void discover_send_probe(discover_sock sock) {
         sprintf(buf, "%s%s", DISCOVER_QUERY, id);
 
         memset(&to, 0, sizeof to);
-        
+
         to.sin_family = AF_INET;
         to.sin_port = htons(DISCOVER_PORT);
         to.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 
-        (void)sendto(sock, buf, (int)strlen(buf), 0, (struct sockaddr *)&to, sizeof to);
-} 
+        (void)sendto(sock, buf, (int)strlen(buf), 0, (struct sockaddr *)&to,
+                     sizeof to);
+}
 
-static void discover_send_reply(discover_sock sock, const char *reply_id, const struct sockaddr_in *to) {
+static void discover_send_reply(discover_sock sock, const char *reply_id,
+                                const struct sockaddr_in *to) {
         char buf[DISCOVER_MAX_FRAME];
 
         sprintf(buf, "%s%s %d", DISCOVER_REPLY, reply_id, listener_port);
 
-        (void)sendto(sock, buf, (int)strlen(buf), 0, (const struct sockaddr *)to, sizeof *to);
+        (void)sendto(sock, buf, (int)strlen(buf), 0,
+                     (const struct sockaddr *)to, sizeof *to);
 }
 
 /* Throw away stale datagrams from earlier scans */
@@ -201,7 +210,7 @@ static void discover_add_peer(const char *ip, int port) {
 }
 
 int discover_init(void) {
-#if defined(OS_WINDOWS) 
+#if defined(OS_WINDOWS)
         WSADATA wsa;
 #endif
 
@@ -211,7 +220,7 @@ int discover_init(void) {
         init_attempted = 1;
 
 #if defined(OS_WINDOWS)
-        if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
+        if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
                 return -1;
         }
 #endif
@@ -232,9 +241,7 @@ int discover_init(void) {
         return 0;
 }
 
-int discover_ready(void) {
-        return init_ready;
-}
+int discover_ready(void) { return init_ready; }
 
 void discover_set_listener_opts(const char *options) {
         const char *rest;
@@ -287,7 +294,7 @@ void discover_frame(void) {
         }
 
         now = get_unix_time();
-        
+
         if (scanning) {
                 if (now >= scan_deadline) {
                         scanning = 0;
@@ -302,15 +309,17 @@ void discover_frame(void) {
                 if (!discover_wait(listen_sock, 0)) {
                         break;
                 }
-                
+
                 n = discover_recv(listen_sock, buf, sizeof buf, &from);
-                if (n != (long)(DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN) || listener_port <= 0) {
+                if (n != (long)(DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN) ||
+                    listener_port <= 0) {
                         continue;
                 }
                 if (strncmp(buf, DISCOVER_QUERY, DISCOVER_PREFIX_LEN) != 0) {
                         continue;
                 }
-                discover_send_reply(listen_sock, buf + DISCOVER_PREFIX_LEN, &from);
+                discover_send_reply(listen_sock, buf + DISCOVER_PREFIX_LEN,
+                                    &from);
         }
 
         if (!scanning) {
@@ -322,7 +331,7 @@ void discover_frame(void) {
                 if (!discover_wait(scan_sock, 0)) {
                         break;
                 }
-                
+
                 n = discover_recv(scan_sock, buf, sizeof buf, &from);
                 if (n < (long)(DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN)) {
                         continue;
@@ -330,7 +339,8 @@ void discover_frame(void) {
                 if (strncmp(buf, DISCOVER_REPLY, DISCOVER_PREFIX_LEN) != 0) {
                         continue;
                 }
-                if (strncmp(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) != 0) {
+                if (strncmp(buf + DISCOVER_PREFIX_LEN, id, DISCOVER_ID_LEN) !=
+                    0) {
                         continue;
                 }
                 if (buf[DISCOVER_PREFIX_LEN + DISCOVER_ID_LEN] != ' ') {
@@ -348,16 +358,13 @@ void discover_frame(void) {
         }
 }
 
-int discover_scanning(void) {
-        return scanning;
-}
+int discover_scanning(void) { return scanning; }
 
-int discover_count(void) {
-        return peer_count;
-}
+int discover_count(void) { return peer_count; }
 
 int discover_peer(int index, char *ip, int ip_size, int *port) {
-        if (ip == NULL || port == NULL || ip_size < 16 || index < 0 || index >= peer_count) {
+        if (ip == NULL || port == NULL || ip_size < 16 || index < 0 ||
+            index >= peer_count) {
                 return -1;
         }
 
