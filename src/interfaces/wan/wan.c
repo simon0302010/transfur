@@ -868,7 +868,7 @@ int close_conn_wan(void *conn) {
 
         st->fd = WAN_INVALID_SOCK;
         st->port = 0;
-        st->role = 0;
+        st->role = wan_role_none;
         st->ping_outstanding = 0;
         st->inited = 0;
 
