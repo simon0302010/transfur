@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
                 return 1;
 #endif
         }
+        /* All app logic should now be written in `gui/app/` */
 
 #ifdef USE_TUI
         if (run_tui("Transfur") != 0)

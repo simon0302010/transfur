@@ -1,17 +1,37 @@
 #include "../../core/widgets/button.h"
+#include "../text.h"
 #include "button.h"
+#include <malloc.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
-void tui_render_button_widget(struct widget widget, int width) {
+char **tui_render_button_widget(struct widget widget, int width) {
         struct widget_button_options *options = widget.content;
+        int length = strlen(options->title);
+        char *text = malloc(length + 4 + 1);
+        char **output;
 
-        /* TODO: should this be full width? */
+        /* TODO: add ANSI support (if available) for button styles */
 
+        /* add starting brackets & arrows if focuses */
         if (widget.is_focused) {
-                /* TODO: Account for cursor position */
-                printf(">{%s}<", options->title);
-
+                text[0] = '>';
+                text[1] = '{';
+                strcpy(text + 2, options->title);
+                text[length + 2] = '}';
+                text[length + 3] = '<';
+                text[length + 4] = '\0';
         } else {
-                printf("{%s}", options->title);
+                text[0] = '{';
+                text[1] = ' ';
+                strcpy(text + 2, options->title);
+                text[length + 2] = ' ';
+                text[length + 3] = '}';
+                text[length + 4] = '\0';
         }
+
+        output = wrap_text(text, width);
+        free(text);
+        return output;
 }

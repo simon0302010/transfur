@@ -43,7 +43,8 @@ TUI_SRC = src/gui/tui/widgets/split.c \
 	src/gui/tui/widgets/loading_bar.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
-	src/gui/tui/widgets/text.c
+	src/gui/tui/widgets/text.c \
+	src/gui/tui/text.c
 
 BASIC_SRC = src/gui/basic/basic.c \
 	src/gui/basic/render.c \
@@ -78,8 +79,12 @@ ifeq ($(OS),Windows_NT)
 	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
 else ifeq ($(shell uname -s),Linux)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c src/relay/relay.c
-	LDLIBS += -lX11 -lpthread -lbluetooth
+	LDLIBS += -lX11 -lpthread
 	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
+	ifeq ($(shell pkg-config --exists bluez || test -f /usr/include/bluetooth/bluetooth.h && echo 1 || echo 0),1)
+		CFLAGS += -DHAVE_BLUETOOTH
+		LDLIBS += -lbluetooth
+	endif
 else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)

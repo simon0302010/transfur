@@ -1,7 +1,7 @@
+#include "../text.h"
 #include "../../core/widget.h"
-#include <stdio.h>
+#include <malloc.h>
 
-void tui_render_text_widget(struct widget widget, int width) {
-        printf("%s\n", (char *)widget.content);
-        fflush(stdout);
+char **tui_render_text_widget(struct widget widget, int width) {
+        return wrap_text(widget.content, width);
 }

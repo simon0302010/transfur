@@ -12,7 +12,7 @@ Apple and Windows are not implemented
 
 #include "bluetooth.h"
 
-#if defined(OS_LINUX) /* Supported systems */
+#if defined(OS_LINUX) && defined(HAVE_BLUETOOTH) /* Supported systems */
 
 #include <string.h>
 
