@@ -69,11 +69,14 @@ const char *get_public_ip(void) {
                 InternetCloseHandle(hInternet);
 
                 if (bytesRead > 0) {
-                        strncpy(dest, buffer, n);
-                        return 0;
-                } else {
-                        return bytesRead;
+                        buffer[bytesRead] = '\0';
+                        strncpy(public_ip, buffer, IP_STRING_LEN - 1);
+                        public_ip[IP_STRING_LEN - 1] = '\0';
+                        return public_ip;
                 }
+
+                connection_failed = true;
+                return NULL;
 #elif defined(OS_MACOS) || defined(OS_LINUX)
                 struct hostent *server;
                 int sockfd;
