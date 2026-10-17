@@ -38,7 +38,7 @@ double get_unix_time(void) {
 
         /* Windows FILETIME starts Jan 1, 1601 in 100-ns intervals.
            Subtract 11644473600 seconds to reach Unix Epoch (Jan 1, 1970). */
-        return (double)(uli.QuadPart - 116444736000000000ULL) / 10000000.0;
+        return (double)uli.QuadPart / 10000000.0 - 11644473600.0;
 #elif defined(OS_MSDOS)
         time_t now = time(NULL);
         clock_t ticks = clock();
