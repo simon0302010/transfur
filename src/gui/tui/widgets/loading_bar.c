@@ -16,14 +16,20 @@ char **tui_render_loading_bar_widget(struct widget widget, int width) {
         char **output;
 
         if (bar_width <= 0) {
-                char **output = {NULL};
+                output = malloc(sizeof(char *));
+                if (!output)
+                        return NULL;
+                output[0] = NULL;
                 return output;
         }
 
         output_text = malloc((size_t)width + 1);
 
         if (!output_text) {
-                char **output = {NULL};
+                output = malloc(sizeof(char *));
+                if (!output)
+                        return NULL;
+                output[0] = NULL;
                 return output;
         }
 

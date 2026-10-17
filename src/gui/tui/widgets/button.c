@@ -8,10 +8,9 @@
 
 char **tui_render_button_widget(struct widget widget, int width) {
         struct widget_button_options *options = widget.content;
-
         int length = strlen(options->title);
-
         char *text = malloc(length + 4 + 1);
+        char **output;
 
         /* TODO: add ANSI support (if available) for button styles */
 
@@ -32,5 +31,7 @@ char **tui_render_button_widget(struct widget widget, int width) {
                 text[length + 4] = '\0';
         }
 
-        return wrap_text(text, width);
+        output = wrap_text(text, width);
+        free(text);
+        return output;
 }

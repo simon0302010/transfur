@@ -26,8 +26,21 @@ char **tui_render_progress_bar_widget(struct widget widget, int width) {
         /* Calculate the widths now that we have progress_string
          */
         heading_chars = strlen(options->title) + strlen(progress_string) + 4;
+        if (width <= heading_chars) {
+                output = malloc(sizeof(char *));
+                if (!output)
+                        return NULL;
+                output[0] = NULL;
+                return output;
+        }
         progress_chars = (*(options->progress)) * (width - heading_chars);
         remaining_width = width - heading_chars - progress_chars;
+        if (progress_chars < 0) {
+                progress_chars = 0;
+        }
+        if (remaining_width < 0) {
+                remaining_width = 0;
+        }
         /* TODO: re-enable ANSI (temporarily disabled for base dynamic loading
         #ifdef USE_ANSI
                 printf("%s|%s%s%s|%s%s%s|%s", ANSI_COLOR_CYAN,
@@ -65,7 +78,10 @@ char **tui_render_progress_bar_widget(struct widget widget, int width) {
         output_text = malloc((size_t)width + 1);
 
         if (!output_text) {
-                char **output = {NULL};
+                output = malloc(sizeof(char *));
+                if (!output)
+                        return NULL;
+                output[0] = NULL;
                 return output;
         }
 
