@@ -6,8 +6,8 @@
 #include <unistd.h>
 #endif
 
-#include "tui.h"
 #include "input.h"
+#include "tui.h"
 
 /* Returns 1 for succes and anything below 1 for errors */
 static int poll_key(char *c, int timeout_ms) {
@@ -107,7 +107,8 @@ struct ui_event tui_poll_key_event(int timeout_ms) {
                                                 if (read(STDIN_FILENO, &seq[2],
                                                          1) > 0 &&
                                                     seq[2] == '~') {
-                                                        event.key = UI_KEY_DELETE;
+                                                        event.key =
+                                                            UI_KEY_DELETE;
                                                 }
                                                 break;
                                         default:
