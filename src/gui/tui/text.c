@@ -4,17 +4,21 @@
 #include <string.h>
 
 char **wrap_text(char *text, size_t max_width) {
-        size_t lines =
-            (strlen(text) + max_width - 1) / max_width + 1; /* +1 for NULL */
-        char **output = malloc(lines * sizeof(char *));
-
-        char *line = malloc(max_width + 1);
-
+        size_t lines;
+        char **output;
+        char *line;
         size_t cursor = 0;
         size_t line_i = 0;
         size_t output_i = 0;
-
         char ch;
+
+        if (max_width == 0) {
+                max_width = 1;
+        }
+
+        lines = (strlen(text) + max_width - 1) / max_width + 1; /* +1 for NULL */
+        output = malloc(lines * sizeof(char *));
+        line = malloc(max_width + 1);
 
         while ((ch = text[cursor++]) != '\0') {
                 line[line_i++] = ch;
@@ -33,5 +37,6 @@ char **wrap_text(char *text, size_t max_width) {
                 free(line);
         }
 
+        output[output_i] = NULL;
         return output;
 }
