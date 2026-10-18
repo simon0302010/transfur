@@ -9,6 +9,7 @@ else
 endif
 
 TARGET = build/$(OS_NAME)/transfur
+ASM_SRC =
 SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
@@ -61,9 +62,20 @@ BASIC_SRC = src/gui/basic/basic.c \
 	src/gui/basic/widgets/split.c \
 	src/gui/basic/widgets/group.c
 
+BASIC_ASM_SRC = src/gui/basic/font.S
+
+ENABLE_THEMES ?= 0
+
+ifeq ($(ENABLE_THEMES), 1)
+	CFLAGS += -DENABLE_THEMES
+	BASIC_SRC += src/gui/basic/images.c src/gui/basic/theme.c src/gui/basic/theme_switcher.c
+	BASIC_ASM_SRC += src/gui/basic/image_assets.S
+endif
+
 ifeq ($(GUI),basic)
     CFLAGS += -DUSE_BASIC_GUI
     SRC += $(BASIC_SRC) src/gui/basic/wrappers/sdl3.c
+	ASM_SRC += $(BASIC_ASM_SRC)
 
     ifeq ($(shell uname -s),Linux)
         LDLIBS += $(shell pkg-config --libs sdl3)
@@ -89,16 +101,6 @@ else ifeq ($(shell uname -s),Darwin)
 	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
 	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
 	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
-endif
-
-ASM_SRC = src/gui/basic/font.S
-
-ENABLE_THEMES ?= 0
-
-ifeq ($(ENABLE_THEMES), 1)
-	CFLAGS += -DENABLE_THEMES
-	SRC += src/gui/basic/images.c src/gui/basic/theme.c
-	ASM_SRC += src/gui/basic/image_assets.S
 endif
 
 OBJ = $(SRC:src/%.c=build/$(OS_NAME)/%.o) $(ASM_SRC:src/%.S=build/$(OS_NAME)/%.o)
