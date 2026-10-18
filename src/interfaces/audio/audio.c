@@ -1,8 +1,22 @@
 #include "audio.h"
 
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) /* Supported systems */
 
-#else
+int init_conn_audio(void *conn, const char *options) {
+        return AUDIO_ERR_PLATFORM;
+}
+
+int send_chunk_audio(void *conn, const struct chunk *chunk) {
+        return AUDIO_ERR_PLATFORM;
+}
+
+int recv_chunk_audio(void *conn, struct chunk *chunk) {
+        return AUDIO_ERR_PLATFORM;
+}
+
+int close_conn_audio(void *conn) { return AUDIO_ERR_PLATFORM; }
+
+#else /* Unsupported systems */
 
 int init_conn_audio(void *conn, const char *options) {
         return AUDIO_ERR_PLATFORM;

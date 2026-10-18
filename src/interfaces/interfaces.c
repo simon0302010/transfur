@@ -4,6 +4,7 @@
 
 #include "interfaces.h"
 
+#include "audio/audio.h"
 #include "bluetooth/bluetooth.h"
 #include "file/file.h"
 #include "lan/lan.h"
@@ -77,6 +78,8 @@ int init_conn(int *conn, enum interface interface, void *options) {
                 return init_conn_wan(context, (const char *)options);
         case if_bluetooth:
                 return init_conn_bluetooth(context, (const char *)options);
+        case if_audio:
+                return init_conn_audio(context, (const char *)options);
         }
 
         return 1;
@@ -100,6 +103,8 @@ int send_chunk(const int *conn, const struct chunk *chunk) {
                 return send_chunk_wan(context, chunk);
         case if_bluetooth:
                 return send_chunk_bluetooth(context, chunk);
+        case if_audio:
+                return send_chunk_audio(context, chunk);
         }
 
         return 1;
@@ -123,6 +128,8 @@ int recv_chunk(const int *conn, struct chunk *chunk) {
                 return recv_chunk_lan(context, chunk);
         case if_bluetooth:
                 return recv_chunk_bluetooth(context, chunk);
+        case if_audio:
+                return recv_chunk_audio(context, chunk);
         }
 
         return 1;
@@ -154,6 +161,9 @@ int close_conn(const int *conn) {
         case if_bluetooth:
                 r = close_conn_bluetooth(context);
                 break;
+        case if_audio:
+                r = close_conn_audio(context);
+                break;
         }
 
         /* This probably creates a bunch of memory leaks lmao */
@@ -177,6 +187,8 @@ const char *get_receiver_text(enum interface interface) {
                 return "Receive over serial";
         case if_bluetooth:
                 return "Receive over Bluetooth";
+        case if_audio:
+                return "Receive over Audio";
         }
 }
 
@@ -194,13 +206,16 @@ const char *get_sender_text(enum interface interface) {
                 return "Send over serial";
         case if_bluetooth:
                 return "Send over Bluetooth";
+        case if_audio:
+                return "Send over Audio";
         }
 }
 
 const enum interface *get_supported_interfaces(void) {
 #if defined(OS_LINUX)
         static const enum interface interfaces[] = {
-            if_file, if_lan, if_wan, if_serial, if_bluetooth, if_empty};
+            if_file,      if_lan,   if_wan,  if_serial,
+            if_bluetooth, if_audio, if_empty};
 #elif defined(OS_WINDOWS)
         static const enum interface interfaces[] = {if_file, if_lan, if_wan,
                                                     if_serial, if_empty};
@@ -230,5 +245,9 @@ const char *get_error_text(enum interface interface, int code) {
                 return get_error_text_lan(code);
         case if_wan:
                 return get_error_text_wan(code);
+        case if_audio:
+                return get_error_text_audio(code);
+        case if_bluetooth:
+                return get_error_text_bluetooth(code);
         }
 }
