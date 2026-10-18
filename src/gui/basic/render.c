@@ -20,20 +20,21 @@ void basic_render(struct ui_context *ctx) {
         int height = BASIC_MARGIN;
         struct basic_render_details details;
 
-        switch (basic_get_theme()) {
-        case THEME_CLASSIC:
+        switch (basic_get_theme_type(basic_get_theme())) {
+        case THEME_COLOR:
         default:
                 basic_clear(page_background);
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE:
-                draw_image_tiled(IMAGE_COFFEE_BACKGROUND, 0, 0, 800, 600, 32,
-                                 32);
-                break;
-        case THEME_PASTEL:
-                draw_image_tiled(IMAGE_PASTEL_BACKGROUND, 0, 0, 800, 600, 32,
-                                 32);
-                break;
+        case THEME_IMAGE:
+                if (basic_get_theme() == THEME_GERMAN) {
+                        /* The German theme is drawn scaled, not tiled */
+                        draw_image_scaled(IMAGE_GERMAN_BACKGROUND, 0, 0, 800,
+                                          600);
+
+                } else
+                        draw_image_tiled(BASIC_THEME_IMAGE(BACKGROUND), 0, 0,
+                                         800, 600, 32, 32);
                 break;
 #endif
         }

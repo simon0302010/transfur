@@ -28,7 +28,22 @@
         X(PASTEL_INPUT, pastel_input)                                          \
         X(PASTEL_PROGRESS_BAR_BACKGROUND, pastel_progress_bar_background)      \
         X(PASTEL_PROGRESS_BAR_SEGMENT, pastel_progress_bar_segment)            \
-        X(PASTEL_PROGRESS_BAR_END, pastel_progress_bar_end)
+        X(PASTEL_PROGRESS_BAR_END, pastel_progress_bar_end)                    \
+        X(GERMAN_BACKGROUND, german_background)                                \
+        X(GERMAN_BUTTON_PRIMARY, german_button_primary)                        \
+        X(GERMAN_BUTTON_DISABLED, german_button_disabled)                      \
+        X(GERMAN_BUTTON_SUCCESS, german_button_success)                        \
+        X(GERMAN_BUTTON_FAILURE, german_button_failure)                        \
+        X(GERMAN_BORDERS_HORIZONTAL, german_borders_horizontal)                \
+        X(GERMAN_BORDERS_VERTICAL, german_borders_vertical)                    \
+        X(GERMAN_INPUT, german_input)                                          \
+        X(GERMAN_PROGRESS_BAR_BACKGROUND, german_progress_bar_background)      \
+        X(GERMAN_PROGRESS_BAR_SEGMENT, german_progress_bar_segment)            \
+        X(GERMAN_PROGRESS_BAR_END, german_progress_bar_end)                    \
+        X(CLASSIC_ICON, classic_icon)                                          \
+        X(COFFEE_ICON, coffee_icon)                                            \
+        X(PASTEL_ICON, pastel_icon)                                            \
+        X(GERMAN_ICON, german_icon)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;

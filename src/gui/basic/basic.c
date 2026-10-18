@@ -7,6 +7,7 @@
 #include "event.h"
 #include "render.h"
 #include "theme.h"
+#include "theme_switcher.h"
 #include "wrappers/basic_wrapper.h"
 
 int run_basic(char *title) {
@@ -34,17 +35,6 @@ int run_basic(char *title) {
                         case UI_EVENT_QUIT:
                                 ui.running = false;
                                 break;
-                        case UI_EVENT_KEY_DOWN:
-                                if (event.key == UI_KEY_CHAR &&
-                                    event.ch == 't') {
-                                        /* TODO: make ui handle this first (so,
-                                         * e.g., you can type "t" in an input)
-                                         */
-                                        basic_toggle_theme();
-                                        break;
-                                }
-                                ui_handle_event(&ui, &event);
-                                break;
                         case UI_EVENT_MOUSE_DOWN: {
                                 struct widget *hit = basic_get_widget_at(
                                     event.mouse_x, event.mouse_y);
@@ -53,7 +43,14 @@ int run_basic(char *title) {
                                 break;
                         }
                         default:
-                                ui_handle_event(&ui, &event);
+                                if (!ui_handle_event(&ui, &event)) {
+                                        if (event.type == UI_EVENT_KEY_DOWN &&
+                                            event.key == UI_KEY_CHAR &&
+                                            event.ch == 't') {
+                                                basic_toggle_theme();
+                                                theme_switcher_show();
+                                        }
+                                }
                                 break;
                         }
                 }
@@ -65,9 +62,13 @@ int run_basic(char *title) {
                 app_update(dt);
                 ui_update(&ui, dt);
 
+                theme_switcher_update(dt);
+
                 basic_begin_frame();
 
                 basic_render(&ui);
+
+                theme_switcher_render(WINDOW_WIDTH, WINDOW_HEIGHT);
 
                 basic_present();
 
