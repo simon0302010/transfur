@@ -12,7 +12,7 @@ static const struct basic_theme_palette palette_classic_light = {
     {0, 120, 220},   {40, 180, 40},   {220, 40, 40},
     {180, 180, 180}, {100, 100, 100}, {0, 120, 255}};
 
-static const struct basic_theme_palette palette_pastel = {
+static const struct basic_theme_palette palette_classic_inverted = {
     {0, 0, 0},     {20, 20, 20}, {0, 0, 0},       {0, 100, 200}, {50, 200, 50},
     {200, 50, 50}, {50, 50, 50}, {200, 200, 200}, {200, 255, 0}};
 
@@ -21,8 +21,8 @@ static const struct basic_theme_desc desc_CLASSIC = {
     0,           IMAGE_CLASSIC_ICON,   palette_classic};
 
 static const struct basic_theme_desc desc_CLASSIC_LIGHT = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 0,
-    0,           IMAGE_CLASSIC_ICON,   palette_classic_light};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,     0,
+    0,           IMAGE_CLASSIC_LIGHT_ICON, palette_classic_light};
 
 static const struct basic_theme_desc desc_COFFEE = {
     THEME_IMAGE, THEME_BG_IMAGE_TILED, 32,
@@ -30,11 +30,15 @@ static const struct basic_theme_desc desc_COFFEE = {
 
 static const struct basic_theme_desc desc_PASTEL = {
     THEME_IMAGE, THEME_BG_IMAGE_TILED, 32,
-    32,          IMAGE_PASTEL_ICON,    palette_pastel};
+    32,          IMAGE_PASTEL_ICON,    palette_classic_inverted};
 
 static const struct basic_theme_desc desc_GERMAN = {
     THEME_IMAGE, THEME_BG_IMAGE_SCALED, 32,
     32,          IMAGE_GERMAN_ICON,     palette_classic};
+
+static const struct basic_theme_desc desc_AMERICAN = {
+    THEME_IMAGE, THEME_BG_IMAGE_TILED, 256,
+    135,         IMAGE_AMERICAN_ICON,  palette_classic_inverted};
 
 static basic_theme_t theme = THEME_CLASSIC;
 
