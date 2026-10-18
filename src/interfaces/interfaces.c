@@ -4,11 +4,11 @@
 
 #include "interfaces.h"
 
+#include "bluetooth/bluetooth.h"
 #include "file/file.h"
-#include "wan/wan.h"
 #include "lan/lan.h"
 #include "serial/serial.h"
-#include "bluetooth/bluetooth.h"
+#include "wan/wan.h"
 
 /* Connection slots */
 static unsigned char connections[MAX_CONN][INTERFACE_CONTEXT_SIZE];
@@ -199,11 +199,11 @@ const char *get_sender_text(enum interface interface) {
 
 const enum interface *get_supported_interfaces(void) {
 #if defined(OS_LINUX)
-        static const enum interface interfaces[] = {if_file, if_lan, if_wan, if_serial,
-                                                    if_bluetooth, if_empty};
+        static const enum interface interfaces[] = {
+            if_file, if_lan, if_wan, if_serial, if_bluetooth, if_empty};
 #elif defined(OS_WINDOWS)
-        static const enum interface interfaces[] = {if_file, if_lan, if_wan, if_serial,
-                                                    if_empty};
+        static const enum interface interfaces[] = {if_file, if_lan, if_wan,
+                                                    if_serial, if_empty};
 #elif defined(OS_MACOS)
         static const enum interface interfaces[] = {if_file, if_empty};
 #elif defined(OS_MSDOS)

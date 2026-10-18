@@ -561,6 +561,12 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
         int can_close_receiver;
         int can_close_sender;
         int bar_visible;
+        const enum interface *supported_interfaces = get_supported_interfaces();
+        unsigned int supported_interfaces_count = 0;
+        int i;
+
+        for (i = 0; supported_interfaces[i] != if_empty; i++)
+                supported_interfaces_count++;
 
         status[0] = '\0';
 
@@ -608,19 +614,18 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                     worker_state == wk_wait_receiver) {
                         nk_widget_disable_begin(ctx);
                 }
-                if (nk_menu_begin_label(ctx, get_receiver_text(receiver),
-                                        NK_TEXT_CENTERED, nk_vec2(180, 120))) {
-                        int i;
-                        const enum interface *supported =
-                            get_supported_interfaces();
-
+                if (nk_menu_begin_label(
+                        ctx, get_receiver_text(receiver), NK_TEXT_CENTERED,
+                        nk_vec2(180, 50 * supported_interfaces_count))) {
                         nk_layout_row_dynamic(ctx, 30, 1);
 
-                        for (i = 0; supported[i] != if_empty; i++) {
+                        for (i = 0; i < supported_interfaces_count; i++) {
                                 if (nk_menu_item_label(
-                                        ctx, get_receiver_text(supported[i]),
+                                        ctx,
+                                        get_receiver_text(
+                                            supported_interfaces[i]),
                                         NK_TEXT_LEFT)) {
-                                        receiver = supported[i];
+                                        receiver = supported_interfaces[i];
                                 }
                         }
                         nk_menu_end(ctx);
@@ -692,19 +697,18 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                     worker_state == wk_wait_sender) {
                         nk_widget_disable_begin(ctx);
                 }
-                if (nk_menu_begin_label(ctx, get_sender_text(sender),
-                                        NK_TEXT_CENTERED, nk_vec2(180, 120))) {
-                        int i;
-                        const enum interface *supported =
-                            get_supported_interfaces();
-
+                if (nk_menu_begin_label(
+                        ctx, get_sender_text(sender), NK_TEXT_CENTERED,
+                        nk_vec2(180, 50 * supported_interfaces_count))) {
                         nk_layout_row_dynamic(ctx, 30, 1);
 
-                        for (i = 0; supported[i] != if_empty; i++) {
+                        for (i = 0; i < supported_interfaces_count; i++) {
                                 if (nk_menu_item_label(
-                                        ctx, get_sender_text(supported[i]),
+                                        ctx,
+                                        get_sender_text(
+                                            supported_interfaces[i]),
                                         NK_TEXT_LEFT)) {
-                                        sender = supported[i];
+                                        sender = supported_interfaces[i];
                                 }
                         }
                         nk_menu_end(ctx);
