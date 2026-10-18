@@ -23,8 +23,8 @@ int basic_render_text_input_widget(struct widget widget,
         h = text_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
             BUTTON_MARGIN;
 
-        switch (basic_get_theme()) {
-        case THEME_CLASSIC:
+        switch (basic_get_theme_type(basic_get_theme())) {
+        case THEME_COLOR:
         default:
 
                 if (widget.is_focused)
@@ -50,22 +50,21 @@ int basic_render_text_input_widget(struct widget widget,
                     primary_button_color);
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE:
-        case THEME_PASTEL:
-                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
-                                     ? IMAGE_COFFEE_INPUT
-                                     : IMAGE_PASTEL_INPUT,
-                                 details.x + BORDER_WIDTH + PADDING,
+        case THEME_IMAGE: {
+                basic_image_id_t image = BASIC_THEME_IMAGE(INPUT);
+                basic_image_id_t horizontal_border_image =
+                    BASIC_THEME_IMAGE(BORDERS_HORIZONTAL);
+                basic_image_id_t vertical_border_image =
+                    BASIC_THEME_IMAGE(BORDERS_VERTICAL);
+                draw_image_tiled(image, details.x + BORDER_WIDTH + PADDING,
                                  details.y + BORDER_WIDTH + PADDING,
                                  input_width - BORDER_WIDTH - BORDER_WIDTH,
                                  text_height + BUTTON_MARGIN + BUTTON_MARGIN,
                                  text_height + BUTTON_MARGIN + BUTTON_MARGIN,
                                  text_height + BUTTON_MARGIN + BUTTON_MARGIN);
 
-                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
-                                     ? IMAGE_COFFEE_BORDERS_HORIZONTAL
-                                     : IMAGE_PASTEL_BORDERS_HORIZONTAL,
-                                 details.x + PADDING, details.y + PADDING,
+                draw_image_tiled(horizontal_border_image, details.x + PADDING,
+                                 details.y + PADDING,
                                  details.width - PADDING - PADDING,
                                  text_height + BORDER_WIDTH + BORDER_WIDTH +
                                      BUTTON_MARGIN + BUTTON_MARGIN,
@@ -76,24 +75,21 @@ int basic_render_text_input_widget(struct widget widget,
 
                 /* left */
                 draw_image_scaled_cropped(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_BORDERS_VERTICAL
-                        : IMAGE_PASTEL_BORDERS_VERTICAL,
-                    details.x + PADDING, details.y + PADDING, h, h,
-                    details.x + PADDING, details.y + PADDING,
-                    details.x + PADDING + h / 2, details.y + PADDING + h);
+                    vertical_border_image, details.x + PADDING,
+                    details.y + PADDING, h, h, details.x + PADDING,
+                    details.y + PADDING, details.x + PADDING + h / 2,
+                    details.y + PADDING + h);
 
                 /* right */
                 draw_image_scaled_cropped(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_BORDERS_VERTICAL
-                        : IMAGE_PASTEL_BORDERS_VERTICAL,
+                    vertical_border_image,
                     details.x + details.width - PADDING - h,
                     details.y + PADDING, h, h,
                     details.x + details.width - PADDING - h / 2,
                     details.y + PADDING, details.x + details.width - PADDING,
                     details.y + PADDING + h);
                 break;
+        }
 #endif
         }
 

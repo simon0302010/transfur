@@ -38,8 +38,8 @@ int basic_render_progress_bar_widget(struct widget widget,
                                       : text_color_inverted);
         remaining_width = details.width - heading_width;
 
-        switch (basic_get_theme()) {
-        case THEME_CLASSIC:
+        switch (basic_get_theme_type(basic_get_theme())) {
+        case THEME_COLOR:
         default:
 
                 basic_fill_rect(details.x + heading_width, details.y,
@@ -50,30 +50,28 @@ int basic_render_progress_bar_widget(struct widget widget,
                     BAR_HEIGHT, progress_color);
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE:
-        case THEME_PASTEL:
-                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
-                                     ? IMAGE_COFFEE_PROGRESS_BAR_BACKGROUND
-                                     : IMAGE_PASTEL_PROGRESS_BAR_BACKGROUND,
-                                 details.x + heading_width, details.y,
+        case THEME_IMAGE: {
+                basic_image_id_t image =
+                    BASIC_THEME_IMAGE(PROGRESS_BAR_BACKGROUND);
+                basic_image_id_t segment_image =
+                    BASIC_THEME_IMAGE(PROGRESS_BAR_SEGMENT);
+                basic_image_id_t end_image =
+                    BASIC_THEME_IMAGE(PROGRESS_BAR_END);
+                draw_image_tiled(image, details.x + heading_width, details.y,
                                  remaining_width, BAR_HEIGHT, BAR_HEIGHT,
                                  BAR_HEIGHT);
                 draw_image_tiled(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_PROGRESS_BAR_SEGMENT
-                        : IMAGE_COFFEE_PROGRESS_BAR_SEGMENT,
-                    details.x + heading_width, details.y,
+                    segment_image, details.x + heading_width, details.y,
                     (int)((double)remaining_width * *options->progress),
                     BAR_HEIGHT, BAR_HEIGHT, BAR_HEIGHT);
                 draw_image_scaled_cropped(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_PROGRESS_BAR_END
-                        : IMAGE_COFFEE_PROGRESS_BAR_END,
+                    end_image,
                     details.x + heading_width +
                         (int)((double)remaining_width * *options->progress),
                     details.y, BAR_HEIGHT, BAR_HEIGHT, 0, 0,
                     details.x + details.width, details.y + BAR_HEIGHT);
                 break;
+        }
 #endif
         }
 

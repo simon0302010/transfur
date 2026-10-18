@@ -29,6 +29,7 @@
         X(PASTEL_PROGRESS_BAR_BACKGROUND, pastel_progress_bar_background)      \
         X(PASTEL_PROGRESS_BAR_SEGMENT, pastel_progress_bar_segment)            \
         X(PASTEL_PROGRESS_BAR_END, pastel_progress_bar_end)                    \
+        X(GERMAN_BACKGROUND, german_background)                                \
         X(GERMAN_BUTTON_PRIMARY, german_button_primary)                        \
         X(GERMAN_BUTTON_DISABLED, german_button_disabled)                      \
         X(GERMAN_BUTTON_SUCCESS, german_button_success)                        \
