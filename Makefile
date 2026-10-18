@@ -126,10 +126,11 @@ clean:
 
 test:
 	mkdir -p build/$(OS_NAME)
-	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c
-	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file tests/file.test.c src/interfaces/file/file.c src/misc/debug.c src/misc/be32.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_serial_local tests/serial_local.test.c src/interfaces/serial/serial.c src/interfaces/file/file.c src/misc/debug.c src/misc/be32.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_pip tests/pip.test.c src/interfaces/lan/pip.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
+	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_audio tests/audio.test.c src/interfaces/audio/audio.c
 
 .PHONY: run clean
