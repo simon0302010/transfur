@@ -1,5 +1,6 @@
 #include "design.h"
 
+#ifndef ENABLE_THEMES
 const struct color page_background = {0, 0, 0};
 const struct color text_color = {255, 255, 255};
 const struct color text_color_inverted = {0, 0, 0};
@@ -9,3 +10,4 @@ const struct color failure_button_color = {200, 50, 50};
 const struct color disabled_button_color = {50, 50, 50};
 const struct color border_color = {200, 200, 200};
 const struct color focus_color = {200, 255, 0};
+#endif
