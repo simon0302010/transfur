@@ -14,5 +14,5 @@ for f in assets/*.png; do
   out_name="${clean_name,,}"
   out_name="${out_name%.png}.bmp"
 
-  "$IM" "$f" "$out_name"
+  "$IM" "$f" -define bmp:format=bmp3 -define bmp3:alpha=true "$out_name" 
 done
