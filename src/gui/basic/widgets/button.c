@@ -140,9 +140,7 @@ int basic_render_button_widget(struct widget widget,
 
                 draw_text(
                     options->title, details.x + BORDER_WIDTH + BUTTON_MARGIN,
-                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1,
-                    (basic_get_theme() != THEME_PASTEL) ? text_color
-                                                        : text_color_inverted);
+                    details.y + BORDER_WIDTH + BUTTON_MARGIN, 1, text_color);
 
                 return title_height + BORDER_WIDTH + BORDER_WIDTH +
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
