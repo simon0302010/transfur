@@ -38,7 +38,11 @@
         X(GERMAN_INPUT, german_input)                                          \
         X(GERMAN_PROGRESS_BAR_BACKGROUND, german_progress_bar_background)      \
         X(GERMAN_PROGRESS_BAR_SEGMENT, german_progress_bar_segment)            \
-        X(GERMAN_PROGRESS_BAR_END, german_progress_bar_end)
+        X(GERMAN_PROGRESS_BAR_END, german_progress_bar_end)                    \
+        X(CLASSIC_ICON, classic_icon)                                          \
+        X(COFFEE_ICON, coffee_icon)                                            \
+        X(PASTEL_ICON, pastel_icon)                                            \
+        X(GERMAN_ICON, german_icon)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;

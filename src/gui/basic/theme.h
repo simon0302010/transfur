@@ -25,15 +25,21 @@ typedef enum { THEME_COLOR, THEME_IMAGE, THEME_OTHER } basic_theme_type_t;
 
 #ifdef ENABLE_THEMES
 
+#include "images.h"
+
 basic_theme_t basic_get_theme(void);
 basic_theme_type_t basic_get_theme_type(basic_theme_t theme);
+basic_image_id_t basic_get_theme_icon(basic_theme_t theme);
+basic_theme_t basic_theme_offset(basic_theme_t base, int offset);
 void basic_set_theme(basic_theme_t theme);
 void basic_toggle_theme(void);
 #else
 #define basic_get_theme() (0)
 #define basic_get_theme_type(t) (0)
 #define basic_set_theme(t) ((void)0)
+#define basic_theme_offset(base, offset) (0)
 #define basic_toggle_theme() ((void)0)
+#define basic_get_theme_icon(t) (0)
 #endif
 
 #endif /* BASIC_THEME_H */

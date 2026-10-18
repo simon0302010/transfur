@@ -47,5 +47,10 @@ EMBED_IMAGE german_input, "assets/german_input.bmp"
 EMBED_IMAGE german_progress_bar_background, "assets/german_progress_bar_background.bmp"
 EMBED_IMAGE german_progress_bar_segment, "assets/german_progress_bar_segment.bmp"
 EMBED_IMAGE german_progress_bar_end, "assets/german_progress_bar_end.bmp"
+EMBED_IMAGE classic_icon, "assets/pastel_icon.bmp"
+EMBED_IMAGE coffee_icon, "assets/coffee_icon.bmp"
+EMBED_IMAGE pastel_icon, "assets/pastel_icon.bmp"
+EMBED_IMAGE german_icon, "assets/german_button_failure.bmp"
+
 
 #endif

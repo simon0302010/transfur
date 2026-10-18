@@ -41,14 +41,11 @@ void theme_switcher_update(double dt) {
                 switcher_alpha = 1.0f;
                 switcher_animation_progress = 0.0f;
         } else {
-                switcher_alpha =
-                    1.0f - (float)((switcher_timer - THEME_SWITCHER_FADE_TIME -
-                                    THEME_SWITCHER_HOLD_TIME) /
-                                   THEME_SWITCHER_SWITCH_TIME);
+                switcher_alpha = 1.0f;
                 switcher_animation_progress =
-                    1.0f - (float)((switcher_timer - THEME_SWITCHER_FADE_TIME -
-                                    THEME_SWITCHER_HOLD_TIME) /
-                                   THEME_SWITCHER_SWITCH_TIME);
+                    (float)((switcher_timer - THEME_SWITCHER_FADE_TIME -
+                             THEME_SWITCHER_HOLD_TIME) /
+                            THEME_SWITCHER_SWITCH_TIME);
         }
 }
 
@@ -70,14 +67,18 @@ void theme_switcher_render(int width, int height) {
         double distance_from_center;
         float scale;
 
-        /* placeholders until icons are added */
-        basic_image_id_t prev_theme_icon = IMAGE_GERMAN_BUTTON_FAILURE;
-        basic_image_id_t current_theme_icon = IMAGE_GERMAN_BUTTON_FAILURE;
-        basic_image_id_t next_theme_icon = IMAGE_GERMAN_BUTTON_FAILURE;
-        basic_image_id_t next_next_theme_icon = IMAGE_GERMAN_BUTTON_FAILURE;
+        basic_theme_t current = basic_get_theme();
 
-        int icon_x_offset = -(int)(switcher_animation_progress *
-                                   (THEME_SWITCHER_ICON + BASIC_SPACING));
+        basic_image_id_t prev_theme_icon =
+            basic_get_theme_icon(basic_theme_offset(current, -1));
+        basic_image_id_t current_theme_icon = basic_get_theme_icon(current);
+        basic_image_id_t next_theme_icon =
+            basic_get_theme_icon(basic_theme_offset(current, 1));
+        basic_image_id_t next_next_theme_icon =
+            basic_get_theme_icon(basic_theme_offset(current, 2));
+
+        int icon_x_offset = (int)(switcher_animation_progress *
+                                  (THEME_SWITCHER_ICON + BASIC_SPACING));
 
         if (switcher_alpha <= 0.0f)
                 return;
