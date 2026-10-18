@@ -82,7 +82,7 @@ else ifeq ($(shell uname -s),Linux)
 	LDLIBS += -lX11 -lpthread
 	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
 	ifeq ($(shell pkg-config --exists bluez || test -f /usr/include/bluetooth/bluetooth.h && echo 1 || echo 0),1)
-		CFLAGS += -DHAVE_BLUETOOTH
+		CFLAGS += -DHAS_BLUETOOTH
 		LDLIBS += -lbluetooth
 	endif
 else ifeq ($(shell uname -s),Darwin)
