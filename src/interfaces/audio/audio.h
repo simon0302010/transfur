@@ -1,6 +1,7 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
+#include "../../misc/bool.h"
 #include "../interfaces.h"
 
 #define AUDIO_OK 0
@@ -12,9 +13,20 @@
 #define AUDIO_ERR_FRAME 4 /* frame gave a length more than CHUNK_SIZE */
 #define AUDIO_ERR_PLATFORM                                                     \
         5 /* this platform does not have a working implementation yet */
+#define AUDIO_ERR_WRITE 6 /* write() call failed */
+#define AUDIO_ERR_UNSUPPORTED                                                  \
+        7                     /* The specified audio device is not supported */
+#define AUDIO_ERR_NOT_FOUND 8 /* The specified audio device was not found */
+
+struct audio_state {
+        int fd_out;
+        int sample_rate;
+        tbool inited;
+};
 
 /*
-Builds a two-way connection to another device over Audio
+Builds a two-way connection to another device over Audio.
+`const char *options` points to a string containing the device id.
 */
 int init_conn_audio(void *conn, const char *options);
 
