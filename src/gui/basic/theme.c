@@ -8,12 +8,11 @@ basic_theme_t basic_get_theme(void) { return theme; }
 
 basic_theme_type_t basic_get_theme_type(basic_theme_t theme) {
         switch (theme) {
-        case THEME_CLASSIC:
-                return THEME_COLOR;
-        case THEME_COFFEE:
-        case THEME_PASTEL:
-        case THEME_GERMAN:
-                return THEME_IMAGE;
+#define X_THEME_CASE(name, type, arg)                                          \
+        case THEME_##name:                                                     \
+                return type;
+                THEME_LIST(X_THEME_CASE, 0)
+#undef X_THEME_CASE
         default:
                 return THEME_OTHER;
         }

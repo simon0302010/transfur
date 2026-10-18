@@ -39,10 +39,9 @@ int basic_render_button_widget(struct widget widget,
         else
                 style = WIDGET_BUTTON_STYLE_DISABLED;
 
-        switch (basic_get_theme()) {
-        case THEME_CLASSIC:
+        switch (basic_get_theme_type(basic_get_theme())) {
+        case THEME_COLOR:
         default:
-
                 if (widget.is_focused)
                         basic_fill_rounded_rect(
                             details.x + PADDING, details.y + PADDING,
@@ -82,34 +81,14 @@ int basic_render_button_widget(struct widget widget,
                        BUTTON_MARGIN + BUTTON_MARGIN + PADDING + PADDING;
                 break;
 #ifdef ENABLE_THEMES
-        case THEME_COFFEE:
-        case THEME_PASTEL: {
-                basic_image_id_t image;
-                int image_height;
+        case THEME_IMAGE: {
+                basic_image_id_t image = BASIC_THEME_IMAGE(BUTTON_PRIMARY);
+                basic_image_id_t horizontal_border_image =
+                    BASIC_THEME_IMAGE(BORDERS_HORIZONTAL);
+                basic_image_id_t vertical_border_image =
+                    BASIC_THEME_IMAGE(BORDERS_VERTICAL);
 
-                switch (style) {
-                case WIDGET_BUTTON_STYLE_PRIMARY:
-                default:
-                        image = (basic_get_theme() == THEME_COFFEE)
-                                    ? IMAGE_COFFEE_BUTTON_PRIMARY
-                                    : IMAGE_PASTEL_BUTTON_PRIMARY;
-                        break;
-                case WIDGET_BUTTON_STYLE_SUCCESS:
-                        image = (basic_get_theme() == THEME_COFFEE)
-                                    ? IMAGE_COFFEE_BUTTON_SUCCESS
-                                    : IMAGE_PASTEL_BUTTON_SUCCESS;
-                        break;
-                case WIDGET_BUTTON_STYLE_FAILURE:
-                        image = (basic_get_theme() == THEME_COFFEE)
-                                    ? IMAGE_COFFEE_BUTTON_FAILURE
-                                    : IMAGE_PASTEL_BUTTON_FAILURE;
-                        break;
-                case WIDGET_BUTTON_STYLE_DISABLED:
-                        image = (basic_get_theme() == THEME_COFFEE)
-                                    ? IMAGE_COFFEE_BUTTON_DISABLED
-                                    : IMAGE_PASTEL_BUTTON_DISABLED;
-                        break;
-                }
+                int image_height;
 
                 draw_image_tiled(image, details.x + BORDER_WIDTH + PADDING,
                                  details.y + BORDER_WIDTH + PADDING,
@@ -118,10 +97,8 @@ int basic_render_button_widget(struct widget widget,
                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN,
                                  title_height + BUTTON_MARGIN + BUTTON_MARGIN);
 
-                draw_image_tiled((basic_get_theme() == THEME_COFFEE)
-                                     ? IMAGE_COFFEE_BORDERS_HORIZONTAL
-                                     : IMAGE_PASTEL_BORDERS_HORIZONTAL,
-                                 details.x + PADDING, details.y + PADDING,
+                draw_image_tiled(horizontal_border_image, details.x + PADDING,
+                                 details.y + PADDING,
                                  details.width - PADDING - PADDING,
                                  title_height + BORDER_WIDTH + BORDER_WIDTH +
                                      BUTTON_MARGIN + BUTTON_MARGIN,
@@ -132,18 +109,14 @@ int basic_render_button_widget(struct widget widget,
 
                 /* left */
                 draw_image_scaled_cropped(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_BORDERS_VERTICAL
-                        : IMAGE_PASTEL_BORDERS_VERTICAL,
-                    details.x + PADDING, details.y + PADDING, h, h,
-                    details.x + PADDING, details.y + PADDING,
-                    details.x + PADDING + h / 2, details.y + PADDING + h);
+                    vertical_border_image, details.x + PADDING,
+                    details.y + PADDING, h, h, details.x + PADDING,
+                    details.y + PADDING, details.x + PADDING + h / 2,
+                    details.y + PADDING + h);
 
                 /* right */
                 draw_image_scaled_cropped(
-                    (basic_get_theme() == THEME_COFFEE)
-                        ? IMAGE_COFFEE_BORDERS_VERTICAL
-                        : IMAGE_PASTEL_BORDERS_VERTICAL,
+                    vertical_border_image,
                     details.x + details.width - PADDING - h,
                     details.y + PADDING, h, h,
                     details.x + details.width - PADDING - h / 2,
