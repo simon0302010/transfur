@@ -1,16 +1,33 @@
 CC = gcc
+# CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
 CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
 	OS_NAME := windows
+	EXE := .exe
+	LDLIBS += -lws2_32
+	COMMON_SRC_EXTRA = src/relay/relay.c
 else
 	OS_NAME := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+	EXE :=
+	ifeq ($(shell uname -s),Linux)
+		CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
+		LDLIBS += -lpthread
+		COMMON_SRC_EXTRA = src/relay/relay.c
+		ifeq ($(shell pkg-config --exists bluez || test -f /usr/include/bluetooth/bluetooth.h && echo 1 || echo 0),1)
+			CFLAGS += -DHAS_BLUETOOTH
+			LDLIBS += -lbluetooth
+		endif
+	else ifeq ($(shell uname -s),Darwin)
+		CFLAGS += -D_DEFAULT_SOURCE
+		LDLIBS += -lpthread
+	endif
 endif
 
-TARGET = build/$(OS_NAME)/transfur
-ASM_SRC =
-SRC = src/main.c \
+#TARGET = build/$(OS_NAME)/transfur
+#ASM_SRC =
+COMMON_SRC = src/main.c \
 	src/interfaces/interfaces.c \
 	src/interfaces/file/file.c \
 	src/interfaces/lan/lan.c \
@@ -32,10 +49,69 @@ SRC = src/main.c \
 	src/gui/core/widgets/text.c \
 	src/gui/core/widgets/text_input.c \
 	src/gui/core/widgets/button.c \
-	src/misc/debug.c \
-	src/gui/core/widgets/split.c
+	src/gui/core/widgets/split.c \
+	${COMMON_SRC_EXTRA}
 
-TUI_SRC = src/gui/tui/widgets/split.c \
+# NUKLEAR GUI
+NUKLEAR_CFLAGS = $(CFLAGS)
+NUKLEAR_LDLIBS = $(LDLIBS)
+NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c
+
+ifeq ($(OS),Windows_NT)
+	NUKLEAR_SRC += src/gui/nuklear/windows/nuklear_windows.c
+	NUKLEAR_LDLIBS += -lmingw32 -lSDL2main -lSDL2
+else ifeq ($(shell uname -s),Linux)
+	NUKLEAR_SRC += src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c
+	NUKLEAR_LDLIBS += -lX11
+else ifeq ($(shell uname -s),Darwin)
+	NUKLEAR_SRC += src/gui/nuklear/macos/nuklear_macos.c src/interfaces/file/browser.c
+	NUKLEAR_CFLAGS += $(shell pkg-config --cflags sdl2)
+	NUKLEAR_LDLIBS += $(shell pkg-config --libs sdl2)
+endif
+
+# BASIC GUI
+BASIC_CFLAGS = $(CFLAGS) -DUSE_BASIC_GUI
+BASIC_LDLIBS = $(LDLIBS)
+BASIC_SRC = $(COMMON_SRC) \
+	src/gui/basic/basic.c \
+	src/gui/basic/render.c \
+	src/gui/basic/event.c \
+	src/gui/basic/text.c \
+	src/gui/basic/widgets/loading_bar.c \
+	src/gui/basic/widgets/progress_bar.c \
+	src/gui/basic/widgets/text_input.c \
+	src/gui/basic/widgets/text.c \
+	src/gui/basic/design.c \
+	src/gui/basic/widgets/button.c \
+	src/gui/basic/drawing.c \
+	src/gui/basic/widgets/split.c \
+	src/gui/basic/widgets/group.c
+
+BASIC_ASM_SRC = src/gui/basic/font.S
+
+ENABLE_THEMES ?= 0
+
+ifeq ($(ENABLE_THEMES), 1)
+	BASIC_CFLAGS += -DENABLE_THEMES
+	BASIC_SRC += src/gui/basic/images.c src/gui/basic/theme.c src/gui/basic/theme_switcher.c
+	BASIC_ASM_SRC += src/gui/basic/image_assets.S
+endif
+
+ifeq ($(shell uname -s),Linux)
+	BASIC_SRC += src/gui/basic/wrappers/sdl3.c
+	BASIC_CFLAGS += $(shell pkg-config --cflags sdl3)
+	BASIC_LDLIBS += $(shell pkg-config --libs sdl3)
+else
+	BASIC_SRC += src/gui/basic/wrappers/sdl3.c
+	BASIC_LDLIBS += -lSDL3
+endif
+
+# TUI GUI
+
+TUI_CFLAGS = $(CFLAGS) -DUSE_TUI
+TUI_LDLIBS = $(LDLIBS)
+TUI_SRC = $(COMMON_SRC) \
+    src/gui/tui/widgets/split.c \
 	src/gui/tui/widgets/group.c \
 	src/gui/tui/widgets/button.c \
 	src/gui/tui/raw.c \
@@ -48,78 +124,71 @@ TUI_SRC = src/gui/tui/widgets/split.c \
 	src/gui/tui/widgets/text.c \
 	src/gui/tui/text.c
 
-BASIC_SRC = src/gui/basic/basic.c \
-	src/gui/basic/render.c \
-	src/gui/basic/event.c \
-	src/gui/basic/text.c \
-	src/gui/basic/widgets/loading_bar.c \
-	src/gui/basic/widgets/progress_bar.c \
-	src/gui/basic/widgets/text_input.c \
-	src/gui/basic/widgets/text.c \
-	src/gui/basic/design.c \
-	src/gui/basic/widgets/button.c \
-	src/gui/basic/design.c \
-	src/gui/basic/drawing.c \
-	src/gui/basic/widgets/split.c \
-	src/gui/basic/widgets/group.c
+BIN_NUKLEAR = build/$(OS_NAME)/transfur-nuklear$(EXE)
+BIN_BASIC = build/$(OS_NAME)/transfur-basic$(EXE)
+BIN_TUI = build/$(OS_NAME)/transfur-tui$(EXE)
+TARGET = build/$(OS_NAME)/transfur$(EXE)
 
-BASIC_ASM_SRC = src/gui/basic/font.S
-
-ENABLE_THEMES ?= 0
-
-ifeq ($(ENABLE_THEMES), 1)
-	CFLAGS += -DENABLE_THEMES
-	BASIC_SRC += src/gui/basic/images.c src/gui/basic/theme.c src/gui/basic/theme_switcher.c
-	BASIC_ASM_SRC += src/gui/basic/image_assets.S
-endif
+NUKLEAR_OBJ = $(NUKLEAR_SRC:src/%.c=build/$(OS_NAME)/nuklear/%.o)
+BASIC_OBJ = $(BASIC_SRC:src/%.c=build/$(OS_NAME)/basic/%.o) $(BASIC_ASM_SRC:src/%.S=build/$(OS_NAME)/basic/%.o)
+TUI_OBJ = $(TUI_SRC:src/%.c=build/$(OS_NAME)/tui/%.o)
 
 ifeq ($(GUI),basic)
-    CFLAGS += -DUSE_BASIC_GUI
-    SRC += $(BASIC_SRC) src/gui/basic/wrappers/sdl3.c
-	ASM_SRC += $(BASIC_ASM_SRC)
-
-    ifeq ($(shell uname -s),Linux)
-        LDLIBS += $(shell pkg-config --libs sdl3)
-        CFLAGS += $(shell pkg-config --cflags sdl3)
-    endif
+.DEFAULT_GOAL := basic
 else ifeq ($(GUI),tui)
-    CFLAGS += -DUSE_TUI
-    SRC += $(TUI_SRC)
+.DEFAULT_GOAL := tui
+else ifeq ($(GUI),nuklear)
+.DEFAULT_GOAL := nuklear
+else
+.DEFAULT_GOAL := all
 endif
 
-ifeq ($(OS),Windows_NT)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/windows/nuklear_windows.c src/relay/relay.c
-	LDLIBS = -lmingw32 -lSDL2main -lSDL2 -lws2_32 -lm
-else ifeq ($(shell uname -s),Linux)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c src/relay/relay.c
-	LDLIBS += -lX11 -lpthread
-	CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE
-	ifeq ($(shell pkg-config --exists bluez || test -f /usr/include/bluetooth/bluetooth.h && echo 1 || echo 0),1)
-		CFLAGS += -DHAS_BLUETOOTH
-		LDLIBS += -lbluetooth
-	endif
-else ifeq ($(shell uname -s),Darwin)
-	SRC += src/gui/nuklear/gui_nuklear.c src/gui/nuklear/macos/nuklear_macos.c
-	CFLAGS += -D_DEFAULT_SOURCE $(shell pkg-config --cflags sdl2)
-	LDLIBS = $(shell pkg-config --libs sdl2) -lpthread -lm
-endif
+all: $(BIN_NUKLEAR) $(BIN_BASIC) $(BIN_TUI) $(TARGET)
 
-OBJ = $(SRC:src/%.c=build/$(OS_NAME)/%.o) $(ASM_SRC:src/%.S=build/$(OS_NAME)/%.o)
+nuklear: $(BIN_NUKLEAR) $(TARGET)
+basic: $(BIN_BASIC)
+tui: $(BIN_TUI)
 
-$(TARGET): $(OBJ)
+$(TARGET): $(BIN_NUKLEAR)
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+	cp -f $< $@
 
-build/$(OS_NAME)/%.o: src/%.c
+$(BIN_NUKLEAR): $(NUKLEAR_OBJ)
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(NUKLEAR_CFLAGS) $^ -o $@ $(NUKLEAR_LDLIBS)
 
-build/$(OS_NAME)/%.o: src/%.S
+$(BIN_BASIC): $(BASIC_OBJ)
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(BASIC_CFLAGS) $^ -o $@ $(BASIC_LDLIBS)
 
-run: $(TARGET)
-	./$(TARGET)
+$(BIN_TUI): $(TUI_OBJ)
+	mkdir -p $(dir $@)
+	$(CC) $(TUI_CFLAGS) $^ -o $@ $(TUI_LDLIBS)
+
+build/$(OS_NAME)/nuklear/%.o: src/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(NUKLEAR_CFLAGS) -c $< -o $@
+
+build/$(OS_NAME)/basic/%.o: src/%.S
+	mkdir -p $(dir $@)
+	$(CC) $(BASIC_CFLAGS) -c $< -o $@
+
+build/$(OS_NAME)/basic/%.o: src/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(BASIC_CFLAGS) -c $< -o $@
+
+build/$(OS_NAME)/tui/%.o: src/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(TUI_CFLAGS) -c $< -o $@
+
+run: $(BIN_NUKLEAR)
+	./$(BIN_NUKLEAR)
+
+run-basic: $(BIN_BASIC)
+	./$(BIN_BASIC)
+
+run-tui: $(BIN_TUI)
+	./$(BIN_TUI)
 
 clean:
 	rm -rf build
@@ -133,4 +202,4 @@ test:
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_audio tests/audio.test.c src/interfaces/audio/audio.c
 
-.PHONY: run clean
+.PHONY: all nuklear basic tui run run-basic run-tui clean test
