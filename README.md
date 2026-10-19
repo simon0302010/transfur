@@ -84,6 +84,8 @@ ENABLE_THEMES=1 make basic
 make run-basic
 ```
 
+**Note:** Run `make clean` before changing `ENABLE_THEMES`
+
 ### TUI
 
 ```bash
