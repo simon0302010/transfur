@@ -10,9 +10,6 @@
 #include "widgets/text.h"
 #include "widgets/text_input.h"
 
-#define BASIC_MARGIN 8
-#define BASIC_SPACING 4
-
 static int hitbox_count = 0;
 
 void basic_render(struct ui_context *ctx) {

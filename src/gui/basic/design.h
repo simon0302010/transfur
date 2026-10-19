@@ -3,6 +3,9 @@
 
 #include "wrappers/basic_wrapper.h"
 
+#define BASIC_MARGIN 8
+#define BASIC_SPACING 4
+
 #define BORDER_WIDTH 2
 #define CONTAINER_MARGIN 8
 #define BUTTON_MARGIN 8

@@ -11,9 +11,6 @@
 #define THEME_SWITCHER_FADE_TIME                                               \
         0.4 /* how long to fade after hold time is up */
 
-#define BASIC_MARGIN 8  /* stolen from render.c */
-#define BASIC_SPACING 4 /* also stolen from render.c */
-
 static double switcher_timer = 0.0;
 static float switcher_alpha = 0.0f;
 static float switcher_animation_progress = 0.0f;
