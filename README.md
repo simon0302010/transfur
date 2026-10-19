@@ -60,6 +60,8 @@ simon (simon): made the ~~entire~~ GUI and placeholder files for us to work on a
 
 Grab a release or build it yourself:
 
+**Note:** The released version of the Basic GUI has themes enabled. Build manually if themes are not needed to save space.
+
 ```bash
 make
 ```
