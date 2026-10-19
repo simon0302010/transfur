@@ -61,16 +61,16 @@ COMMON_SRC = src/main.c \
 # NUKLEAR GUI
 NUKLEAR_CFLAGS = $(CFLAGS)
 NUKLEAR_LDLIBS = $(LDLIBS)
-NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c
+NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c src/interfaces/file/browser.c
 
 ifeq ($(OS),Windows_NT)
 	NUKLEAR_SRC += src/gui/nuklear/windows/nuklear_windows.c
 	NUKLEAR_LDLIBS += -lmingw32 -lSDL2main -lSDL2
 else ifeq ($(shell uname -s),Linux)
-	NUKLEAR_SRC += src/gui/nuklear/linux/nuklear_linux.c src/interfaces/file/browser.c
+	NUKLEAR_SRC += src/gui/nuklear/linux/nuklear_linux.c
 	NUKLEAR_LDLIBS += -lX11
 else ifeq ($(shell uname -s),Darwin)
-	NUKLEAR_SRC += src/gui/nuklear/macos/nuklear_macos.c src/interfaces/file/browser.c
+	NUKLEAR_SRC += src/gui/nuklear/macos/nuklear_macos.c
 	NUKLEAR_CFLAGS += $(shell pkg-config --cflags sdl2)
 	NUKLEAR_LDLIBS += $(shell pkg-config --libs sdl2)
 endif

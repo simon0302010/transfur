@@ -7,16 +7,17 @@ Needs to implement all functions defined in `gui.h`
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../interfaces/file/browser.h"
 #include "../../interfaces/interfaces.h"
 #include "../../interfaces/lan/discover.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../gui.h"
 
+#define NK_INCLUDE_FIXED_TYPES
 #include "nuklear.h"
 
 #if defined(OS_LINUX)
-#include "../../interfaces/file/browser.h"
 #include "linux/nuklear_linux.h"
 #include <pthread.h>
 #include <pwd.h>
@@ -311,7 +312,6 @@ static int worker_active(void) {
 }
 
 static void show_file_receiver_options(struct nk_context *ctx) {
-#if defined(OS_LINUX) || defined(OS_MACOS)
         char cwd[PATH_MAX + 1];
         char errmsg[128];
         int res;
@@ -384,11 +384,9 @@ static void show_file_receiver_options(struct nk_context *ctx) {
 
         /* Vertical spacer */
         nk_layout_row_dynamic(ctx, 10, 1);
-#endif
 }
 
 static void show_file_sender_options(struct nk_context *ctx) {
-#if defined(OS_LINUX) || defined(OS_MACOS)
         char cwd[PATH_MAX + 1];
         char errmsg[128];
         int res;
@@ -460,7 +458,6 @@ static void show_file_sender_options(struct nk_context *ctx) {
 
         /* Vertical spacer */
         nk_layout_row_dynamic(ctx, 10, 1);
-#endif
 }
 
 static void show_lan_discovery(struct nk_context *ctx) {
