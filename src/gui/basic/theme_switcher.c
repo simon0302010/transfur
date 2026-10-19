@@ -6,8 +6,8 @@
 #include "theme.h"
 #include <math.h>
 
-#define THEME_SWITCHER_SWITCH_TIME 0.4 /* animation between themes */
-#define THEME_SWITCHER_HOLD_TIME 1.5   /* how long to wait after no updates */
+#define THEME_SWITCHER_SWITCH_TIME 0.2 /* animation between themes */
+#define THEME_SWITCHER_HOLD_TIME 1     /* how long to wait after no updates */
 #define THEME_SWITCHER_FADE_TIME                                               \
         0.4 /* how long to fade after hold time is up */
 
