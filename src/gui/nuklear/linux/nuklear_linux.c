@@ -12,12 +12,12 @@
 #include <unistd.h>
 
 #define NK_INCLUDE_FIXED_TYPES
+#define NK_USE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_IMPLEMENTATION
 #define NK_XLIB_IMPLEMENTATION
-#define NK_INCLUDE_FIXED_TYPES
 #include "../../gui.h"
 #include "nuklear_xlib.h"
 

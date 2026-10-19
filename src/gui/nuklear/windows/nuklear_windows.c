@@ -11,7 +11,10 @@
 #include <time.h>
 #include <windows.h>
 
+#include "../../gui.h"
+
 #define NK_INCLUDE_FIXED_TYPES
+#define NK_USE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
@@ -80,8 +83,8 @@ static void create_d3d9_device(HWND wnd) {
                 typedef HRESULT WINAPI Direct3DCreate9ExPtr(UINT,
                                                             IDirect3D9Ex **);
                 Direct3DCreate9ExPtr *Direct3DCreate9Ex =
-                    (void *)GetProcAddress(GetModuleHandleA("d3d9.dll"),
-                                           "Direct3DCreate9Ex");
+                    (Direct3DCreate9ExPtr *)GetProcAddress(
+                        GetModuleHandleA("d3d9.dll"), "Direct3DCreate9Ex");
                 if (Direct3DCreate9Ex) {
                         IDirect3D9Ex *d3d9ex;
                         if (SUCCEEDED(

@@ -19,6 +19,7 @@ Needs to implement all functions defined in `gui.h`
 #include "../gui.h"
 
 #define NK_INCLUDE_FIXED_TYPES
+#define NK_USE_FIXED_TYPES
 #include "nuklear.h"
 
 #if defined(OS_LINUX)
