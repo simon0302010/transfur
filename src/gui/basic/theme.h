@@ -44,7 +44,9 @@ struct basic_theme_desc {
         X(CATPPUCCIN_FRAPPE, THEME_COLOR, arg)                                 \
         X(CATPPUCCIN_LATTE, THEME_COLOR, arg)                                  \
         X(CATPPUCCIN_MACCHIATO, THEME_COLOR, arg)                              \
-        X(CATPPUCCIN_MOCHA, THEME_COLOR, arg)
+        X(CATPPUCCIN_MOCHA, THEME_COLOR, arg)                                  \
+        X(GRUVBOX_DARK, THEME_COLOR, arg)                                      \
+        X(GRUVBOX_LIGHT, THEME_COLOR, arg)
 
 #define X_THEME_ENUM(name, type, arg) THEME_##name,
 typedef enum { THEME_LIST(X_THEME_ENUM, 0) THEME_END } basic_theme_t;

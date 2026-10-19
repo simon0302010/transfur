@@ -37,6 +37,16 @@ static const struct basic_theme_palette palette_catppuccin_mocha = {
     {116, 199, 236}, {166, 227, 161}, {243, 139, 168},
     {24, 24, 37},    {30, 30, 46},    {249, 226, 175}};
 
+static const struct basic_theme_palette palette_gruvbox_dark = {
+    {40, 40, 40},    {235, 219, 178}, {40, 40, 40},
+    {69, 133, 136},  {152, 151, 26},  {204, 36, 29},
+    {168, 153, 132}, {146, 131, 116}, {250, 189, 47}};
+
+static const struct basic_theme_palette palette_gruvbox_light = {
+    {251, 241, 199}, {60, 56, 54},    {251, 241, 199},
+    {69, 133, 136},  {152, 151, 26},  {204, 36, 29},
+    {168, 153, 132}, {146, 131, 116}, {250, 189, 47}};
+
 static const struct basic_theme_desc desc_CLASSIC = {
     THEME_COLOR, THEME_BG_SOLID_COLOR, 0,
     0,           IMAGE_CLASSIC_ICON,   palette_classic};
@@ -80,6 +90,14 @@ static const struct basic_theme_desc desc_CATPPUCCIN_MOCHA = {
 static const struct basic_theme_desc desc_CATPPUCCIN_LATTE = {
     THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
     32,          IMAGE_CLASSIC_ICON,   palette_catppuccin_latte};
+
+static const struct basic_theme_desc desc_GRUVBOX_DARK = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
+    32,          IMAGE_CLASSIC_ICON,   palette_gruvbox_dark};
+
+static const struct basic_theme_desc desc_GRUVBOX_LIGHT = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
+    32,          IMAGE_CLASSIC_ICON,   palette_gruvbox_light};
 
 static basic_theme_t theme = THEME_CLASSIC;
 
