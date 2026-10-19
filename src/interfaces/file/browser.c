@@ -204,7 +204,7 @@ int browser_cd(struct browser_ctx *ctx, const char *path, tbool relative) {
 
         if (relative) {
                 /* Points to current browser location */
-                if (strcmp(path, '.') == 0)
+                if (strcmp(path, ".") == 0)
                         return 0;
                 written = snprintf(full_path, sizeof(full_path), "%s\\%s",
                                    ctx->location, path);
