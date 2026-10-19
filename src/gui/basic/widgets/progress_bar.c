@@ -2,6 +2,7 @@
 #include "../../core/widgets/progress_bar.h"
 #include "../design.h"
 #include "../images.h"
+#include "../text.h"
 #include "../theme.h"
 #include "../wrappers/basic_wrapper.h"
 #include <stdio.h>
@@ -30,10 +31,11 @@ int basic_render_progress_bar_widget(struct widget widget,
         /* Calculate the widths now that we have progress_string
          */
 
-        heading_width = draw_text(progress_string, details.x, details.y, 1,
-                                  (basic_get_theme() != THEME_PASTEL)
-                                      ? text_color
-                                      : text_color_inverted);
+        heading_width =
+            draw_text(progress_string, details.x, details.y, 1,
+                      (basic_get_theme() != THEME_PASTEL) ? text_color
+                                                          : text_color_inverted)
+                .width;
         remaining_width = details.width - heading_width;
 
         switch (basic_get_theme_type(basic_get_theme())) {

@@ -1,5 +1,6 @@
 #include "../../core/widgets/button.h"
 #include "../design.h"
+#include "../drawing.h"
 #include "../images.h"
 #include "../text.h"
 #include "../theme.h"

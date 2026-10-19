@@ -1,5 +1,12 @@
 CC = cc
-CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
+CFLAGS = -std=c89 \
+	-Wdeclaration-after-statement \
+	-Werror=declaration-after-statement \
+	-Wimplicit-function-declaration \
+	-Werror=implicit-function-declaration \
+	-pedantic-errors \
+	-include src/platform.h \
+	-DTRANSFUR_DEBUG
 LDLIBS = -lm
 
 ifeq ($(OS),Windows_NT)
