@@ -1,9 +1,9 @@
 #include "basic_wrapper.h"
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_keycode.h>
-#include <SDL3/SDL_pixels.h>
-#include <SDL3/SDL_render.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_keycode.h>
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_render.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,8 +22,7 @@ static int s_height = 0;
 int basic_init(const char *title, int width, int height) {
         SDL_Init(SDL_INIT_VIDEO);
 
-        SDL_CreateWindowAndRenderer(title, width, height, 0, &s_window,
-                                    &s_renderer);
+        SDL_CreateWindowAndRenderer(width, height, 0, &s_window, &s_renderer);
 
         s_width = width;
         s_height = height;
@@ -91,7 +90,7 @@ void basic_present(void) {
         if (s_texture && s_framebuffer) {
                 SDL_UpdateTexture(s_texture, NULL, s_framebuffer,
                                   s_width * sizeof(framebuffer_pixel));
-                SDL_RenderTexture(s_renderer, s_texture, NULL, NULL);
+                SDL_RenderCopy(s_renderer, s_texture, NULL, NULL);
         }
         SDL_RenderPresent(s_renderer);
 }
@@ -145,7 +144,7 @@ void basic_draw_rect(int x, int y, int w, int h, struct color color) {
         basic_fill_rect(x + w - 1, y, 1, h, color);
 }
 
-double basic_get_time(void) { return (double)SDL_GetTicksNS() / 1e9; }
+double basic_get_time(void) { return (double)SDL_GetTicks() / 1000.0; }
 
 tbool basic_poll_event(struct basic_event *event) {
         SDL_Event sdl_event;
@@ -161,39 +160,39 @@ tbool basic_poll_event(struct basic_event *event) {
                 return false;
 
         switch (sdl_event.type) {
-        case SDL_EVENT_QUIT:
+        case SDL_QUIT:
                 event->type = BASIC_EVENT_QUIT;
                 break;
 
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_MOUSEBUTTONDOWN:
                 event->type = BASIC_EVENT_MOUSE_DOWN;
                 event->mouse_x = (int)sdl_event.button.x;
                 event->mouse_y = (int)sdl_event.button.y;
                 event->mouse_button = (int)sdl_event.button.button;
                 break;
 
-        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_MOUSEBUTTONUP:
                 event->type = BASIC_EVENT_MOUSE_UP;
                 event->mouse_x = (int)sdl_event.button.x;
                 event->mouse_y = (int)sdl_event.button.y;
                 event->mouse_button = (int)sdl_event.button.button;
                 break;
 
-        case SDL_EVENT_MOUSE_MOTION:
+        case SDL_MOUSEMOTION:
                 event->type = BASIC_EVENT_MOUSE_MOVE;
                 event->mouse_x = (int)sdl_event.button.x;
                 event->mouse_y = (int)sdl_event.button.y;
                 break;
 
-        case SDL_EVENT_KEY_DOWN:
+        case SDL_KEYDOWN:
                 event->type = BASIC_EVENT_KEY_DOWN;
 
-                switch (sdl_event.key.key) {
+                switch (sdl_event.key.keysym.sym) {
                 case SDLK_ESCAPE:
                         event->key = BASIC_KEY_ESC;
                         break;
                 case SDLK_TAB:
-                        if (sdl_event.key.mod & SDL_KMOD_SHIFT)
+                        if (sdl_event.key.keysym.mod & KMOD_SHIFT)
                                 event->key = BASIC_KEY_SHIFT_TAB;
                         else
                                 event->key = BASIC_KEY_TAB;
@@ -225,8 +224,9 @@ tbool basic_poll_event(struct basic_event *event) {
                         break;
                 }
 
-                if (sdl_event.key.key >= 32 && sdl_event.key.key <= 126) {
-                        event->ch = (char)sdl_event.key.key;
+                if (sdl_event.key.keysym.sym >= 32 &&
+                    sdl_event.key.keysym.sym <= 126) {
+                        event->ch = (char)sdl_event.key.keysym.sym;
                 }
                 break;
 

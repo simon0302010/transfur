@@ -1,5 +1,4 @@
-CC = gcc
-# CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
+CC = cc
 CFLAGS = -std=c89 -Wdeclaration-after-statement -Werror=declaration-after-statement -pedantic-errors -include src/platform.h -DTRANSFUR_DEBUG
 LDLIBS = -lm
 
@@ -98,12 +97,12 @@ ifeq ($(ENABLE_THEMES), 1)
 endif
 
 ifeq ($(shell uname -s),Linux)
-	BASIC_SRC += src/gui/basic/wrappers/sdl3.c
-	BASIC_CFLAGS += $(shell pkg-config --cflags sdl3)
-	BASIC_LDLIBS += $(shell pkg-config --libs sdl3)
+	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
+	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2)
+	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
 else
-	BASIC_SRC += src/gui/basic/wrappers/sdl3.c
-	BASIC_LDLIBS += -lSDL3
+	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
+	BASIC_LDLIBS += -lSDL2
 endif
 
 # TUI GUI
