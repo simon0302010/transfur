@@ -64,6 +64,18 @@ EMBED_IMAGE american_progress_bar_background, "assets/american_progress_bar_back
 EMBED_IMAGE american_progress_bar_segment, "assets/american_progress_bar_segment.bmp"
 EMBED_IMAGE american_progress_bar_end, "assets/american_progress_bar_end.bmp"
 EMBED_IMAGE american_icon, "assets/american_icon.bmp"
+EMBED_IMAGE casino_background, "assets/casino_background.bmp"
+EMBED_IMAGE casino_button_disabled, "assets/casino_button_disabled.bmp"
+EMBED_IMAGE casino_button_failure, "assets/casino_button_failure.bmp"
+EMBED_IMAGE casino_button_success, "assets/casino_button_success.bmp"
+EMBED_IMAGE casino_button_primary, "assets/casino_button_primary.bmp"
+EMBED_IMAGE casino_borders_horizontal, "assets/casino_borders_horizontal.bmp"
+EMBED_IMAGE casino_borders_vertical, "assets/casino_borders_vertical.bmp"
+EMBED_IMAGE casino_input, "assets/casino_input.bmp"
+EMBED_IMAGE casino_progress_bar_background, "assets/casino_progress_bar_background.bmp"
+EMBED_IMAGE casino_progress_bar_segment, "assets/casino_progress_bar_segment.bmp"
+EMBED_IMAGE casino_progress_bar_end, "assets/casino_progress_bar_end.bmp"
+EMBED_IMAGE casino_icon, "assets/casino_icon.bmp"
 
 
 #endif

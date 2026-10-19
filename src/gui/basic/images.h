@@ -56,7 +56,19 @@
         X(AMERICAN_PROGRESS_BAR_BACKGROUND, american_progress_bar_background)  \
         X(AMERICAN_PROGRESS_BAR_SEGMENT, american_progress_bar_segment)        \
         X(AMERICAN_PROGRESS_BAR_END, american_progress_bar_end)                \
-        X(AMERICAN_ICON, american_icon)
+        X(AMERICAN_ICON, american_icon)                                        \
+        X(CASINO_BACKGROUND, casino_background)                                \
+        X(CASINO_BUTTON_PRIMARY, casino_button_primary)                        \
+        X(CASINO_BUTTON_DISABLED, casino_button_disabled)                      \
+        X(CASINO_BUTTON_SUCCESS, casino_button_success)                        \
+        X(CASINO_BUTTON_FAILURE, casino_button_failure)                        \
+        X(CASINO_BORDERS_HORIZONTAL, casino_borders_horizontal)                \
+        X(CASINO_BORDERS_VERTICAL, casino_borders_vertical)                    \
+        X(CASINO_INPUT, casino_input)                                          \
+        X(CASINO_PROGRESS_BAR_BACKGROUND, casino_progress_bar_background)      \
+        X(CASINO_PROGRESS_BAR_SEGMENT, casino_progress_bar_segment)            \
+        X(CASINO_PROGRESS_BAR_END, casino_progress_bar_end)                    \
+        X(CASINO_ICON, casino_icon)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;
@@ -72,6 +84,10 @@ void draw_image_tiled(basic_image_id_t id, int x, int y, int w, int h,
                       int tile_w, int tile_h);
 int get_image_width(basic_image_id_t id);
 int get_image_height(basic_image_id_t id);
+
+#else
+
+typedef enum { IMAGE_COUNT } basic_image_id_t;
 
 #endif
 
