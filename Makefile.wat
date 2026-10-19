@@ -34,8 +34,9 @@ SRC = src/main.c \
 	src/gui/tui/raw.c \
 	src/gui/tui/render.c \
 	src/gui/tui/input.c \
-	src/gui/tui/tui.c \
-	src/gui/tui/widgets/loading_bar.c \
+  src/gui/tui/tui.c \
+  src/gui/tui/text.c \
+  src/gui/tui/widgets/loading_bar.c \
 	src/gui/tui/widgets/progress_bar.c \
 	src/gui/tui/widgets/text_input.c \
 	src/gui/tui/widgets/text.c \
