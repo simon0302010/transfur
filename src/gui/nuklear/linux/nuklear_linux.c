@@ -17,6 +17,7 @@
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_IMPLEMENTATION
 #define NK_XLIB_IMPLEMENTATION
+#define NK_INCLUDE_FIXED_TYPES
 #include "../../gui.h"
 #include "nuklear_xlib.h"
 

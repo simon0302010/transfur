@@ -21,6 +21,7 @@
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
 #define NK_SDL_RENDERER_IMPLEMENTATION
+#define NK_INCLUDE_FIXED_TYPES
 #include "../../gui.h"
 #include "nuklear_sdl_renderer.h"
 
