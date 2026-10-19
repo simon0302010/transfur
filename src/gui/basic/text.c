@@ -90,9 +90,6 @@ struct text_metrics draw_text(char *text, int x, int y, int size,
         if (!font_loaded)
                 load_font();
 
-        metrics.width = char_width * size *
-                        strlen(text); /* perhaps we should just count manually
-                                         so we don't iterate this twice */
         metrics.height = char_height * size;
 
         while (text[i] != '\0') {
@@ -154,6 +151,8 @@ struct text_metrics draw_text(char *text, int x, int y, int size,
 
                 i++;
         }
+
+        metrics.width = char_width * size * i;
 
         return metrics;
 }
