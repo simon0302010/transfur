@@ -205,7 +205,7 @@ static relay_sock relay_socket_open(void) {
         return fd;
 }
 
-static int relay_socket_cloe(relay_sock socket) {
+static int relay_socket_close(relay_sock socket) {
         return closesocket(socket) == 0 ? 0 : -1;
 }
 
