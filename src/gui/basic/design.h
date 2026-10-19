@@ -9,7 +9,7 @@
 #define TEXT_SIZE_TITLE 4
 #define TEXT_SIZE_HEADING 3
 #define TEXT_SIZE_REGULAR 2
-#define THEME_SWITCHER_ICON 16
+#define THEME_SWITCHER_ICON 48
 
 /* This should be used across all elements */
 #define BORDER_ROUNDED 0.4
