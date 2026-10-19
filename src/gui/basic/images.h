@@ -41,9 +41,40 @@
         X(GERMAN_PROGRESS_BAR_SEGMENT, german_progress_bar_segment)            \
         X(GERMAN_PROGRESS_BAR_END, german_progress_bar_end)                    \
         X(CLASSIC_ICON, classic_icon)                                          \
+        X(CLASSIC_LIGHT_ICON, classic_light_icon)                              \
         X(COFFEE_ICON, coffee_icon)                                            \
         X(PASTEL_ICON, pastel_icon)                                            \
-        X(GERMAN_ICON, german_icon)
+        X(GERMAN_ICON, german_icon)                                            \
+        X(AMERICAN_BACKGROUND, american_background)                            \
+        X(AMERICAN_BUTTON_PRIMARY, american_button_primary)                    \
+        X(AMERICAN_BUTTON_DISABLED, american_button_disabled)                  \
+        X(AMERICAN_BUTTON_SUCCESS, american_button_success)                    \
+        X(AMERICAN_BUTTON_FAILURE, american_button_failure)                    \
+        X(AMERICAN_BORDERS_HORIZONTAL, american_borders_horizontal)            \
+        X(AMERICAN_BORDERS_VERTICAL, american_borders_vertical)                \
+        X(AMERICAN_INPUT, american_input)                                      \
+        X(AMERICAN_PROGRESS_BAR_BACKGROUND, american_progress_bar_background)  \
+        X(AMERICAN_PROGRESS_BAR_SEGMENT, american_progress_bar_segment)        \
+        X(AMERICAN_PROGRESS_BAR_END, american_progress_bar_end)                \
+        X(AMERICAN_ICON, american_icon)                                        \
+        X(CASINO_BACKGROUND, casino_background)                                \
+        X(CASINO_BUTTON_PRIMARY, casino_button_primary)                        \
+        X(CASINO_BUTTON_DISABLED, casino_button_disabled)                      \
+        X(CASINO_BUTTON_SUCCESS, casino_button_success)                        \
+        X(CASINO_BUTTON_FAILURE, casino_button_failure)                        \
+        X(CASINO_BORDERS_HORIZONTAL, casino_borders_horizontal)                \
+        X(CASINO_BORDERS_VERTICAL, casino_borders_vertical)                    \
+        X(CASINO_INPUT, casino_input)                                          \
+        X(CASINO_PROGRESS_BAR_BACKGROUND, casino_progress_bar_background)      \
+        X(CASINO_PROGRESS_BAR_SEGMENT, casino_progress_bar_segment)            \
+        X(CASINO_PROGRESS_BAR_END, casino_progress_bar_end)                    \
+        X(CASINO_ICON, casino_icon)                                            \
+        X(CATPPUCCIN_FRAPPE_ICON, catppuccin_frappe_icon)                      \
+        X(CATPPUCCIN_LATTE_ICON, catppuccin_latte_icon)                        \
+        X(CATPPUCCIN_MACCHIATO_ICON, catppuccin_macchiato_icon)                \
+        X(CATPPUCCIN_MOCHA_ICON, catppuccin_mocha_icon)                        \
+        X(GRUVBOX_DARK_ICON, gruvbox_dark_icon)                                \
+        X(GRUVBOX_LIGHT_ICON, gruvbox_light_icon)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;
@@ -59,6 +90,10 @@ void draw_image_tiled(basic_image_id_t id, int x, int y, int w, int h,
                       int tile_w, int tile_h);
 int get_image_width(basic_image_id_t id);
 int get_image_height(basic_image_id_t id);
+
+#else
+
+typedef enum { IMAGE_COUNT } basic_image_id_t;
 
 #endif
 

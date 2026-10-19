@@ -6,13 +6,10 @@
 #include "theme.h"
 #include <math.h>
 
-#define THEME_SWITCHER_SWITCH_TIME 0.4 /* animation between themes */
-#define THEME_SWITCHER_HOLD_TIME 1.5   /* how long to wait after no updates */
+#define THEME_SWITCHER_SWITCH_TIME 0.2 /* animation between themes */
+#define THEME_SWITCHER_HOLD_TIME 1     /* how long to wait after no updates */
 #define THEME_SWITCHER_FADE_TIME                                               \
         0.4 /* how long to fade after hold time is up */
-
-#define BASIC_MARGIN 8  /* stolen from render.c */
-#define BASIC_SPACING 4 /* also stolen from render.c */
 
 static double switcher_timer = 0.0;
 static float switcher_alpha = 0.0f;
@@ -98,9 +95,9 @@ void theme_switcher_render(int width, int height) {
         scale = 1.0f - (float)fabs(distance_from_center) / (float)(w / 2);
         icon_w = (int)(icon_w * scale);
         icon_h = (int)(icon_h * scale);
-        /* center the icon based on new size */
+        /* bottom center the icon based on new size */
         icon_x += (THEME_SWITCHER_ICON - icon_w) / 2;
-        icon_y += (THEME_SWITCHER_ICON - icon_h) / 2;
+        icon_y += (THEME_SWITCHER_ICON - icon_h);
 
         draw_image_scaled_cropped(prev_theme_icon, icon_x, icon_y, icon_w,
                                   icon_h, x + BORDER_WIDTH, y + BORDER_WIDTH,
@@ -130,9 +127,9 @@ void theme_switcher_render(int width, int height) {
         scale = 1.0f - (float)fabs(distance_from_center) / (float)(w / 2);
         icon_w = (int)(icon_w * scale);
         icon_h = (int)(icon_h * scale);
-        /* center the icon based on new size */
+        /* bottom center the icon based on new size */
         icon_x += (THEME_SWITCHER_ICON - icon_w) / 2;
-        icon_y += (THEME_SWITCHER_ICON - icon_h) / 2;
+        icon_y += (THEME_SWITCHER_ICON - icon_h);
 
         draw_image_scaled_cropped(next_theme_icon, icon_x, icon_y, icon_w,
                                   icon_h, x + BORDER_WIDTH, y + BORDER_WIDTH,

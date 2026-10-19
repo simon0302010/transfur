@@ -38,7 +38,15 @@ struct basic_theme_desc {
         X(CLASSIC_LIGHT, THEME_COLOR, arg)                                     \
         X(COFFEE, THEME_IMAGE, arg)                                            \
         X(PASTEL, THEME_IMAGE, arg)                                            \
-        X(GERMAN, THEME_IMAGE, arg)
+        X(GERMAN, THEME_IMAGE, arg)                                            \
+        X(AMERICAN, THEME_IMAGE, arg)                                          \
+        X(CASINO, THEME_IMAGE, arg)                                            \
+        X(CATPPUCCIN_FRAPPE, THEME_COLOR, arg)                                 \
+        X(CATPPUCCIN_LATTE, THEME_COLOR, arg)                                  \
+        X(CATPPUCCIN_MACCHIATO, THEME_COLOR, arg)                              \
+        X(CATPPUCCIN_MOCHA, THEME_COLOR, arg)                                  \
+        X(GRUVBOX_DARK, THEME_COLOR, arg)                                      \
+        X(GRUVBOX_LIGHT, THEME_COLOR, arg)
 
 #define X_THEME_ENUM(name, type, arg) THEME_##name,
 typedef enum { THEME_LIST(X_THEME_ENUM, 0) THEME_END } basic_theme_t;

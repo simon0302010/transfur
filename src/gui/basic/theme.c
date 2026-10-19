@@ -1,4 +1,5 @@
 #include "theme.h"
+#include "design.h"
 
 #ifdef ENABLE_THEMES
 
@@ -12,17 +13,47 @@ static const struct basic_theme_palette palette_classic_light = {
     {0, 120, 220},   {40, 180, 40},   {220, 40, 40},
     {180, 180, 180}, {100, 100, 100}, {0, 120, 255}};
 
-static const struct basic_theme_palette palette_pastel = {
+static const struct basic_theme_palette palette_classic_inverted = {
     {0, 0, 0},     {20, 20, 20}, {0, 0, 0},       {0, 100, 200}, {50, 200, 50},
     {200, 50, 50}, {50, 50, 50}, {200, 200, 200}, {200, 255, 0}};
+
+static const struct basic_theme_palette palette_catppuccin_frappe = {
+    {65, 69, 89},    {198, 208, 245}, {35, 38, 52},
+    {133, 193, 220}, {166, 209, 137}, {231, 130, 132},
+    {41, 44, 60},    {48, 52, 70},    {229, 200, 144}};
+
+static const struct basic_theme_palette palette_catppuccin_latte = {
+    {204, 208, 218}, {76, 79, 105},   {220, 224, 232},
+    {32, 159, 181},  {64, 160, 43},   {210, 15, 57},
+    {230, 223, 239}, {239, 241, 245}, {223, 142, 29}};
+
+static const struct basic_theme_palette palette_catppuccin_macchiato = {
+    {54, 58, 79},    {202, 211, 245}, {24, 25, 38},
+    {125, 196, 228}, {166, 218, 149}, {237, 135, 150},
+    {30, 32, 48},    {36, 39, 58},    {238, 212, 159}};
+
+static const struct basic_theme_palette palette_catppuccin_mocha = {
+    {49, 50, 68},    {205, 214, 244}, {17, 17, 27},
+    {116, 199, 236}, {166, 227, 161}, {243, 139, 168},
+    {24, 24, 37},    {30, 30, 46},    {249, 226, 175}};
+
+static const struct basic_theme_palette palette_gruvbox_dark = {
+    {40, 40, 40},    {235, 219, 178}, {40, 40, 40},
+    {69, 133, 136},  {152, 151, 26},  {204, 36, 29},
+    {168, 153, 132}, {146, 131, 116}, {250, 189, 47}};
+
+static const struct basic_theme_palette palette_gruvbox_light = {
+    {251, 241, 199}, {60, 56, 54},    {251, 241, 199},
+    {69, 133, 136},  {152, 151, 26},  {204, 36, 29},
+    {168, 153, 132}, {146, 131, 116}, {250, 189, 47}};
 
 static const struct basic_theme_desc desc_CLASSIC = {
     THEME_COLOR, THEME_BG_SOLID_COLOR, 0,
     0,           IMAGE_CLASSIC_ICON,   palette_classic};
 
 static const struct basic_theme_desc desc_CLASSIC_LIGHT = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 0,
-    0,           IMAGE_CLASSIC_ICON,   palette_classic_light};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,     0,
+    0,           IMAGE_CLASSIC_LIGHT_ICON, palette_classic_light};
 
 static const struct basic_theme_desc desc_COFFEE = {
     THEME_IMAGE, THEME_BG_IMAGE_TILED, 32,
@@ -30,11 +61,47 @@ static const struct basic_theme_desc desc_COFFEE = {
 
 static const struct basic_theme_desc desc_PASTEL = {
     THEME_IMAGE, THEME_BG_IMAGE_TILED, 32,
-    32,          IMAGE_PASTEL_ICON,    palette_pastel};
+    32,          IMAGE_PASTEL_ICON,    palette_classic_inverted};
 
 static const struct basic_theme_desc desc_GERMAN = {
     THEME_IMAGE, THEME_BG_IMAGE_SCALED, 32,
     32,          IMAGE_GERMAN_ICON,     palette_classic};
+
+static const struct basic_theme_desc desc_AMERICAN = {
+    THEME_IMAGE, THEME_BG_IMAGE_TILED, 256,
+    135,         IMAGE_AMERICAN_ICON,  palette_classic_inverted};
+
+static const struct basic_theme_desc desc_CASINO = {
+    THEME_IMAGE, THEME_BG_IMAGE_TILED, 32,
+    32,          IMAGE_CASINO_ICON,    palette_classic};
+
+static const struct basic_theme_desc desc_CATPPUCCIN_FRAPPE = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR,         32,
+    32,          IMAGE_CATPPUCCIN_FRAPPE_ICON, palette_catppuccin_frappe};
+
+static const struct basic_theme_desc desc_CATPPUCCIN_MACCHIATO = {
+    THEME_COLOR,
+    THEME_BG_SOLID_COLOR,
+    32,
+    32,
+    IMAGE_CATPPUCCIN_MACCHIATO_ICON,
+    palette_catppuccin_macchiato};
+
+static const struct basic_theme_desc desc_CATPPUCCIN_MOCHA = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR,        32,
+    32,          IMAGE_CATPPUCCIN_MOCHA_ICON, palette_catppuccin_mocha};
+
+static const struct basic_theme_desc desc_CATPPUCCIN_LATTE = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR,        32,
+    32,          IMAGE_CATPPUCCIN_LATTE_ICON, palette_catppuccin_latte};
+
+static const struct basic_theme_desc desc_GRUVBOX_DARK = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR,    32,
+    32,          IMAGE_GRUVBOX_DARK_ICON, palette_gruvbox_dark};
+
+static const struct basic_theme_desc desc_GRUVBOX_LIGHT = {
+    THEME_COLOR, THEME_BG_SOLID_COLOR,     32,
+    32,          IMAGE_GRUVBOX_LIGHT_ICON, palette_gruvbox_light};
 
 static basic_theme_t theme = THEME_CLASSIC;
 

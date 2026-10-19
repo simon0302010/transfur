@@ -10,9 +10,6 @@
 #include "widgets/text.h"
 #include "widgets/text_input.h"
 
-#define BASIC_MARGIN 8
-#define BASIC_SPACING 4
-
 static int hitbox_count = 0;
 
 void basic_render(struct ui_context *ctx) {
@@ -26,7 +23,7 @@ void basic_render(struct ui_context *ctx) {
         switch (desc->bg_mode) {
         case THEME_BG_SOLID_COLOR:
         default:
-                basic_clear(desc->palette.page_color);
+                basic_clear(page_background);
                 break;
 #ifdef ENABLE_THEMES
         case THEME_BG_IMAGE_TILED:
