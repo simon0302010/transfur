@@ -6062,15 +6062,15 @@ struct nk_context {
  *                          ALIGNMENT
  * =============================================================== */
 /* Pointer to Integer type conversion for pointer alignment */
-#if defined(__PTRDIFF_TYPE__) /* This case should work for GCC*/
+#if defined(NK_USE_FIXED_TYPES) /* used if we have <stdint.h> */
+# define NK_UINT_TO_PTR(x) ((void*)(uintptr_t)(x))
+# define NK_PTR_TO_UINT(x) ((uintptr_t)(x))
+#elif defined(__PTRDIFF_TYPE__) /* This case should work for GCC*/
 # define NK_UINT_TO_PTR(x) ((void*)(__PTRDIFF_TYPE__)(x))
 # define NK_PTR_TO_UINT(x) ((nk_size)(__PTRDIFF_TYPE__)(x))
 #elif !defined(__GNUC__) /* works for compilers other than LLVM */
 # define NK_UINT_TO_PTR(x) ((void*)&((char*)0)[x])
 # define NK_PTR_TO_UINT(x) ((nk_size)(((char*)x)-(char*)0))
-#elif defined(NK_USE_FIXED_TYPES) /* used if we have <stdint.h> */
-# define NK_UINT_TO_PTR(x) ((void*)(uintptr_t)(x))
-# define NK_PTR_TO_UINT(x) ((uintptr_t)(x))
 #else /* generates warning but works */
 # define NK_UINT_TO_PTR(x) ((void*)(x))
 # define NK_PTR_TO_UINT(x) ((nk_size)(x))
