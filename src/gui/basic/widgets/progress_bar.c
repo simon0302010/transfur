@@ -6,7 +6,6 @@
 #include "../wrappers/basic_wrapper.h"
 #include <malloc.h>
 #include <stdio.h>
-#include <string.h>
 
 #define BAR_HEIGHT 8
 

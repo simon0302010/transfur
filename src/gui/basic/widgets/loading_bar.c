@@ -4,7 +4,6 @@
 #include "../text.h"
 #include "../wrappers/basic_wrapper.h"
 #include "loading_bar.h"
-#include <string.h>
 
 #define LOADING_SEGMENT_SIZE 8
 #define LOADING_CIRCLE_RADIUS 12
