@@ -7,7 +7,7 @@
 
 #if defined(USE_TUI)
 #include "gui/tui/tui.h"
-#elif defined(USE_BASIS_GUI)
+#elif defined(USE_BASIC_GUI)
 #include "gui/basic/basic.h"
 #else
 #include "gui/gui.h"
