@@ -1,7 +1,17 @@
-#include "gui/gui.h"
-#include "relay/relay.h"
 #include <stdio.h>
 #include <string.h>
+
+#if defined(OS_WINDOWS) || defined(OS_LINUX)
+#include "relay/relay.h"
+#endif
+
+#if defined(USE_TUI)
+#include "gui/tui/tui.h"
+#elif defined(USE_BASIS_GUI)
+#include "gui/basic/basic.h"
+#else
+#include "gui/gui.h"
+#endif
 
 int main(int argc, char **argv) {
         if (argc == 3 && strcmp(argv[1], "--relay") == 0) {
@@ -14,7 +24,7 @@ int main(int argc, char **argv) {
         }
         /* All app logic should now be written in `gui/app/` */
 
-#ifdef USE_TUI
+#if defined(USE_TUI)
         if (run_tui("Transfur") != 0)
                 perror("run_tui");
 #elif defined(USE_BASIC_GUI)
