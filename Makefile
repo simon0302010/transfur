@@ -107,6 +107,10 @@ ifeq ($(shell uname -s),Linux)
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
 	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2)
 	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
+else ifeq ($(shell uname -s),Darwin)
+	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
+	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2)
+	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
 else
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
 	BASIC_LDLIBS += -lSDL2
