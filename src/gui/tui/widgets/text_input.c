@@ -1,8 +1,7 @@
 #include "../../core/widgets/text_input.h"
-#include "../ansi.h"
 #include "../text.h"
 #include "loading_bar.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 char **tui_render_text_input_widget(struct widget widget, int width) {

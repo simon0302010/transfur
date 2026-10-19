@@ -1,8 +1,7 @@
 #include "loading_bar.h"
 #include "../../core/widgets/loading_bar.h"
-#include "../ansi.h"
-#include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 char **tui_render_loading_bar_widget(struct widget widget, int width) {

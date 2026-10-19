@@ -1,9 +1,8 @@
 #include "progress_bar.h"
 #include "../../core/widgets/progress_bar.h"
-#include "../ansi.h"
-#include <malloc.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 char **tui_render_progress_bar_widget(struct widget widget, int width) {

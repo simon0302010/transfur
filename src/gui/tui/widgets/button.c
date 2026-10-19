@@ -1,9 +1,8 @@
 #include "../../core/widgets/button.h"
 #include "../text.h"
 #include "button.h"
-#include <malloc.h>
 #include <stddef.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 char **tui_render_button_widget(struct widget widget, int width) {

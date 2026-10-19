@@ -7,9 +7,9 @@
 #include "widgets/split.h"
 #include "widgets/text.h"
 #include "widgets/text_input.h"
-#include <malloc.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void tui_render(struct ui_context *ctx) {
         int i, width;

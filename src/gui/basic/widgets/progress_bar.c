@@ -4,7 +4,6 @@
 #include "../images.h"
 #include "../theme.h"
 #include "../wrappers/basic_wrapper.h"
-#include <malloc.h>
 #include <stdio.h>
 
 #define BAR_HEIGHT 8

@@ -1,6 +1,6 @@
 #include "text.h"
-#include <malloc.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 char **wrap_text(char *text, size_t max_width) {
@@ -16,7 +16,8 @@ char **wrap_text(char *text, size_t max_width) {
                 max_width = 1;
         }
 
-        lines = (strlen(text) + max_width - 1) / max_width + 1; /* +1 for NULL */
+        lines =
+            (strlen(text) + max_width - 1) / max_width + 1; /* +1 for NULL */
         output = malloc(lines * sizeof(char *));
         line = malloc(max_width + 1);
 
