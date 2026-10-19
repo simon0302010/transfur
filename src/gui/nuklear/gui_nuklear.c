@@ -8,6 +8,10 @@ Needs to implement all functions defined in `gui.h`
 #include <string.h>
 
 #include "../../interfaces/file/browser.h"
+#ifdef interface
+#undef interface /* Compilation fails otherwise */
+#endif
+
 #include "../../interfaces/interfaces.h"
 #include "../../interfaces/lan/discover.h"
 #include "../../interfaces/lan/lan.h"
@@ -25,11 +29,6 @@ Needs to implement all functions defined in `gui.h`
 #elif defined(OS_WINDOWS)
 #include "windows/nuklear_windows.h"
 #include <windows.h>
-
-#ifdef interface
-#undef interface
-#endif
-
 #elif defined(OS_MACOS)
 #include "../../interfaces/file/browser.h"
 #include "macos/nuklear_macos.h"

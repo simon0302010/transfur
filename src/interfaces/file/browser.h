@@ -10,8 +10,12 @@
 #define PATH_MAX 128
 #elif defined(OS_WINDOWS)
 #include <windows.h>
+#ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
+#endif
+#ifndef NAME_MAX
 #define NAME_MAX 255
+#endif
 #else /* This should cover POSIX */
 #include <limits.h>
 #ifndef PATH_MAX /* PATH_MAX may not exist */

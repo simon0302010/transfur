@@ -7,15 +7,22 @@
 #endif
 .align 4
 
-/* any BMP */
+#ifdef __APPLE__
+#define ASM_PREFIX _
+#else
+#define ASM_PREFIX
+#endif
+
 .macro EMBED_IMAGE name, file
-.global \name\()_bmp_data
-.global \name\()_bmp_size
-\name\()_bmp_data:
+.global ASM_PREFIX\name\()_bmp_data
+.global ASM_PREFIX\name\()_bmp_size
+
+ASM_PREFIX\name\()_bmp_data:
     .incbin "\file"
-\name\()_bmp_end:
-\name\()_bmp_size:
-    .long \name\()_bmp_end - \name\()_bmp_data
+ASM_PREFIX\name\()_bmp_end:
+
+ASM_PREFIX\name\()_bmp_size:
+    .long ASM_PREFIX\name\()_bmp_end - ASM_PREFIX\name\()_bmp_data
 .endm
 
 EMBED_IMAGE coffee_background, "assets/coffee_background.bmp"
