@@ -76,6 +76,12 @@ EMBED_IMAGE casino_progress_bar_background, "assets/casino_progress_bar_backgrou
 EMBED_IMAGE casino_progress_bar_segment, "assets/casino_progress_bar_segment.bmp"
 EMBED_IMAGE casino_progress_bar_end, "assets/casino_progress_bar_end.bmp"
 EMBED_IMAGE casino_icon, "assets/casino_icon.bmp"
+EMBED_IMAGE catppuccin_frappe_icon, "assets/catppuccin_frappe_icon.bmp"
+EMBED_IMAGE catppuccin_latte_icon, "assets/catppuccin_latte_icon.bmp"
+EMBED_IMAGE catppuccin_macchiato_icon, "assets/catppuccin_macchiato_icon.bmp"
+EMBED_IMAGE catppuccin_mocha_icon, "assets/catppuccin_mocha_icon.bmp"
+EMBED_IMAGE gruvbox_dark_icon, "assets/gruvbox_dark_icon.bmp"
+EMBED_IMAGE gruvbox_light_icon, "assets/gruvbox_light_icon.bmp"
 
 
 #endif

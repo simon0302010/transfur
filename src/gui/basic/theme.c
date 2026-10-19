@@ -76,28 +76,32 @@ static const struct basic_theme_desc desc_CASINO = {
     32,          IMAGE_CASINO_ICON,    palette_classic};
 
 static const struct basic_theme_desc desc_CATPPUCCIN_FRAPPE = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_catppuccin_frappe};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,         32,
+    32,          IMAGE_CATPPUCCIN_FRAPPE_ICON, palette_catppuccin_frappe};
 
 static const struct basic_theme_desc desc_CATPPUCCIN_MACCHIATO = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_catppuccin_macchiato};
+    THEME_COLOR,
+    THEME_BG_SOLID_COLOR,
+    32,
+    32,
+    IMAGE_CATPPUCCIN_MACCHIATO_ICON,
+    palette_catppuccin_macchiato};
 
 static const struct basic_theme_desc desc_CATPPUCCIN_MOCHA = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_catppuccin_mocha};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,        32,
+    32,          IMAGE_CATPPUCCIN_MOCHA_ICON, palette_catppuccin_mocha};
 
 static const struct basic_theme_desc desc_CATPPUCCIN_LATTE = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_catppuccin_latte};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,        32,
+    32,          IMAGE_CATPPUCCIN_LATTE_ICON, palette_catppuccin_latte};
 
 static const struct basic_theme_desc desc_GRUVBOX_DARK = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_gruvbox_dark};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,    32,
+    32,          IMAGE_GRUVBOX_DARK_ICON, palette_gruvbox_dark};
 
 static const struct basic_theme_desc desc_GRUVBOX_LIGHT = {
-    THEME_COLOR, THEME_BG_SOLID_COLOR, 32,
-    32,          IMAGE_CLASSIC_ICON,   palette_gruvbox_light};
+    THEME_COLOR, THEME_BG_SOLID_COLOR,     32,
+    32,          IMAGE_GRUVBOX_LIGHT_ICON, palette_gruvbox_light};
 
 static basic_theme_t theme = THEME_CLASSIC;
 

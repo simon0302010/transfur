@@ -68,7 +68,13 @@
         X(CASINO_PROGRESS_BAR_BACKGROUND, casino_progress_bar_background)      \
         X(CASINO_PROGRESS_BAR_SEGMENT, casino_progress_bar_segment)            \
         X(CASINO_PROGRESS_BAR_END, casino_progress_bar_end)                    \
-        X(CASINO_ICON, casino_icon)
+        X(CASINO_ICON, casino_icon)                                            \
+        X(CATPPUCCIN_FRAPPE_ICON, catppuccin_frappe_icon)                      \
+        X(CATPPUCCIN_LATTE_ICON, catppuccin_latte_icon)                        \
+        X(CATPPUCCIN_MACCHIATO_ICON, catppuccin_macchiato_icon)                \
+        X(CATPPUCCIN_MOCHA_ICON, catppuccin_mocha_icon)                        \
+        X(GRUVBOX_DARK_ICON, gruvbox_dark_icon)                                \
+        X(GRUVBOX_LIGHT_ICON, gruvbox_light_icon)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;
