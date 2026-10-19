@@ -1,6 +1,10 @@
 #ifdef ENABLE_THEMES
 
+#if defined(__APPLE__)
+.section __TEXT,__const
+#else
 .section .rodata
+#endif
 .align 4
 
 /* any BMP */

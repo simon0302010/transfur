@@ -1,4 +1,8 @@
+#if defined(__APPLE__)
+.section __TEXT,__const
+#else
 .section .rodata
+#endif
 .global font_bmp_data
 .global font_bmp_size
 .align 4
