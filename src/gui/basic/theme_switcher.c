@@ -95,9 +95,9 @@ void theme_switcher_render(int width, int height) {
         scale = 1.0f - (float)fabs(distance_from_center) / (float)(w / 2);
         icon_w = (int)(icon_w * scale);
         icon_h = (int)(icon_h * scale);
-        /* center the icon based on new size */
+        /* bottom center the icon based on new size */
         icon_x += (THEME_SWITCHER_ICON - icon_w) / 2;
-        icon_y += (THEME_SWITCHER_ICON - icon_h) / 2;
+        icon_y += (THEME_SWITCHER_ICON - icon_h);
 
         draw_image_scaled_cropped(prev_theme_icon, icon_x, icon_y, icon_w,
                                   icon_h, x + BORDER_WIDTH, y + BORDER_WIDTH,
@@ -127,9 +127,9 @@ void theme_switcher_render(int width, int height) {
         scale = 1.0f - (float)fabs(distance_from_center) / (float)(w / 2);
         icon_w = (int)(icon_w * scale);
         icon_h = (int)(icon_h * scale);
-        /* center the icon based on new size */
+        /* bottom center the icon based on new size */
         icon_x += (THEME_SWITCHER_ICON - icon_w) / 2;
-        icon_y += (THEME_SWITCHER_ICON - icon_h) / 2;
+        icon_y += (THEME_SWITCHER_ICON - icon_h);
 
         draw_image_scaled_cropped(next_theme_icon, icon_x, icon_y, icon_w,
                                   icon_h, x + BORDER_WIDTH, y + BORDER_WIDTH,
