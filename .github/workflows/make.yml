@@ -20,9 +20,18 @@ jobs:
 
                         - name: Install dependencies (Windows)
                           if: runner.os == 'Windows'
+                          id: sdl
                           uses: libsdl-org/setup-sdl@main
                           with:
                                   version: 2-latest
+
+                        - name: Configure SDL2 paths (Windows)
+                          if: runner.os == 'Windows'
+                          shell: bash
+                          run: |
+                                  echo "CPATH=${{ steps.sdl.outputs.prefix }}/include" >> "$GITHUB_ENV"
+                                  echo "LIBRARY_PATH=${{ steps.sdl.outputs.prefix }}/lib" >> "$GITHUB_ENV"
+                                  echo "${{ steps.sdl.outputs.prefix }}/bin" >> "$GITHUB_PATH"
 
                         - name: Install dependencies (Linux)
                           if: runner.os == 'Linux'
@@ -32,8 +41,9 @@ jobs:
                           if: runner.os == 'macOS'
                           run: brew install sdl2
 
-                        - name: make
+                        - name: Build
                           run: make
+
         msdos:
                 runs-on: ubuntu-latest
 
@@ -49,7 +59,7 @@ jobs:
                                   sudo mkdir -p /opt/watcom
                                   sudo tar -xf /tmp/openwatcom.tar.xz -C /opt/watcom
 
-                        - name: make
+                        - name: Build
                           run: |
                                   export WATCOM=/opt/watcom
                                   export PATH="$WATCOM/binl64:$WATCOM/binl:$PATH"
