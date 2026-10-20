@@ -34,3 +34,23 @@ jobs:
 
                         - name: make
                           run: make
+        msdos:
+                runs-on: ubuntu-latest
+
+                steps:
+                        - uses: actions/checkout@v4
+
+                        - name: Install dependencies
+                          run: sudo apt-get update && sudo apt-get install -y build-essential
+
+                        - name: Install Open Watcom
+                          run: |
+                                  wget -q https://github.com/open-watcom/open-watcom-v2/releases/download/Last-CI-build/ow-snapshot.tar.xz -O /tmp/openwatcom.tar.xz
+                                  sudo mkdir -p /opt/watcom
+                                  sudo tar -xf /tmp/openwatcom.tar.xz -C /opt/watcom
+
+                        - name: make
+                          env:
+                                  WATCOM: /opt/watcom
+                                  PATH: /opt/openwatcom/binl64:/opt/openwatcom/binl:$PATH
+                          run: make -f Makefile.wat
