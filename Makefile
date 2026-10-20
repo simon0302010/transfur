@@ -12,7 +12,7 @@ LDLIBS = -lm
 ifeq ($(OS),Windows_NT)
 	OS_NAME := windows
 	EXE := .exe
-	LDLIBS += -lws2_32
+	LDLIBS += -lws2_32 -lwininet
 	COMMON_SRC_EXTRA = src/relay/relay.c
 else
 	OS_NAME := $(shell uname -s | tr '[:upper:]' '[:lower:]')
