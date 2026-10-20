@@ -1,12 +1,13 @@
-#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
+#include <signal.h>
 #include <termios.h>
 #include <unistd.h>
 #elif defined(OS_MSDOS) && defined(__WATCOMC__)
 #include <graph.h>
-#elif defined(OS_MSDOS) || defined(OS_WINDOWS)
+#elif defined(OS_MSDOS)
 #include <conio.h>
 #endif
 
@@ -23,14 +24,17 @@ void disable_raw_mode(void) {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
 #elif defined(OS_MSDOS) && defined(__WATCOMC__)
         _clearscreen(_GCLEARSCREEN);
-#elif defined(OS_MSDOS) || defined(OS_WINDOWS)
+#elif defined(OS_MSDOS)
         clrscr();
+#elif defined(OS_WINDOWS)
+        printf("\x1b[2J\x1b[H\x1b[?25h");
+        fflush(stdout);
 #endif
 }
 
 static void sigint_handler(int sig) {
         disable_raw_mode();
-        _exit(128 + sig);
+        exit(128 + sig);
 }
 
 void enable_raw_mode(void) {
@@ -50,18 +54,26 @@ void enable_raw_mode(void) {
         signal(SIGINT, sigint_handler);
 #elif defined(OS_MSDOS) && defined(__WATCOMC__)
         _clearscreen(_GCLEARSCREEN);
-#elif defined(OS_MSDOS) || defined(OS_WINDOWS)
+#elif defined(OS_MSDOS)
         clrscr();
+#elif defined(OS_WINDOWS)
+        printf("\x1b[2J\x1b[H\x1b[?25l");
+        fflush(stdout);
 #endif
 }
 
-/* use `fflush(stdout)` after running on posix systems */
+/* use `fflush(stdout)` after running */
 void reset_cursor(void) {
 #if !defined(OS_WINDOWS) && !defined(OS_MSDOS)
         printf("\x1b[H");
 #elif defined(OS_MSDOS) && defined(__WATCOMC__)
-        _settextposition(0, 0);
-#elif defined(OS_MSDOS) || defined(OS_WINDOWS)
+        /*
+        https://open-watcom.github.io/open-watcom-v2-wikidocs/clib.html#_settextposition
+        */
+        _settextposition(1, 1);
+#elif defined(OS_MSDOS)
         gotoxy(0, 0);
+#elif defined(OS_WINDOWS)
+        printf("\x1b[H");
 #endif
 }
