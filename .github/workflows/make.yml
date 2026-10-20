@@ -18,6 +18,12 @@ jobs:
                 steps:
                         - uses: actions/checkout@v4
 
+                        - name: Install dependencies (Windows)
+                          if: runner.os == 'Windows'
+                          uses: libsdl-org/setup-sdl@main
+                          with:
+                                  version: 2-latest
+
                         - name: Install dependencies (Linux)
                           if: runner.os == 'Linux'
                           run: sudo apt-get update && sudo apt-get install -y libbluetooth-dev libx11-dev build-essential libsdl2-dev

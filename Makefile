@@ -65,7 +65,7 @@ NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c src/interfaces/file/br
 
 ifeq ($(OS),Windows_NT)
 	NUKLEAR_SRC += src/gui/nuklear/windows/nuklear_windows.c
-	NUKLEAR_LDLIBS += -lmingw32 -lSDL2main -lSDL2
+	NUKLEAR_LDLIBS += -ld3d9
 else ifeq ($(shell uname -s),Linux)
 	NUKLEAR_SRC += src/gui/nuklear/linux/nuklear_linux.c
 	NUKLEAR_LDLIBS += -lX11
@@ -113,7 +113,7 @@ else ifeq ($(shell uname -s),Darwin)
 	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
 else
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
-	BASIC_LDLIBS += -lSDL2
+	BASIC_LDLIBS += -lSDL2main -lSDL2
 endif
 
 # TUI GUI
