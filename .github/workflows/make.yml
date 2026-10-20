@@ -50,7 +50,7 @@ jobs:
                                   sudo tar -xf /tmp/openwatcom.tar.xz -C /opt/watcom
 
                         - name: make
-                          env:
-                                  WATCOM: /opt/watcom
-                                  PATH: /opt/openwatcom/binl64:/opt/openwatcom/binl:$PATH
-                          run: make -f Makefile.wat
+                          run: |
+                                  export WATCOM=/opt/watcom
+                                  export PATH="$WATCOM/binl64:$WATCOM/binl:$PATH"
+                                  make -f Makefile.wat
