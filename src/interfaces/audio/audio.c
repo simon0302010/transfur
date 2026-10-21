@@ -2,57 +2,59 @@
 
 #if defined(OS_LINUX) /* Supported systems */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../../misc/be32.h"
+#include "../../misc/bool.h"
+
 #if defined(OS_LINUX)
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/soundcard.h>
-#include <unistd.h>
+#include <SDL2/SDL.h> /* SDL2 was chosen because alsa doesn't work with C89 (I think) */
 #endif
 
-#define DEFAULT_SAMPLE_RATE 48000;
+#define FREQUENCY 48000
+#define BUFFER_LENGTH 30 /* 1/30s */
+#define BUFFER_SAMPLES (FREQUENCY / BUFFER_LENGTH)
 
-static int open_audio_device(int *fd, const char *name, int mode,
-                             int *sample_rate) {
-        int tmp;
+static tbool busy;
 
-        if ((*fd = open(name, mode, 0)) == -1) {
-                perror(name);
-                return AUDIO_ERR_NOT_FOUND;
+/* SDL only seems to expose one audio interface.
+Opening it multiple times wouldn't make any sense. */
+static SDL_AudioDeviceID dev;
+static SDL_AudioSpec spec;
+static Sint16 buffer[FREQUENCY / BUFFER_LENGTH];
+static tbool inited;
+
+static Sint16 format(double sample, double *amplitude) {
+        return (Sint16)(sample * 32567 * *amplitude);
+}
+
+static double tone(double *hz, unsigned long *time) {
+        return sin(*time * *hz * M_PI * 2 / FREQUENCY);
+}
+
+static double saw(double *hz, unsigned long *time) {
+        return fmod(*time * *hz / FREQUENCY, 1) * 2 - 1;
+}
+
+static double square(double *hz, unsigned long *time) {
+        double sine = tone(hz, time);
+        return sine > 0.0 ? 1.0 : -1.0;
+}
+
+static int play_tone(SDL_AudioDeviceID *dev, Sint16 *buffer, double hz,
+                     double amplitude) {
+        unsigned long i;
+
+        for (i = 0; i < BUFFER_SAMPLES; i++) {
+                buffer[i] = format(tone(&hz, &i), &amplitude);
         }
 
-        tmp = AFMT_S16_NE; /* Native 16 bits */
-        if (ioctl(*fd, SNDCTL_DSP_SETFMT, &tmp) == -1) {
-                perror("SNDCTL_DSP_SETFMT");
-                return AUDIO_ERR_UNSUPPORTED;
-        }
-
-        if (tmp != AFMT_S16_NE) {
-                fprintf(stderr, "The audio device doesn't support the 16 bit "
-                                "sample format.\n");
-                return AUDIO_ERR_UNSUPPORTED;
-        }
-
-        tmp = 1;
-        if (ioctl(*fd, SNDCTL_DSP_CHANNELS, &tmp) == -1) {
-                perror("SNDCTL_DSP_CHANNELS");
-                return AUDIO_ERR_UNSUPPORTED;
-        }
-
-        if (tmp != 1) {
-                fprintf(stderr,
-                        "The audio device doesn't support mono mode.\n");
-                return AUDIO_ERR_UNSUPPORTED;
-        }
-
-        if (sample_rate == NULL)
-                *sample_rate = DEFAULT_SAMPLE_RATE;
-
-        if (ioctl(*fd, SNDCTL_DSP_SPEED, &sample_rate) == -1) {
-                perror("SNDCTL_DSP_SPEED");
-                return AUDIO_ERR_UNSUPPORTED;
+        if (SDL_QueueAudio(*dev, buffer, BUFFER_SAMPLES * sizeof(buffer[0])) <
+            0) {
+                fprintf(stderr, "failed to queue audio: %s\n", SDL_GetError());
+                return AUDIO_ERR_QUEUE;
         }
 
         return AUDIO_OK;
@@ -61,53 +63,77 @@ static int open_audio_device(int *fd, const char *name, int mode,
 int init_conn_audio(void *conn, const char *options) {
         struct audio_state *state = (struct audio_state *)conn;
 
-        if (state->inited == true)
-                return AUDIO_ERR_STATE;
+        if (inited == true)
+                return AUDIO_ERR_BUSY;
 
-        state->sample_rate = DEFAULT_SAMPLE_RATE;
-        open_audio_device(&state->fd_out, options, O_WRONLY,
-                          &state->sample_rate);
+        spec.freq = FREQUENCY;
+        spec.format = AUDIO_S16SYS;
+        spec.channels = 1;
+        spec.callback = NULL;
+        spec.samples = 4096;
+        spec.userdata = NULL;
+
+        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+                fprintf(stderr, "SDL failed to initialize : %s\n",
+                        SDL_GetError());
+                return AUDIO_ERR_INIT;
+        }
+
+        dev = SDL_OpenAudioDevice(NULL, 0, &spec, NULL, 0);
+        if (dev == 0) {
+                fprintf(stderr, "failed to open audio: %s\n", SDL_GetError());
+                SDL_Quit();
+                return AUDIO_ERR_INIT;
+        }
+
+        inited = true;
 
         return AUDIO_OK;
 }
 
 int send_chunk_audio(void *conn, const struct chunk *chunk) {
         struct audio_state *state = (struct audio_state *)conn;
-        static unsigned int phase = 0; /* Phase of the sine wave */
-        unsigned int p;
-        int i;
-        short buf[1024]; /* 1024 samples/write is a safe choice */
-        int outsz = sizeof(buf) / 2;
+        int res;
+        unsigned long i;
+        unsigned long len;
 
-        static int sinebuf[48] = {
-            0,      4276,   8480,   12539,  16383,  19947,  23169,  25995,
-            28377,  30272,  31650,  32486,  32767,  32486,  31650,  30272,
-            28377,  25995,  23169,  19947,  16383,  12539,  8480,   4276,
-            0,      -4276,  -8480,  -12539, -16383, -19947, -23169, -25995,
-            -28377, -30272, -31650, -32486, -32767, -32486, -31650, -30272,
-            -28377, -25995, -23169, -19947, -16383, -12539, -8480,  -4276};
+        if (busy)
+                return AUDIO_ERR_BUSY;
 
-        if (state->inited == false)
-                return AUDIO_ERR_STATE;
+        busy = true;
 
-        for (i = 0; i < outsz; i++) {
-                p = (phase * state->sample_rate) / 48000;
+        len = get_be32(chunk->length);
+        if (len > CHUNK_SIZE)
+                return AUDIO_ERR_FRAME;
 
-                phase = (phase + 1) % 4800;
-                buf[i] = sinebuf[p % 48];
+        for (i = 0; i < len; i++) {
+                res = play_tone(&dev, buffer, chunk->data[i] * 25 + 500, 0.5);
+                if (res != AUDIO_OK)
+                        return res;
         }
 
-        if (write(state->fd_out, buf, sizeof(buf)) != sizeof(buf)) {
-                perror("audio_write");
-                exit(-1);
+        SDL_PauseAudioDevice(dev, 0);
+
+        while (SDL_GetQueuedAudioSize(dev) > 0) {
+                SDL_Delay(10);
         }
+
+        busy = false;
 
         return AUDIO_OK;
 }
 
 int recv_chunk_audio(void *conn, struct chunk *chunk) { return AUDIO_OK; }
 
-int close_conn_audio(void *conn) { return AUDIO_OK; }
+int close_conn_audio(void *conn) {
+        SDL_CloseAudioDevice(dev);
+        SDL_Quit();
+
+        inited = false;
+        dev = 0;
+
+        return AUDIO_OK;
+}
 
 #else /* Unsupported systems */
 
@@ -140,8 +166,12 @@ const char *get_error_text_audio(int code) {
         case AUDIO_ERR_PLATFORM:
                 return "Audio transfer is not yet supported on this "
                        "system";
-        case AUDIO_ERR_WRITE:
-                return "Failed to write to audio device";
+        case AUDIO_ERR_BUSY:
+                return "The device is busy";
+        case AUDIO_ERR_INIT:
+                return "Failed to initialize the audio device";
+        case AUDIO_ERR_QUEUE:
+                return "Failed to queue the next tone";
         default:
                 return "Unknown audio error";
         }

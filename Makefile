@@ -210,7 +210,6 @@ test:
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_lan_local tests/lan_local.test.c src/interfaces/lan/lan.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_pip tests/pip.test.c src/interfaces/lan/pip.c
 	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_file_browser tests/file_browser.test.c src/interfaces/file/browser.c
-	$(CC) $(CFLAGS) -I. -o build/$(OS_NAME)/test_audio tests/audio.test.c src/interfaces/audio/audio.c
-	$(CC) $(CFLAGS) $(shell pkg-config --cflags sdl2) $(shell pkg-config --libs sdl2) -lm -I. -o build/$(OS_NAME)/test_sdlsound tests/sdlsound.test.c
+	$(CC) $(CFLAGS) $(shell pkg-config --cflags sdl2) $(shell pkg-config --libs sdl2) -lm -I. -o build/$(OS_NAME)/test_audio tests/audio.test.c src/interfaces/audio/audio.c src/misc/be32.c
 
 .PHONY: all nuklear basic tui run run-basic run-tui clean test
