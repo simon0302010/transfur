@@ -356,7 +356,101 @@ static int bt_advertise_start(unsigned int channel) {
         proto_list = sdp_list_append(NULL, l2cap_list);
 
         sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
+        rfcomm_list = sdp_list_append(NULL, &rfcomm_uuid);
+        channel_data = sdp_data_alloc(SDP_UINT8, &ch);
+        rfcomm_list = sdp_list_append(rfcomm_list, channel_data);
+        proto_list = sdp_list_append(proto_list, rfcomm_list);
 
+        access_proto_list = sdp_list_append(NULL, proto_list);
+        sdp_set_access_protos(record, access_proto_list);
+
+        sdp_uuid128_create(&svc_uuid, (void *)bt_service_uuid);
+        svc_class_list = sdp_list_append(NULL, &svc_uuid);
+        sdp_set_service_classes(record, svc_class_list);
+
+        sdp_set_info_attr(record, "Transfur", NULL, NULL);
+
+        adv_session = sdp_connect(BDADDR_ANY, BDADDR_LOCAL, SDP_RETRY_IF_BUSY);
+        if (adv_session == NULL) {
+                err = -1;
+        } else {
+                err = sdp_record_register(adv_session, record, 0);
+                if (err != 0) {
+                        sdp_close(adv_session);
+                        adv_session = NULL;
+                }
+        }
+
+        sdp_list_free(root_list, NULL);
+        sdp_list_free(access_proto_list, NULL);
+        sdp_list_free(svc_class_list, NULL);
+        sdp_list_free(proto_list, NULL);
+        sdp_list_free(l2cap_list, NULL);
+        sdp_list_free(rfcomm_list, NULL);
+        if (channel_data != NULL) {
+                sdp_data_free(channel_data);
+        }
+
+        if (err != 0) {
+                sdp_record_free(record);
+                return -1;
+        }
+
+        adv_record = record;
+        return 0;
 }
 
-/* TODO: finish because I need to sleep */
+static void bt_advertise_stop(void) {
+        if (adv_session != NULL && adv_record != NULL) {
+                (void)sdp_record_unregister(adv_session, adv_record);
+        } 
+        if (adv_record != NULL) {
+                sdp_record_free(adv_record);
+                adv_record = NULL;
+        }
+        if (adv_session != NULL) {
+                sdp_close(adv_session);
+                adv_session = NULL;
+        }
+}
+
+#else /* Unsupported systems */
+
+int bt_discover_init(void) {
+        return 0;
+}
+
+int bt_discover_ready(void) {
+        return 0;
+}
+
+void bt_discover_set_listener_opts(const char *options) {
+        (void)options;
+}
+
+void bt_discover_scan(void) {
+        /* spooky */
+}
+
+void bt_discover_frame(void) {
+        /* lonely :< */
+}
+
+int bt_discover_scanning(void) {
+        return 0;
+}
+
+int bt_discover_count(void) {
+        return 0;
+}
+
+int bt_discover_peer(int index, char *out, int out_size) {
+        (void)index;
+        (void)out;
+        (void)out_size;
+        return -1;
+}
+
+#endif
+
+
