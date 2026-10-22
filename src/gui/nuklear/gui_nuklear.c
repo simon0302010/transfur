@@ -13,7 +13,7 @@ Needs to implement all functions defined in `gui.h`
 #endif
 
 #include "../../interfaces/interfaces.h"
-#include "../../interfaces/discovery.c"
+#include "../../interfaces/discovery.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../gui.h"
