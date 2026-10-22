@@ -14,7 +14,7 @@
 #endif
 
 #define FREQUENCY 48000
-#define BUFFER_LENGTH 30 /* 1/30s */
+#define BUFFER_LENGTH 1 /* 1/1s */
 #define BUFFER_SAMPLES (FREQUENCY / BUFFER_LENGTH)
 
 static tbool busy;
@@ -26,33 +26,33 @@ static SDL_AudioSpec spec;
 static Sint16 buffer[FREQUENCY / BUFFER_LENGTH];
 static tbool inited;
 
-static Sint16 format(double sample, double *amplitude) {
+static Sint16 format(float sample, float *amplitude) {
         return (Sint16)(sample * 32567 * *amplitude);
 }
 
-static double tone(double *hz, unsigned long *time) {
+static float tone(float *hz, unsigned long *time) {
         return sin(*time * *hz * M_PI * 2 / FREQUENCY);
 }
 
-static double saw(double *hz, unsigned long *time) {
+static float saw(float *hz, unsigned long *time) {
         return fmod(*time * *hz / FREQUENCY, 1) * 2 - 1;
 }
 
-static double square(double *hz, unsigned long *time) {
-        double sine = tone(hz, time);
+static float square(float *hz, unsigned long *time) {
+        float sine = tone(hz, time);
         return sine > 0.0 ? 1.0 : -1.0;
 }
 
-static int play_tone(SDL_AudioDeviceID *dev, Sint16 *buffer, double hz,
-                     double amplitude) {
+static int play_tone(SDL_AudioDeviceID *dev, Sint16 *buffer, float hz,
+                     float amplitude, float duration) {
         unsigned long i;
+        unsigned long samples = FREQUENCY * duration;
 
-        for (i = 0; i < BUFFER_SAMPLES; i++) {
+        for (i = 0; i < samples; i++) {
                 buffer[i] = format(tone(&hz, &i), &amplitude);
         }
 
-        if (SDL_QueueAudio(*dev, buffer, BUFFER_SAMPLES * sizeof(buffer[0])) <
-            0) {
+        if (SDL_QueueAudio(*dev, buffer, samples * sizeof(buffer[0])) < 0) {
                 fprintf(stderr, "failed to queue audio: %s\n", SDL_GetError());
                 return AUDIO_ERR_QUEUE;
         }
@@ -106,11 +106,38 @@ int send_chunk_audio(void *conn, const struct chunk *chunk) {
         if (len > CHUNK_SIZE)
                 return AUDIO_ERR_FRAME;
 
+        /* Indicates chunk start */
+        res = play_tone(&dev, buffer, 300, 0.5, 0.3);
+        if (res != AUDIO_OK)
+                return res;
+
+        /* Chunk type */
+        res = play_tone(&dev, buffer, chunk->type * 25 + 500, 0.5, 0.3);
+        if (res != AUDIO_OK)
+                return res;
+
+        /* Data start */
+        res = play_tone(&dev, buffer, 400, 0.5, 0.3);
+        if (res != AUDIO_OK)
+                return res;
+
+        /* Data */
         for (i = 0; i < len; i++) {
-                res = play_tone(&dev, buffer, chunk->data[i] * 25 + 500, 0.5);
+                res = play_tone(&dev, buffer, chunk->data[i] * 25 + 500, 0.5,
+                                0.05);
                 if (res != AUDIO_OK)
                         return res;
         }
+
+        /* Data end */
+        res = play_tone(&dev, buffer, 400, 0.5, 0.3);
+        if (res != AUDIO_OK)
+                return res;
+
+        /* Chunk end */
+        res = play_tone(&dev, buffer, 300, 0.5, 0.3);
+        if (res != AUDIO_OK)
+                return res;
 
         SDL_PauseAudioDevice(dev, 0);
 

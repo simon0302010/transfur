@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include "../src/interfaces/audio/audio.h"
@@ -6,6 +7,7 @@
 int main(void) {
         struct audio_state state;
         struct chunk chunk;
+        int result;
 
         strcpy((char *)chunk.data,
                "Die Würde des Menschen ist unantastbar. Sie zu achten und zu "
@@ -23,9 +25,23 @@ int main(void) {
         /* Subtracting the null-terminator. Probably bad practice. */
         put_be32(chunk.length, strlen((const char *)chunk.data) - 1);
 
+        chunk.type = chunk_type_data;
+
         /* Init and send */
-        init_conn_audio(&state, 0);
-        send_chunk_audio(&state, &chunk);
+        result = init_conn_audio(&state, NULL);
+        if (result != AUDIO_OK) {
+                fprintf(stderr, "audio init failed: %s (%d)\n",
+                        get_error_text_audio(result), result);
+                return result;
+        }
+
+        result = send_chunk_audio(&state, &chunk);
+        if (result != AUDIO_OK) {
+                close_conn_audio(&state);
+                return result;
+        }
+
+        close_conn_audio(&state);
 
         return 0;
 }
