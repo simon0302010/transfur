@@ -350,7 +350,7 @@ static int parse_options(const char *options, unsigned char *role,
                 return -1;
         }
 
-        colon = strrchr(rest, ';');
+        colon = strrchr(rest, ':');
         if (colon == NULL) {
                 if (*role != BT_ROLE_LISTEN) {
                         return -1;

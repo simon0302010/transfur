@@ -1,6 +1,6 @@
 #include "app.h"
 #include "../../interfaces/interfaces.h"
-#include "../../interfaces/lan/discover.h"
+#include "../../interfaces/discovery.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../../interfaces/serial/serial.h"
@@ -502,12 +502,20 @@ void app_init(struct ui_context *ctx) {
 void app_update(double dt) {
         int can_start;
 
-        discover_init();
-        discover_set_listener_opts(
-            (worker_state == wk_wait_receiver && receiver_conn_if == if_lan)
-                ? receiver_conn_opts
-                : "");
-        discover_frame();
+        discovery_init();
+        discovery_set_listener_opts(
+                if_lan,
+                (worker_state == wk_wait_receiver && receiver_conn_if == if_lan) 
+                        ? receiver_conn_opts
+                        : ""
+        );
+        discovery_set_listener_opts(
+                if_bluetooth,
+                (worker_state == wk_wait_receiver && receiver_conn_if == if_bluetooth) 
+                        ? receiver_conn_opts
+                        : ""
+        );
+        discovery_frame();
 
         status_text(status);
 

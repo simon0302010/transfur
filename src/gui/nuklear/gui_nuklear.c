@@ -13,7 +13,7 @@ Needs to implement all functions defined in `gui.h`
 #endif
 
 #include "../../interfaces/interfaces.h"
-#include "../../interfaces/lan/discover.h"
+#include "../../interfaces/discovery.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../gui.h"
@@ -568,12 +568,21 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
         status[0] = '\0';
 
         /* Discovery */
-        discover_init();
-        discover_set_listener_opts(worker_state == wk_wait_receiver &&
-                                           receiver_conn_if == if_lan
-                                       ? receiver_conn_opts
-                                       : "");
-        discover_frame();
+        discovery_init();
+        discovery_set_listener_opts(
+                if_lan,
+                (worker_state == wk_wait_receiver && receiver_conn_if == if_lan)
+                        ? receiver_conn_opts
+                        : ""
+        );
+        discovery_set_listener_opts(
+                if_bluetooth,
+                (worker_state == wk_wait_receiver && receiver_conn_if == if_bluetooth)
+                        ? receiver_conn_opts
+                        : ""
+        );
+
+        discovery_frame();
 
         if (nk_begin(ctx, title, nk_rect(0, 0, width, height), 0)) {
                 ctx->style.menu_button = ctx->style.button;
@@ -832,8 +841,8 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
                 nk_layout_row_dynamic(ctx, 10, 1);
 
                 /* LAN peer discovery if sender is if_lan */
-                if (sender == if_lan)
-                        show_lan_discovery(ctx);
+                if (sender == if_lan || sender == if_bluetooth)
+                        show_discovery(ctx, if_lan);
 
                 if (receiver == if_file)
                         show_file_receiver_options(ctx);

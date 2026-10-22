@@ -40,9 +40,11 @@ COMMON_SRC = src/main.c \
 	src/interfaces/wan/wan.c \
 	src/interfaces/audio/audio.c \
 	src/interfaces/lan/discover.c \
+	src/interfaces/discovery.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
 	src/interfaces/bluetooth/bluetooth.c \
+	src/interfaces/bluetooth/bt_discover.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
