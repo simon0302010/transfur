@@ -14,7 +14,7 @@ SRC = src/main.c \
 	src/interfaces/serial/serial.c \
   src/interfaces/serial/dos_serial/dos_serial.c \
 	src/interfaces/lan/lan.c \
-  src/interfaces/lan/discover.c \
+  src/interfaces/lan/lan_discover.c \
 	src/interfaces/wan/wan.c \
 	src/interfaces/audio/audio.c \
 	src/interfaces/bluetooth/bluetooth.c \

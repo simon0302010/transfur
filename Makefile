@@ -39,7 +39,7 @@ COMMON_SRC = src/main.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/wan/wan.c \
 	src/interfaces/audio/audio.c \
-	src/interfaces/lan/discover.c \
+	src/interfaces/lan/lan_discover.c \
 	src/interfaces/discovery.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \

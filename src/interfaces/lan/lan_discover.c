@@ -1,4 +1,4 @@
-#include "discover.h"
+#include "lan_discover.h"
 
 #if defined(OS_LINUX) || defined(OS_WINDOWS) /* Supported systems */
 

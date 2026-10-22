@@ -1,16 +1,19 @@
 #ifndef DISCOVERY_H
 #define DISCOVERY_H
 
+#include "interfaces.h"
+
 #define DISCOVERY_UNSUPPORTED 0
 #define DISCOVERY_SUPPORTED 1
 
 void discovery_init(void);
 void discovery_frame(void);
-int discovery_supported(int interface_id);
-void discovery_scan(int interface_id);
-int discovery_scanning(int interface_id);
-int discovery_count(int interface_id);
-int discovery_peer(int interface_id, int index, char *out, int out_size);
-void discovery_set_listener_opts(int interface_id, const char *options);
+int discovery_supported(enum interface interface);
+void discovery_scan(enum interface interface);
+int discovery_scanning(enum interface interface);
+int discovery_count(enum interface interface);
+int discovery_peer(enum interface interface, int index, char *out,
+                   int out_size);
+void discovery_set_listener_opts(enum interface interface, const char *options);
 
 #endif

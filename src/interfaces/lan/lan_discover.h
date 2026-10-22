@@ -1,5 +1,5 @@
-#ifndef DISCOVER_H
-#define DISCOVER_H
+#ifndef LAN_DISCOVER_H
+#define LAN_DISCOVER_H
 
 /* UDP broadcast peer discovery for LAN interface */
 
@@ -8,7 +8,8 @@
 
 /*
 Opens the discovery sockets and assigns this instance it's probe id.
-returns `0` when ready, nonzero when discovery is unavailable, all other calls are no-ops
+returns `0` when ready, nonzero when discovery is unavailable, all other calls
+are no-ops
 */
 int discover_init(void);
 
