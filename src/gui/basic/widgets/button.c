@@ -7,10 +7,6 @@
 #include "../wrappers/basic_wrapper.h"
 #include "button.h"
 
-#ifdef ENABLE_EASTER_EGGS
-#include <math.h>
-#endif
-
 int basic_render_button_widget(struct widget widget,
                                struct basic_render_details details) {
         struct widget_button_options *options = widget.content;
