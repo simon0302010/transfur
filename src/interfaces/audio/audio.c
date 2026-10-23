@@ -17,6 +17,9 @@
 #define BUFFER_LENGTH 1 /* 1/1s */
 #define BUFFER_SAMPLES (FREQUENCY / BUFFER_LENGTH)
 
+#define FREQUENCY_FALSE 1100
+#define FREQUENCY_TRUE 2200
+
 static tbool busy;
 
 /* SDL only seems to expose one audio interface.
@@ -25,31 +28,27 @@ static SDL_AudioDeviceID dev;
 static SDL_AudioSpec spec;
 static Sint16 buffer[FREQUENCY / BUFFER_LENGTH];
 static tbool inited;
+static float phase = 0.0;
 
 static Sint16 format(float sample, float *amplitude) {
         return (Sint16)(sample * 32567 * *amplitude);
-}
-
-static float tone(float *hz, unsigned long *time) {
-        return sin(*time * *hz * M_PI * 2 / FREQUENCY);
-}
-
-static float saw(float *hz, unsigned long *time) {
-        return fmod(*time * *hz / FREQUENCY, 1) * 2 - 1;
-}
-
-static float square(float *hz, unsigned long *time) {
-        float sine = tone(hz, time);
-        return sine > 0.0 ? 1.0 : -1.0;
 }
 
 static int play_tone(SDL_AudioDeviceID *dev, Sint16 *buffer, float hz,
                      float amplitude, float duration) {
         unsigned long i;
         unsigned long samples = FREQUENCY * duration;
+        float phase_increment = (hz * 2.0 * M_PI) / FREQUENCY;
 
         for (i = 0; i < samples; i++) {
-                buffer[i] = format(tone(&hz, &i), &amplitude);
+                float sample_val = sin(phase);
+
+                buffer[i] = format(sample_val, &amplitude);
+
+                phase += phase_increment;
+
+                if (phase >= 2.0 * M_PI)
+                        phase -= 2.0 * M_PI;
         }
 
         if (SDL_QueueAudio(*dev, buffer, samples * sizeof(buffer[0])) < 0) {
@@ -112,8 +111,9 @@ static void get_bits(unsigned char *dest, unsigned char c) {
 int send_chunk_audio(void *conn, const struct chunk *chunk) {
         struct audio_state *state = (struct audio_state *)conn;
         int res;
-        unsigned long i;
+        unsigned long i, b;
         unsigned long len;
+        unsigned char bits[8];
 
         if (busy)
                 return AUDIO_ERR_BUSY;
@@ -141,10 +141,16 @@ int send_chunk_audio(void *conn, const struct chunk *chunk) {
 
         /* Data */
         for (i = 0; i < len; i++) {
-                res = play_tone(&dev, buffer, chunk->data[i] * 25 + 500, 0.5,
-                                0.05);
-                if (res != AUDIO_OK)
-                        return res;
+                get_bits(bits, chunk->data[i]);
+
+                for (b = 0; b < 8; b++) {
+                        res = play_tone(&dev, buffer,
+                                        bits[b] == 0 ? FREQUENCY_FALSE
+                                                     : FREQUENCY_TRUE,
+                                        0.5, 0.01);
+                        if (res != AUDIO_OK)
+                                return res;
+                }
         }
 
         /* Data end */
