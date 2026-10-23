@@ -91,6 +91,24 @@ int init_conn_audio(void *conn, const char *options) {
         return AUDIO_OK;
 }
 
+/*
+Writes an unterminated array of unsigned chars set to either 1 or 0 to DEST.
+DEST must be at least 8 bytes large.
+Reads from C in most signification byte first order.
+A loop is not used to prevent unnecessary allocations and overhead on ancient
+compilers.
+*/
+static void get_bits(unsigned char *dest, unsigned char c) {
+        dest[0] = ((unsigned char)c >> 7) & 1u;
+        dest[1] = ((unsigned char)c >> 6) & 1u;
+        dest[2] = ((unsigned char)c >> 5) & 1u;
+        dest[3] = ((unsigned char)c >> 4) & 1u;
+        dest[4] = ((unsigned char)c >> 3) & 1u;
+        dest[5] = ((unsigned char)c >> 2) & 1u;
+        dest[6] = ((unsigned char)c >> 1) & 1u;
+        dest[7] = ((unsigned char)c >> 0) & 1u;
+}
+
 int send_chunk_audio(void *conn, const struct chunk *chunk) {
         struct audio_state *state = (struct audio_state *)conn;
         int res;
