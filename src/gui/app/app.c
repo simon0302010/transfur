@@ -392,7 +392,7 @@ static void cycle_sender(void) {
         else
                 sender = supported[i + 1];
 
-        send_button_opts.title = (char *)get_sender_text(receiver);
+        send_button_opts.title = (char *)get_sender_text(sender);
 }
 
 static void close_receiver(void) {
@@ -506,13 +506,13 @@ void app_update(double dt) {
         discovery_set_listener_opts(
                 if_lan,
                 (worker_state == wk_wait_receiver && receiver_conn_if == if_lan) 
-                        ? receiver_conn_opts
+                                                ? receiver_conn_opts
                         : ""
         );
         discovery_set_listener_opts(
                 if_bluetooth,
                 (worker_state == wk_wait_receiver && receiver_conn_if == if_bluetooth) 
-                        ? receiver_conn_opts
+                                        ? receiver_conn_opts
                         : ""
         );
         discovery_frame();
