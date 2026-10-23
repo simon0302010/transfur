@@ -57,3 +57,5 @@ dkms.conf
 build/
 
 compile_commands.json
+
+*example*
