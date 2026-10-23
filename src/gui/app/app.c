@@ -493,12 +493,14 @@ void app_init(struct ui_context *ctx) {
 
         ctx->widgets = widgets;
         ctx->count = APP_WIDGET_COUNT;
+
+        /* This should probably only be done once */
+        discovery_init();
 }
 
 void app_update(double dt) {
         int can_start;
 
-        discovery_init();
         discovery_set_listener_opts(if_lan, (worker_state == wk_wait_receiver &&
                                              receiver_conn_if == if_lan)
                                                 ? receiver_conn_opts
