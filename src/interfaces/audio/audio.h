@@ -1,6 +1,7 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
+#include "../../misc/bool.h"
 #include "../interfaces.h"
 
 #define AUDIO_OK 0
@@ -14,7 +15,10 @@
         5 /* this platform does not have a working implementation yet */
 #define AUDIO_ERR_BUSY 6  /* Audio device is already sending a chunk */
 #define AUDIO_ERR_INIT 7  /* Failed to initialize device */
-#define AUDIO_ERR_QUEUE 8 /* Failed to queue a tone */
+#define AUDIO_ERR_ALLOC 8 /* Failed to allocate memory */
+#define AUDIO_ERR_PLAY                                                         \
+        9 /* Unknown error occurred while trying to play sound                 \
+           */
 
 struct audio_state {
         char unused;
@@ -39,7 +43,7 @@ int recv_chunk_audio(void *conn, struct chunk *chunk);
 /*
 Closes the connection's socket and resets the connection state
 */
-int close_conn_audio(void *conn);
+int close_conn_audio(void *conn, tbool is_last);
 
 /* It's obvious what this does */
 const char *get_error_text_audio(int code);
