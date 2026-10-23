@@ -12,8 +12,8 @@ Needs to implement all functions defined in `gui.h`
 #undef interface /* Compilation fails otherwise */
 #endif
 
-#include "../../interfaces/interfaces.h"
 #include "../../interfaces/discovery.h"
+#include "../../interfaces/interfaces.h"
 #include "../../interfaces/lan/lan.h"
 #include "../../interfaces/lan/pip.h"
 #include "../gui.h"
@@ -569,18 +569,15 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
 
         /* Discovery */
         discovery_init();
-        discovery_set_listener_opts(
-                if_lan,
-                (worker_state == wk_wait_receiver && receiver_conn_if == if_lan)
-                        ? receiver_conn_opts
-                        : ""
-        );
-        discovery_set_listener_opts(
-                if_bluetooth,
-                (worker_state == wk_wait_receiver && receiver_conn_if == if_bluetooth)
-                        ? receiver_conn_opts
-                        : ""
-        );
+        discovery_set_listener_opts(if_lan, (worker_state == wk_wait_receiver &&
+                                             receiver_conn_if == if_lan)
+                                                ? receiver_conn_opts
+                                                : "");
+        discovery_set_listener_opts(if_bluetooth,
+                                    (worker_state == wk_wait_receiver &&
+                                     receiver_conn_if == if_bluetooth)
+                                        ? receiver_conn_opts
+                                        : "");
 
         discovery_frame();
 

@@ -211,7 +211,7 @@ static void discover_add_peer(const char *ip, int port) {
         peer_count++;
 }
 
-int discover_init(void) {
+int lan_discover_init(void) {
 #if defined(OS_WINDOWS)
         WSADATA wsa;
 #endif
@@ -243,9 +243,9 @@ int discover_init(void) {
         return 0;
 }
 
-int discover_ready(void) { return init_ready; }
+int lan_discover_ready(void) { return init_ready; }
 
-void discover_set_listener_opts(const char *options) {
+void lan_discover_set_listener_opts(const char *options) {
         const char *rest;
         const char *colon;
 
@@ -267,7 +267,7 @@ void discover_set_listener_opts(const char *options) {
         }
 }
 
-void discover_scan(void) {
+void lan_discover_scan(void) {
         if (!init_ready) {
                 return;
         }
@@ -282,7 +282,7 @@ void discover_scan(void) {
         discover_send_probe(scan_sock);
 }
 
-void discover_frame(void) {
+void lan_discover_frame(void) {
         char buf[DISCOVER_MAX_FRAME];
         struct sockaddr_in from;
         double now;
@@ -360,11 +360,11 @@ void discover_frame(void) {
         }
 }
 
-int discover_scanning(void) { return scanning; }
+int lan_discover_scanning(void) { return scanning; }
 
-int discover_count(void) { return peer_count; }
+int lan_discover_count(void) { return peer_count; }
 
-int discover_peer(int index, char *ip, int ip_size, int *port) {
+int lan_discover_peer(int index, char *ip, int ip_size, int *port) {
         if (ip == NULL || port == NULL || ip_size < 16 || index < 0 ||
             index >= peer_count) {
                 return -1;
@@ -379,20 +379,22 @@ int discover_peer(int index, char *ip, int ip_size, int *port) {
 
 #else /* Unsupported systems */
 
-int discover_init(void) { return -1; }
+int lan_discover_init(void) { return -1; }
 
-int discover_ready(void) { return -1; }
+int lan_discover_ready(void) { return -1; }
 
-void discover_set_listener_opts(const char *options) { return; }
+void lan_discover_set_listener_opts(const char *options) { return; }
 
-void discover_scan(void) { return; }
+void lan_discover_scan(void) { return; }
 
-void discover_frame(void) { return; }
+void lan_discover_frame(void) { return; }
 
-int discover_scanning(void) { return -1; }
+int lan_discover_scanning(void) { return -1; }
 
-int discover_count(void) { return -1; }
+int lan_discover_count(void) { return -1; }
 
-int discover_peer(int index, char *ip, int ip_size, int *port) { return -1; }
+int lan_discover_peer(int index, char *ip, int ip_size, int *port) {
+        return -1;
+}
 
 #endif

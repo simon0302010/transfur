@@ -4,64 +4,53 @@
 #include <string.h>
 
 #include "interfaces.h"
+
+/* No need to guard the includes */
+#include "bluetooth/bt_discover.h"
 #include "lan/lan_discover.h"
 
-#if defined(OS_LINUX)
-#include "bluetooth/bt_discover.h"
-#endif
-
 void discovery_init(void) {
-        discover_init();
-#if defined(OS_LINUX)
+        lan_discover_init();
         bt_discover_init();
-#endif
+}
+
+void discovery_frame(void) {
+        lan_discover_frame();
+        bt_discover_frame();
 }
 
 int discovery_supported(enum interface interface) {
-        if (interface == if_lan) {
-                return discover_ready() ? 1 : 0;
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
-                return bt_discover_ready();
-        }
-#endif
-        return DISCOVERY_UNSUPPORTED;
+        if (interface == if_lan && lan_discover_ready() == 1)
+                return DISCOVERY_OK;
+        else if (interface == if_bluetooth && bt_discover_ready() == 1)
+                return DISCOVERY_OK;
+
+        return DISCOVERY_ERR_UNSUPPORTED;
 }
 
 void discovery_scan(enum interface interface) {
         if (interface == if_lan) {
-                discover_scan();
-                return;
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
+                lan_discover_scan();
+        } else if (interface == if_bluetooth) {
                 bt_discover_scan();
         }
-#endif
 }
 
 int discovery_scanning(enum interface interface) {
         if (interface == if_lan) {
-                return discover_scanning();
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
+                return lan_discover_scanning();
+        } else if (interface == if_bluetooth) {
                 return bt_discover_scanning();
         }
-#endif
         return 0;
 }
 
 int discovery_count(enum interface interface) {
         if (interface == if_lan) {
-                return discover_count();
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
+                return lan_discover_count();
+        } else if (interface == if_bluetooth) {
                 return bt_discover_count();
         }
-#endif
         return 0;
 }
 
@@ -75,20 +64,17 @@ int discovery_peer(enum interface interface, int index, char *out,
         }
 
         if (interface == if_lan) {
-                if (discover_peer(index, ip, sizeof ip, &port) != 0) {
+                if (lan_discover_peer(index, ip, sizeof ip, &port) != 0) {
                         return -1;
                 }
-                if ((int)strlen(ip) + 7 > out_size) {
+                if (strlen(ip) + 7 > out_size) {
                         return -1;
                 }
                 sprintf(out, "%s:%d", ip, port);
                 return 0;
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
+        } else if (interface == if_bluetooth) {
                 return bt_discover_peer(index, out, out_size);
         }
-#endif
         return -1;
 }
 
@@ -99,12 +85,9 @@ void discovery_set_listener_opts(enum interface interface,
         }
 
         if (interface == if_lan) {
-                discover_set_listener_opts(options);
+                lan_discover_set_listener_opts(options);
                 return;
-        }
-#if defined(OS_LINUX)
-        if (interface == if_bluetooth) {
+        } else if (interface == if_bluetooth) {
                 bt_discover_set_listener_opts(options);
         }
-#endif
 }

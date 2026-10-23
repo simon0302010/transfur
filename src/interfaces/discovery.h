@@ -3,8 +3,9 @@
 
 #include "interfaces.h"
 
-#define DISCOVERY_UNSUPPORTED 0
-#define DISCOVERY_SUPPORTED 1
+#define DISCOVERY_OK 0
+#define DISCOVERY_ERR_UNKNOWN 1
+#define DISCOVERY_ERR_UNSUPPORTED 2
 
 void discovery_init(void);
 void discovery_frame(void);
