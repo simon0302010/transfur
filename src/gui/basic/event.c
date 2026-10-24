@@ -47,6 +47,12 @@ struct ui_event basic_poll_ui_event(void) {
                 case BASIC_KEY_ESC:
                         event.key = UI_KEY_ESC;
                         break;
+                case BASIC_KEY_LEFT:
+                        event.key = UI_KEY_LEFT;
+                        break;
+                case BASIC_KEY_RIGHT:
+                        event.key = UI_KEY_RIGHT;
+                        break;
                 default:
                         event.key = UI_KEY_CHAR;
                         break;

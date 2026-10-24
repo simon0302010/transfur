@@ -20,7 +20,8 @@ char **tui_render_text_input_widget(struct widget widget, int width) {
         text[label_size + 1] = '[';
         strcpy(text + label_size + 2, options->buffer);
         if (widget.is_focused) {
-                text[label_size + 2 + buffer_size] = '_';
+                text[label_size + 2 + buffer_size] = ' ';
+                text[label_size + 2 + options->cursor] = '_';
                 text[label_size + 3 + buffer_size] = ']';
                 text[label_size + 4 + buffer_size] = '\0';
         } else {

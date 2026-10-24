@@ -1,4 +1,6 @@
 #include "text_input.h"
+#include "../../../misc/bool.h"
+#include <string.h>
 
 struct widget widget_text_input(struct widget_text_input_options *options,
                                 size_t size) {
@@ -20,21 +22,43 @@ tbool widget_handle_event_text_input(struct widget *widget,
         struct widget_text_input_options *options = widget->content;
 
         if (event->type == UI_EVENT_KEY_DOWN) {
-                if (event->key == UI_KEY_CHAR) {
+                switch (event->key) {
+                case UI_KEY_CHAR: {
+                        tbool is_last = false;
+
                         if (options->cursor + 1 >= options->max_len) {
                                 return true;
                         }
 
+                        if (options->buffer[options->cursor] == '\0') {
+                                is_last = true;
+                        }
+
                         options->buffer[options->cursor] = event->ch;
                         options->cursor++;
-                        options->buffer[options->cursor] = '\0';
+                        if (is_last) {
+                                options->buffer[options->cursor] = '\0';
+                        }
                         return true;
-                } else if (event->key == UI_KEY_BACKSPACE) {
+                }
+                case UI_KEY_BACKSPACE:
                         if (options->cursor > 0) {
                                 options->buffer[options->cursor - 1] = '\0';
                                 options->cursor--;
                         }
                         /* TODO: shift all chars left */
+                        return true;
+                case UI_KEY_DELETE:
+                        break;
+                case UI_KEY_LEFT:
+                        if (options->cursor > 0) {
+                                options->cursor--;
+                        }
+                        return true;
+                case UI_KEY_RIGHT:
+                        if (options->cursor < strlen(options->buffer)) {
+                                options->cursor++;
+                        }
                         return true;
                 }
         }

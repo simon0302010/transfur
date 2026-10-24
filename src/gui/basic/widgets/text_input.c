@@ -5,6 +5,8 @@
 #include "../text.h"
 #include "../theme.h"
 #include "text_input.h"
+#include <stdlib.h>
+#include <string.h>
 
 int basic_render_text_input_widget(struct widget widget,
                                    struct basic_render_details details) {
@@ -97,6 +99,20 @@ int basic_render_text_input_widget(struct widget widget,
                   details.y + BORDER_WIDTH + BUTTON_MARGIN, 1,
                   (basic_get_theme() != THEME_PASTEL) ? text_color
                                                       : text_color_inverted);
+
+        if (widget.is_focused) {
+                char *cursor_text = malloc(options->cursor + 1);
+                strncpy(cursor_text, options->buffer, options->cursor);
+                cursor_text[options->cursor] = '\0';
+                draw_text("_",
+                          details.x + BORDER_WIDTH + BUTTON_MARGIN +
+                              measure_text(cursor_text, 1).width,
+                          details.y + BORDER_WIDTH + BUTTON_MARGIN, 1,
+                          (basic_get_theme() != THEME_PASTEL)
+                              ? text_color
+                              : text_color_inverted);
+                free(cursor_text);
+        }
 
         return text_height + BORDER_WIDTH + BORDER_WIDTH + BUTTON_MARGIN +
                BUTTON_MARGIN + PADDING + PADDING;
