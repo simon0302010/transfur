@@ -460,33 +460,39 @@ static void show_file_sender_options(struct nk_context *ctx) {
         nk_layout_row_dynamic(ctx, 10, 1);
 }
 
-static void show_lan_discovery(struct nk_context *ctx) {
+static void show_discovery(struct nk_context *ctx) {
         int can_scan;
         int can_show_peers;
         char peers_label[64];
         char ip_label[32];
+        char section_label[64];
 
         /* Row for title */
         nk_layout_row_dynamic(ctx, 20, 1);
 
-        nk_label(ctx, "LAN Options (Sender)", NK_TEXT_ALIGN_CENTERED);
+        /* Must be updated in case new interfaces get discovery support */
+        snprintf(section_label, sizeof(section_label),
+                 "%s receiver discovery (Sender)",
+                 sender == if_lan         ? "LAN"
+                 : sender == if_bluetooth ? "Bluetooth"
+                                          : "Unknown");
+        nk_label(ctx, section_label, NK_TEXT_ALIGN_CENTERED);
 
-        /* Row for LAN peer discovery */
+        /* Row for peer discovery */
         nk_layout_row_template_begin(ctx, 20);
         nk_layout_row_template_push_static(ctx, 180);
         nk_layout_row_template_push_dynamic(ctx);
         nk_layout_row_template_push_static(ctx, 180);
         nk_layout_row_template_end(ctx);
 
-        /* Scanning uses it's own UDP socket, so it is fine even while a
-         * transfur runs */
-        can_scan = discover_ready() && !discover_scanning();
+        can_scan = discovery_ready(sender) && !discovery_scanning(sender);
         if (!can_scan) {
                 nk_widget_disable_begin(ctx);
         }
-        if (nk_button_label(ctx, discover_scanning() ? "Scanning"
-                                                     : "Scan for receivers")) {
-                discover_scan();
+        if (nk_button_label(ctx, discovery_scanning(sender)
+                                     ? "Scanning"
+                                     : "Scan for receivers")) {
+                discovery_scan(sender);
         }
         if (!can_scan) {
                 nk_widget_disable_end(ctx);
@@ -494,18 +500,18 @@ static void show_lan_discovery(struct nk_context *ctx) {
 
         /* Set color for the peers found text */
         ctx->style.menu_button.normal = nk_style_item_color(
-            (discover_count() > 0) ? nk_rgba(0, 100, 0, 255)
-                                   : nk_rgba(100, 0, 0, 255));
+            (discovery_count(sender) > 0) ? nk_rgba(0, 100, 0, 255)
+                                          : nk_rgba(100, 0, 0, 255));
         ctx->style.menu_button.hover = nk_style_item_color(
-            (discover_count() > 0) ? nk_rgba(0, 80, 0, 255)
-                                   : nk_rgba(80, 0, 0, 255));
+            (discovery_count(sender) > 0) ? nk_rgba(0, 80, 0, 255)
+                                          : nk_rgba(80, 0, 0, 255));
         ctx->style.menu_button.active = nk_style_item_color(
-            (discover_count() > 0) ? nk_rgba(0, 60, 0, 255)
-                                   : nk_rgba(60, 0, 0, 255));
+            (discovery_count(sender) > 0) ? nk_rgba(0, 60, 0, 255)
+                                          : nk_rgba(60, 0, 0, 255));
 
-        sprintf(peers_label, "Peers found: %d%s", discover_count(),
-                (discover_count() > 0) ? " (Click to select)" : "");
-        can_show_peers = discover_count() > 0;
+        sprintf(peers_label, "Peers found: %d%s", discovery_count(sender),
+                (discovery_count(sender) > 0) ? " (Click to select)" : "");
+        can_show_peers = discovery_count(sender) > 0;
         if (!can_show_peers) {
                 nk_widget_disable_begin(ctx);
         }
@@ -517,14 +523,13 @@ static void show_lan_discovery(struct nk_context *ctx) {
                 int port;
 
                 nk_layout_row_dynamic(ctx, 25, 1);
-                for (i = 0; i < discover_count(); i++) {
-                        if (discover_peer(i, ip, sizeof ip, &port) != 0) {
+                for (i = 0; i < discovery_count(sender); i++) {
+                        if (discovery_peer(sender, i, item, sizeof(item)) !=
+                            DISCOVERY_OK) {
                                 continue;
                         }
-                        sprintf(item, "%s:%d", ip, port);
                         if (nk_menu_item_label(ctx, item, NK_TEXT_LEFT)) {
                                 strcpy(sender_options, item);
-                                sender = if_lan;
                         }
                 }
                 nk_menu_end(ctx);
@@ -533,18 +538,21 @@ static void show_lan_discovery(struct nk_context *ctx) {
                 nk_widget_disable_end(ctx);
         }
 
-        switch (ip_btn_state) {
-        case btn_local_ip:
-                sprintf(ip_label, "Local IP: %s", get_lan_ip());
-                break;
-        case btn_public_ip:
-                sprintf(ip_label, "Public IP: %s",
-                        get_public_ip() ? get_public_ip() : "Unavailable");
-                break;
-        }
+        if (sender == if_lan) {
+                switch (ip_btn_state) {
+                case btn_local_ip:
+                        sprintf(ip_label, "Local IP: %s", get_lan_ip());
+                        break;
+                case btn_public_ip:
+                        sprintf(ip_label, "Public IP: %s",
+                                get_public_ip() ? get_public_ip()
+                                                : "Unavailable");
+                        break;
+                }
 
-        if (nk_button_label(ctx, ip_label)) {
-                ip_btn_state = (ip_btn_state + 1) % 2;
+                if (nk_button_label(ctx, ip_label)) {
+                        ip_btn_state = (ip_btn_state + 1) % 2;
+                }
         }
 
         /* Vertical spacer */
@@ -568,7 +576,6 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
         status[0] = '\0';
 
         /* Discovery */
-        discovery_init();
         discovery_set_listener_opts(if_lan, (worker_state == wk_wait_receiver &&
                                              receiver_conn_if == if_lan)
                                                 ? receiver_conn_opts
@@ -839,7 +846,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
 
                 /* LAN peer discovery if sender is if_lan */
                 if (sender == if_lan || sender == if_bluetooth)
-                        show_discovery(ctx, if_lan);
+                        show_discovery(ctx);
 
                 if (receiver == if_file)
                         show_file_receiver_options(ctx);
@@ -851,6 +858,7 @@ static void nk_gui(const char *title, struct nk_context *ctx, int width,
 }
 
 int run_gui(const char *title) {
+        discovery_init();
         browser_init_default(&browser_ctx_receiver);
         browser_init_default(&browser_ctx_sender);
 

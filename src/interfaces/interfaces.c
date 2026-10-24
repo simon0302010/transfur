@@ -4,6 +4,8 @@
 
 #include "interfaces.h"
 
+#include "../misc/bool.h"
+
 #include "audio/audio.h"
 #include "bluetooth/bluetooth.h"
 #include "file/file.h"
@@ -161,9 +163,20 @@ int close_conn(const int *conn) {
         case if_bluetooth:
                 r = close_conn_bluetooth(context);
                 break;
-        case if_audio:
-                r = close_conn_audio(context);
+        case if_audio: {
+                tbool is_last = true;
+                int i;
+
+                for (i = 0; i < MAX_CONN; i++) {
+                        if (i != *conn && connection_types[i] == if_audio) {
+                                is_last = false;
+                                break;
+                        }
+                }
+
+                r = close_conn_audio(context, is_last);
                 break;
+        }
         }
 
         /* This probably creates a bunch of memory leaks lmao */

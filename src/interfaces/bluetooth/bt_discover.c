@@ -18,7 +18,8 @@
 #undef inline
 
 /* Service UUID for scanning/advertising */
-static const uint8_t bt_service_uuid[16] = {
+static const uint8_t bt_service_uuid[16] =
+    {
         0x74, 0x72, 0x62, 0x6e, 0x73, 0x66, 0x75, 0x72, /* "transfur" */
         0x2d, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x31  /* "-discov1" */
 }
@@ -115,7 +116,7 @@ void bt_discover_set_listener_opts(const char *options) {
         if (!init_ok) {
                 return;
         }
-        
+
         channel = bt_parse_listener_channel(options);
 
         if (channel == 0) {
@@ -131,8 +132,7 @@ void bt_discover_set_listener_opts(const char *options) {
         }
 
         if (listener_channel != 0) {
-                bt_advertise_stop()
-                listener_channel = 0;
+                bt_advertise_stop() listener_channel = 0;
         }
 
         if (bt_advertise_start((unsigned int)channel) == 0) {
@@ -142,7 +142,7 @@ void bt_discover_set_listener_opts(const char *options) {
 
 static void *bt_scan_worker(void *arg) {
         (void)arg;
-        
+
         bt_scan_once();
 
         scanning = 0;
@@ -160,7 +160,7 @@ void bt_discover_scan(void) {
 
         scanning = 1;
         scan_running = 1;
-        if(pthread_create(&scan_thread, NULL, bt_scan_worker, NULL) != 0) {
+        if (pthread_create(&scan_thread, NULL, bt_scan_worker, NULL) != 0) {
                 scanning = 0;
                 scan_running = 0;
                 return;
@@ -168,13 +168,9 @@ void bt_discover_scan(void) {
         pthread_detach(scan_thread);
 }
 
-void bt_discover_frame(void) {
-        /* mmmmpppfghh */
-}
+void bt_discover_frame(void) { /* mmmmpppfghh */ }
 
-int bt_discover_scanning(void) {
-        return scanning;
-}
+int bt_discover_scanning(void) { return scanning; }
 
 int bt_discover_count(void) {
         int n;
@@ -246,7 +242,9 @@ static void bt_scan_once(void) {
         }
 
         /* hydrochloric acid inquiry 🤣🤣🤣🤣🤣🤣🤣 */
-        num = hci_inquiry(dev_id, BT_DISCOVER_INQUIRY_SECONDS, BT_DISCOVER_MAX_DEVICES, NULL, &devices, IREQ_CACHE_FLUSH);
+        num = hci_inquiry(dev_id, BT_DISCOVER_INQUIRY_SECONDS,
+                          BT_DISCOVER_MAX_DEVICES, NULL, &devices,
+                          IREQ_CACHE_FLUSH);
         if (num < 0) {
                 hci_close_dev(sock);
                 return;
@@ -255,7 +253,7 @@ static void bt_scan_once(void) {
         for (i = 0; i < num && found < BT_DISCOVER_MAX_PEERS; i++) {
                 unsigned int channel;
                 bdaddr_t *bd;
-                
+
                 bd = &devices[i].bdaddr;
                 if (bt_browse_channel(bd, &channel) != 0) {
                         continue;
@@ -296,7 +294,8 @@ static int bt_browse_channel(const bdaddr_t *remote, unsigned int *out) {
                 return -1;
         }
 
-        if (sdp_service_search_attr_req(sess, search_list, SDP_ATTR_REQ_RANGE, attrid_list, &response_list) == 0) {
+        if (sdp_service_search_attr_req(sess, search_list, SDP_ATTR_REQ_RANGE,
+                                        attrid_list, &response_list) == 0) {
                 for (r = response_list; r != NULL; r = r->next) {
                         sdp_record_t *rec;
                         sdp_list_t *protos = NULL;
@@ -403,7 +402,7 @@ static int bt_advertise_start(unsigned int channel) {
 static void bt_advertise_stop(void) {
         if (adv_session != NULL && adv_record != NULL) {
                 (void)sdp_record_unregister(adv_session, adv_record);
-        } 
+        }
         if (adv_record != NULL) {
                 sdp_record_free(adv_record);
                 adv_record = NULL;
@@ -416,33 +415,19 @@ static void bt_advertise_stop(void) {
 
 #else /* Unsupported systems */
 
-int bt_discover_init(void) {
-        return 0;
-}
+int bt_discover_init(void) { return 0; }
 
-int bt_discover_ready(void) {
-        return 0;
-}
+int bt_discover_ready(void) { return 0; }
 
-void bt_discover_set_listener_opts(const char *options) {
-        (void)options;
-}
+void bt_discover_set_listener_opts(const char *options) { (void)options; }
 
-void bt_discover_scan(void) {
-        /* spooky */
-}
+void bt_discover_scan(void) { /* spooky */ }
 
-void bt_discover_frame(void) {
-        /* lonely :< */
-}
+void bt_discover_frame(void) { /* lonely :< */ }
 
-int bt_discover_scanning(void) {
-        return 0;
-}
+int bt_discover_scanning(void) { return 0; }
 
-int bt_discover_count(void) {
-        return 0;
-}
+int bt_discover_count(void) { return 0; }
 
 int bt_discover_peer(int index, char *out, int out_size) {
         (void)index;
@@ -452,5 +437,3 @@ int bt_discover_peer(int index, char *out, int out_size) {
 }
 
 #endif
-
-

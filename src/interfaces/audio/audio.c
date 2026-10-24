@@ -5,87 +5,59 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../../misc/be32.h"
 #include "../../misc/bool.h"
 
 #if defined(OS_LINUX)
-#include <SDL2/SDL.h> /* SDL2 was chosen because alsa doesn't work with C89 (I think) */
+#include <ao/ao.h>
 #endif
 
-#define FREQUENCY 48000
-#define BUFFER_LENGTH 1 /* 1/1s */
-#define BUFFER_SAMPLES (FREQUENCY / BUFFER_LENGTH)
+#define FREQUENCY 44100
+#define BIT_DURATION 0.01f
 
 #define FREQUENCY_FALSE 1100
 #define FREQUENCY_TRUE 2200
 
-static tbool busy;
+/* Plays a tone and returns if it failed */
+#define TONE(FREQ, T)                                                          \
+        res = play_tone(FREQ, T);                                              \
+        if (res != AUDIO_OK)                                                   \
+                return res;
 
-/* SDL only seems to expose one audio interface.
-Opening it multiple times wouldn't make any sense. */
-static SDL_AudioDeviceID dev;
-static SDL_AudioSpec spec;
-static Sint16 buffer[FREQUENCY / BUFFER_LENGTH];
-static tbool inited;
-static float phase = 0.0;
-
-static Sint16 format(float sample, float *amplitude) {
-        return (Sint16)(sample * 32567 * *amplitude);
-}
-
-static int play_tone(SDL_AudioDeviceID *dev, Sint16 *buffer, float hz,
-                     float amplitude, float duration) {
-        unsigned long i;
-        unsigned long samples = FREQUENCY * duration;
-        float phase_increment = (hz * 2.0 * M_PI) / FREQUENCY;
-
-        for (i = 0; i < samples; i++) {
-                float sample_val = sin(phase);
-
-                buffer[i] = format(sample_val, &amplitude);
-
-                phase += phase_increment;
-
-                if (phase >= 2.0 * M_PI)
-                        phase -= 2.0 * M_PI;
-        }
-
-        if (SDL_QueueAudio(*dev, buffer, samples * sizeof(buffer[0])) < 0) {
-                fprintf(stderr, "failed to queue audio: %s\n", SDL_GetError());
-                return AUDIO_ERR_QUEUE;
-        }
-
-        return AUDIO_OK;
-}
+ao_device *sender_device;
+ao_sample_format sender_format;
+static tbool sender_busy = false;
+static tbool sender_inited = false;
+static float sender_phase = 0.0;
 
 int init_conn_audio(void *conn, const char *options) {
         struct audio_state *state = (struct audio_state *)conn;
 
-        if (inited == true)
-                return AUDIO_ERR_BUSY;
+        if (!sender_inited) {
+                int default_driver;
 
-        spec.freq = FREQUENCY;
-        spec.format = AUDIO_S16SYS;
-        spec.channels = 1;
-        spec.callback = NULL;
-        spec.samples = 4096;
-        spec.userdata = NULL;
+                ao_initialize();
 
-        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-                fprintf(stderr, "SDL failed to initialize : %s\n",
-                        SDL_GetError());
-                return AUDIO_ERR_INIT;
+                default_driver = ao_default_driver_id();
+
+                memset(&sender_format, 0, sizeof(sender_format));
+                sender_format.bits = 8;     /* Don't change */
+                sender_format.channels = 1; /* Don't change */
+                sender_format.rate = FREQUENCY;
+                sender_format.byte_format = AO_FMT_LITTLE;
+
+                sender_device = ao_open_live(default_driver, &sender_format,
+                                             NULL /* no options */);
+                if (sender_device == NULL) {
+                        fprintf(stderr, "error opening audio device\n");
+                        ao_shutdown();
+                        return AUDIO_ERR_INIT;
+                }
         }
 
-        dev = SDL_OpenAudioDevice(NULL, 0, &spec, NULL, 0);
-        if (dev == 0) {
-                fprintf(stderr, "failed to open audio: %s\n", SDL_GetError());
-                SDL_Quit();
-                return AUDIO_ERR_INIT;
-        }
-
-        inited = true;
+        sender_inited = true;
 
         return AUDIO_OK;
 }
@@ -108,6 +80,36 @@ static void get_bits(unsigned char *dest, unsigned char c) {
         dest[7] = ((unsigned char)c >> 0) & 1u;
 }
 
+static int play_tone(float hz, float duration) {
+        unsigned long sample_count;
+        unsigned long i;
+        unsigned char *buffer;
+        float phase_increment;
+
+        sample_count = (unsigned long)(sender_format.rate * duration);
+        buffer = calloc(sample_count, sizeof(unsigned char));
+        if (buffer == NULL)
+                return AUDIO_ERR_ALLOC;
+
+        phase_increment = (hz * 2.0 * M_PI) / sender_format.rate;
+
+        for (i = 0; i < sample_count; i++) {
+                buffer[i] = (unsigned char)(128 + 127 * sin(sender_phase));
+
+                sender_phase += phase_increment;
+                if (sender_phase >= 2.0 * M_PI)
+                        sender_phase -= 2.0 * M_PI;
+        }
+
+        if (!ao_play(sender_device, (char *)buffer, sample_count)) {
+                free(buffer);
+                return AUDIO_ERR_PLAY;
+        }
+
+        free(buffer);
+        return AUDIO_OK;
+}
+
 int send_chunk_audio(void *conn, const struct chunk *chunk) {
         struct audio_state *state = (struct audio_state *)conn;
         int res;
@@ -115,73 +117,63 @@ int send_chunk_audio(void *conn, const struct chunk *chunk) {
         unsigned long len;
         unsigned char bits[8];
 
-        if (busy)
+        if (sender_busy)
                 return AUDIO_ERR_BUSY;
 
-        busy = true;
+        sender_busy = true;
 
         len = get_be32(chunk->length);
-        if (len > CHUNK_SIZE)
+        if (len > CHUNK_SIZE) {
+                sender_busy = false;
                 return AUDIO_ERR_FRAME;
+        }
 
-        /* Indicates chunk start */
-        res = play_tone(&dev, buffer, 300, 0.5, 0.3);
-        if (res != AUDIO_OK)
-                return res;
+        /* Chunk start */
+        TONE(300, 0.3);
 
         /* Chunk type */
-        res = play_tone(&dev, buffer, chunk->type * 25 + 500, 0.5, 0.3);
-        if (res != AUDIO_OK)
-                return res;
+        get_bits(bits, chunk->type);
+        for (i = 0; i < 8; i++) {
+                TONE(bits[i] == 0 ? FREQUENCY_FALSE : FREQUENCY_TRUE,
+                     BIT_DURATION);
+        }
 
-        /* Data start */
-        res = play_tone(&dev, buffer, 400, 0.5, 0.3);
-        if (res != AUDIO_OK)
-                return res;
+        /* Data length */
+        for (i = 0; i < 4; i++) {
+                get_bits(bits, chunk->length[i]);
+
+                for (b = 0; b < 8; b++)
+                        TONE(bits[b] == 0 ? FREQUENCY_FALSE : FREQUENCY_TRUE,
+                             BIT_DURATION);
+        }
 
         /* Data */
         for (i = 0; i < len; i++) {
                 get_bits(bits, chunk->data[i]);
 
-                for (b = 0; b < 8; b++) {
-                        res = play_tone(&dev, buffer,
-                                        bits[b] == 0 ? FREQUENCY_FALSE
-                                                     : FREQUENCY_TRUE,
-                                        0.5, 0.01);
-                        if (res != AUDIO_OK)
-                                return res;
-                }
+                for (b = 0; b < 8; b++)
+                        TONE(bits[b] == 0 ? FREQUENCY_FALSE : FREQUENCY_TRUE,
+                             BIT_DURATION);
         }
-
-        /* Data end */
-        res = play_tone(&dev, buffer, 400, 0.5, 0.3);
-        if (res != AUDIO_OK)
-                return res;
 
         /* Chunk end */
-        res = play_tone(&dev, buffer, 300, 0.5, 0.3);
-        if (res != AUDIO_OK)
-                return res;
+        TONE(300, 0.3);
 
-        SDL_PauseAudioDevice(dev, 0);
-
-        while (SDL_GetQueuedAudioSize(dev) > 0) {
-                SDL_Delay(10);
-        }
-
-        busy = false;
+        sender_busy = false;
 
         return AUDIO_OK;
 }
 
 int recv_chunk_audio(void *conn, struct chunk *chunk) { return AUDIO_OK; }
 
-int close_conn_audio(void *conn) {
-        SDL_CloseAudioDevice(dev);
-        SDL_Quit();
-
-        inited = false;
-        dev = 0;
+int close_conn_audio(void *conn, tbool is_last) {
+        if (is_last) {
+                sender_busy = false;
+                sender_inited = false;
+                ao_close(sender_device);
+                sender_device = NULL;
+                ao_shutdown();
+        }
 
         return AUDIO_OK;
 }
@@ -200,7 +192,7 @@ int recv_chunk_audio(void *conn, struct chunk *chunk) {
         return AUDIO_ERR_PLATFORM;
 }
 
-int close_conn_audio(void *conn) { return AUDIO_ERR_PLATFORM; }
+int close_conn_audio(void *conn, tbool is_last) { return AUDIO_ERR_PLATFORM; }
 
 #endif
 
@@ -221,8 +213,10 @@ const char *get_error_text_audio(int code) {
                 return "The device is busy";
         case AUDIO_ERR_INIT:
                 return "Failed to initialize the audio device";
-        case AUDIO_ERR_QUEUE:
-                return "Failed to queue the next tone";
+        case AUDIO_ERR_ALLOC:
+                return "Failed to allocate memory";
+        case AUDIO_ERR_PLAY:
+                return "An unknown error occurred while trying to play a sound";
         default:
                 return "Unknown audio error";
         }

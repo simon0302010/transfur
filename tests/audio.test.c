@@ -37,11 +37,11 @@ int main(void) {
 
         result = send_chunk_audio(&state, &chunk);
         if (result != AUDIO_OK) {
-                close_conn_audio(&state);
+                close_conn_audio(&state, true);
                 return result;
         }
 
-        close_conn_audio(&state);
+        close_conn_audio(&state, true);
 
         return 0;
 }
