@@ -2,6 +2,7 @@
 #include "design.h"
 #include "images.h"
 #include "theme.h"
+#include "wallpaper.h"
 #include "widgets/button.h"
 #include "widgets/group.h"
 #include "widgets/loading_bar.h"
@@ -20,22 +21,32 @@ void basic_render(struct ui_context *ctx) {
         const struct basic_theme_desc *desc =
             basic_get_theme_desc(basic_get_theme());
 
-        switch (desc->bg_mode) {
-        case THEME_BG_SOLID_COLOR:
-        default:
-                basic_clear(page_background);
-                break;
 #ifdef ENABLE_THEMES
-        case THEME_BG_IMAGE_TILED:
-                draw_image_tiled(BASIC_THEME_IMAGE(BACKGROUND), 0, 0, 800, 600,
-                                 desc->bg_tile_w, desc->bg_tile_h);
-                break;
-        case THEME_BG_IMAGE_SCALED:
-                draw_image_scaled(IMAGE_GERMAN_BACKGROUND, 0, 0, 800, 600);
-
-                break;
+        if (basic_wallpaper_is_active()) {
+                basic_wallpaper_render();
+        } else {
 #endif
+                switch (desc->bg_mode) {
+                case THEME_BG_SOLID_COLOR:
+                default:
+                        basic_clear(page_background);
+                        break;
+#ifdef ENABLE_THEMES
+                case THEME_BG_IMAGE_TILED:
+                        draw_image_tiled(BASIC_THEME_IMAGE(BACKGROUND), 0, 0,
+                                         800, 600, desc->bg_tile_w,
+                                         desc->bg_tile_h);
+                        break;
+                case THEME_BG_IMAGE_SCALED:
+                        draw_image_scaled(IMAGE_GERMAN_BACKGROUND, 0, 0, 800,
+                                          600);
+
+                        break;
+#endif
+                }
+#ifdef ENABLE_THEMES
         }
+#endif
 
         details.width =
             800 - BASIC_MARGIN - BASIC_MARGIN; /* TODO: Match window */

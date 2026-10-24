@@ -8,6 +8,7 @@
 #include "render.h"
 #include "theme.h"
 #include "theme_switcher.h"
+#include "wallpaper.h"
 #include "wrappers/basic_wrapper.h"
 
 int run_basic(char *title) {
@@ -29,6 +30,8 @@ int run_basic(char *title) {
 
         basic_init(title, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+        basic_wallpaper_init(WINDOW_WIDTH, WINDOW_HEIGHT);
+
         while (ui.running) {
                 while ((event = basic_poll_ui_event()).type != UI_EVENT_NONE) {
                         switch (event.type) {
@@ -45,10 +48,19 @@ int run_basic(char *title) {
                         default:
                                 if (!ui_handle_event(&ui, &event)) {
                                         if (event.type == UI_EVENT_KEY_DOWN &&
-                                            event.key == UI_KEY_CHAR &&
-                                            event.ch == 't') {
-                                                basic_toggle_theme();
-                                                theme_switcher_show();
+                                            event.key == UI_KEY_CHAR) {
+                                                switch (event.ch) {
+                                                case 't':
+                                                        basic_toggle_theme();
+                                                        theme_switcher_show();
+                                                        break;
+                                                case 'w':
+                                                        basic_wallpaper_next();
+                                                        break;
+                                                case 'r':
+                                                        basic_wallpaper_regenerate();
+                                                        break;
+                                                }
                                         }
                                 }
                                 break;
@@ -80,6 +92,8 @@ int run_basic(char *title) {
         }
 
         basic_cleanup();
+
+        basic_wallpaper_cleanup();
 
         return 0;
 }

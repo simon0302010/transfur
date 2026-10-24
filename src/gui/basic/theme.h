@@ -22,6 +22,8 @@ struct basic_theme_palette {
         struct color focus_color;
 };
 
+#define BASIC_THEME_PALETTE_COLORS 9
+
 typedef enum { THEME_COLOR, THEME_IMAGE, THEME_OTHER } basic_theme_type_t;
 
 struct basic_theme_desc {

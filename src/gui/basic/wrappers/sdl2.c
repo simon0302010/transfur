@@ -236,3 +236,14 @@ tbool basic_poll_event(struct basic_event *event) {
 
         return true;
 }
+
+void basic_draw_buffer(const struct color *pixels, int w, int h) {
+        int i;
+        int total = w * h;
+
+        for (i = 0; i < total; i++) {
+                s_framebuffer[i] = ((unsigned int)pixels[i].r << 16) |
+                                   ((unsigned int)pixels[i].g << 8) |
+                                   (unsigned int)pixels[i].b;
+        }
+}

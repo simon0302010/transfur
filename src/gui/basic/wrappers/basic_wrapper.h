@@ -61,4 +61,6 @@ void basic_draw_rect(int x, int y, int w, int h, struct color color);
 
 void basic_fill_rect(int x, int y, int w, int h, struct color color);
 
+void basic_draw_buffer(const struct color *pixels, int w, int h);
+
 #endif
