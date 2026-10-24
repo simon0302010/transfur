@@ -1,5 +1,6 @@
 #include "../../core/widget.h"
 #include "../render.h"
+#include "../text.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,30 +60,43 @@ char **tui_render_split_widget(struct widget widget, int width) {
                 size_t j;
                 size_t pos = 0;
                 size_t line_length = 0;
+                size_t child_bytes;
+                size_t child_visible;
 
                 for (j = 0; j < widget.content_size; j++) {
-                        size_t child_len = (outputs[j] != NULL && i < lines[j])
-                                               ? strlen(outputs[j][i])
-                                               : 0;
-                        size_t col_width = (child_len > width_per_child)
-                                               ? child_len
-                                               : width_per_child;
-                        line_length += col_width + 3; /* " | " */
+                        size_t pad = 0;
+                        child_bytes = 0;
+                        child_visible = 0;
+
+                        if (outputs[j] != NULL && i < lines[j]) {
+                                child_bytes = strlen(outputs[j][i]);
+                                child_visible =
+                                    get_visible_width(outputs[j][i]);
+                        }
+
+                        if (child_visible < width_per_child) {
+                                pad = width_per_child - child_visible;
+                        }
+                        line_length += child_bytes + pad + 3; /* " | " */
                 }
 
                 output[i] = malloc(line_length + 1);
 
                 for (j = 0; j < widget.content_size; j++) {
-                        size_t child_len = 0;
+                        child_bytes = 0;
+                        child_visible = 0;
+
                         if (outputs[j] != NULL && i < lines[j]) {
-                                child_len = strlen(outputs[j][i]);
+                                child_bytes = strlen(outputs[j][i]);
+                                child_visible =
+                                    get_visible_width(outputs[j][i]);
                                 memcpy(output[i] + pos, outputs[j][i],
-                                       child_len);
-                                pos += child_len;
+                                       child_bytes);
+                                pos += child_bytes;
                         }
-                        while (child_len < width_per_child) {
+                        while (child_visible < width_per_child) {
                                 output[i][pos++] = ' ';
-                                child_len++;
+                                child_visible++;
                         }
                         if (j < widget.content_size - 1) {
                                 memcpy(output[i] + pos, " | ", 3);
