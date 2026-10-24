@@ -1,5 +1,6 @@
 #include "theme.h"
 #include "design.h"
+#include "wallpaper.h"
 
 #ifdef ENABLE_THEMES
 
@@ -140,8 +141,14 @@ basic_theme_t basic_theme_offset(basic_theme_t base, int offset) {
         return (basic_theme_t)index;
 }
 
-void basic_set_theme(basic_theme_t new_theme) { theme = new_theme; }
+void basic_set_theme(basic_theme_t new_theme) {
+        theme = new_theme;
+        basic_wallpaper_on_theme_changed();
+}
 
-void basic_toggle_theme(void) { theme = basic_theme_offset(theme, 1); }
+void basic_toggle_theme(void) {
+        theme = basic_theme_offset(theme, 1);
+        basic_wallpaper_on_theme_changed();
+}
 
 #endif
