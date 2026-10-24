@@ -12,6 +12,7 @@
 
 #if defined(OS_LINUX)
 #include <ao/ao.h>
+#include <portaudio.h>
 #endif
 
 #define FREQUENCY 44100
@@ -26,8 +27,10 @@
         if (res != AUDIO_OK)                                                   \
                 return res;
 
+#if defined(OS_LINUX)
 ao_device *sender_device;
 ao_sample_format sender_format;
+#endif
 static tbool sender_busy = false;
 static tbool sender_inited = false;
 static float sender_phase = 0.0;
@@ -36,6 +39,7 @@ int init_conn_audio(void *conn, const char *options) {
         struct audio_state *state = (struct audio_state *)conn;
 
         if (!sender_inited) {
+#if defined(OS_LINUX)
                 int default_driver;
 
                 ao_initialize();
@@ -55,6 +59,7 @@ int init_conn_audio(void *conn, const char *options) {
                         ao_shutdown();
                         return AUDIO_ERR_INIT;
                 }
+#endif
         }
 
         sender_inited = true;
@@ -101,10 +106,12 @@ static int play_tone(float hz, float duration) {
                         sender_phase -= 2.0 * M_PI;
         }
 
+#if defined(OS_LINUX)
         if (!ao_play(sender_device, (char *)buffer, sample_count)) {
                 free(buffer);
                 return AUDIO_ERR_PLAY;
         }
+#endif
 
         free(buffer);
         return AUDIO_OK;
@@ -170,9 +177,11 @@ int close_conn_audio(void *conn, tbool is_last) {
         if (is_last) {
                 sender_busy = false;
                 sender_inited = false;
+#if defined(OS_LINUX)
                 ao_close(sender_device);
                 sender_device = NULL;
                 ao_shutdown();
+#endif
         }
 
         return AUDIO_OK;
