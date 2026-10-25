@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "wallpapers/colors.h"
 #include "wallpapers/quilt.h"
+#include "wallpapers/sand.h"
 #include "wrappers/basic_wrapper.h"
 
 static basic_wallpaper_type_t current_wallpaper_type = WALLPAPER_NONE;
@@ -69,6 +70,10 @@ void basic_wallpaper_draw(void) {
         case WALLPAPER_QUILT:
                 basic_draw_quilt_wallpaper(wallpaper_pixels, wallpaper_width,
                                            wallpaper_height);
+                break;
+        case WALLPAPER_SAND:
+                basic_draw_sand_wallpaper(wallpaper_pixels, wallpaper_width,
+                                          wallpaper_height);
                 break;
         default:
                 break;
