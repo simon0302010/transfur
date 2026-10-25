@@ -4,6 +4,6 @@
 #include "../wrappers/basic_wrapper.h"
 
 void basic_draw_war_wallpaper(struct color *wallpaper_pixels,
-                              unsigned int width, unsigned int height);
+                              unsigned int width, unsigned int height, tbool lasers_enabled);
 
 #endif /* BASIC_WALLPAPER_WAR_H */

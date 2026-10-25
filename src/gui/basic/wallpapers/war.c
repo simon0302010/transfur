@@ -22,8 +22,21 @@ struct color war_colors[] = {{255, 0, 0},   {0, 255, 0},    {0, 0, 255},
 - if a team tries to grow into another team's land, the outcome is random
 */
 
+/* Lasers mode:
+if enabled:
+- on it's turn, a pixel has a low chance to shoot a laser instead
+- it will shoot to a random pixel
+- that pixel must be empty, or else this fails and the shooter pixel loses its
+turn
+- if the laser hits an empty pixel, it will create a new pixel of the shooter's
+team
+*/
+
+#define WAR_LASER_CHANCE 0.1f
+
 void basic_draw_war_wallpaper(struct color *wallpaper_pixels,
-                              unsigned int width, unsigned int height) {
+                              unsigned int width, unsigned int height,
+                              tbool lasers_enabled) {
         unsigned int scale =
             basic_wallpaper_get_random() * (WAR_MAX_SCALE - WAR_MIN_SCALE) +
             WAR_MIN_SCALE;
@@ -70,6 +83,23 @@ void basic_draw_war_wallpaper(struct color *wallpaper_pixels,
                                 unsigned int neighbor_team;
                                 if (team == 0)
                                         continue;
+                                if (lasers_enabled &&
+                                    basic_wallpaper_get_random() <
+                                        WAR_LASER_CHANCE) {
+                                        unsigned int target_x =
+                                            basic_wallpaper_get_random() *
+                                            (scale_width - 1);
+                                        unsigned int target_y =
+                                            basic_wallpaper_get_random() *
+                                            (scale_height - 1);
+                                        if (battlefield[target_y * scale_width +
+                                                        target_x] == 0) {
+                                                battlefield[target_y *
+                                                                scale_width +
+                                                            target_x] = team;
+                                        }
+                                        continue;
+                                }
                                 if (y > 0) {
                                         if (x > 0) {
                                                 neighbor_team = battlefield
