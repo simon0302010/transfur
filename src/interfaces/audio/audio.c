@@ -135,6 +135,12 @@ int send_chunk_audio(void *conn, const struct chunk *chunk) {
                 return AUDIO_ERR_FRAME;
         }
 
+        /* 100 tones to sync with receiver */
+        for (i = 0; i < 50; i++) {
+                TONE(FREQUENCY_TRUE, BIT_DURATION);
+                TONE(FREQUENCY_FALSE, BIT_DURATION);
+        }
+
         /* Chunk start */
         TONE(300, 0.3);
 
