@@ -12,7 +12,8 @@ Apple is not implemented
 
 #include "bluetooth.h"
 
-#if (defined(OS_LINUX) && defined(HAS_BLUETOOTH)) || defined(OS_LINUX) /* Supported systems */
+#if (defined(OS_LINUX) && defined(HAS_BLUETOOTH)) ||                           \
+    defined(OS_LINUX) /* Supported systems */
 
 #include <string.h>
 
@@ -62,8 +63,8 @@ static int bt_socket_close(bt_sock socket);
 static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr,
                           unsigned int channel);
 #elif defined(OS_WINDOWS)
-static int bt_socket_bijnd(bt_sock socket, const BTH_ADDR *addr, 
-                          unsigned int channel);
+static int bt_socket_bijnd(bt_sock socket, const BTH_ADDR *addr,
+                           unsigned int channel);
 #endif
 static int bt_socket_listen(bt_sock socket);
 static bt_sock bt_socket_accept(bt_sock socket);
@@ -94,7 +95,7 @@ static int bt_net_init(void) {
                 return 0;
         }
 
-        if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
+        if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
                 return -1;
         }
         inited = 1;
@@ -152,7 +153,7 @@ static int bt_socket_bind(bt_sock socket, const bdaddr_t *addr,
 }
 #elif defined(OS_WINDOWS)
 static int bt_socket_bind(bt_sock socket, const BTH_ADDR *addr,
-                           unsigned int channel) {
+                          unsigned int channel) {
         SOCKADDR_BTH socket_address;
 
         memset(&socket_address, 0, sizeof socket_address);
@@ -165,7 +166,10 @@ static int bt_socket_bind(bt_sock socket, const BTH_ADDR *addr,
         socket_address.port = (ULONG)channel;
         socket_address.serviceClassId = RFCOMM_PROTOCOL_UUID;
 
-        return bind(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return bind(socket, (struct sockaddr *)&socket_address,
+                    sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 #endif
 
@@ -217,7 +221,8 @@ static int bt_socket_connect(bt_sock socket, const bdaddr_t *addr,
                    : -1;
 }
 #elif defined(OS_WINDOWS)
-static int bt_socket_connect(bt_sock socket, const BTH_ADDR *addr, unsigned int channel) {
+static int bt_socket_connect(bt_sock socket, const BTH_ADDR *addr,
+                             unsigned int channel) {
         SOCKADDR_BTH socket_address;
 
         if (addr == NULL) {
@@ -230,7 +235,10 @@ static int bt_socket_connect(bt_sock socket, const BTH_ADDR *addr, unsigned int 
         socket_address.port = (ULONG)channel;
         socket_address.serviceClassId = RFCOMM_PROTOCOL_UUID;
 
-        return connect(socket, (struct sockaddr *)&socket_address, sizeof socket_address) == 0 ? 0 : -1;
+        return connect(socket, (struct sockaddr *)&socket_address,
+                       sizeof socket_address) == 0
+                   ? 0
+                   : -1;
 }
 
 static int bt_addr_from_str(const char *str, BTH_ADDR *out) {
@@ -293,9 +301,8 @@ static int bt_addr_from_str(const char *str, BTH_ADDR *out) {
 /* Send bytes to peer */
 static long bt_socket_send(bt_sock socket, const unsigned char *buf,
                            size_t len) {
-#if defined(OS_LINUX)                        
+#if defined(OS_LINUX)
         ssize_t n;
-
 
         do {
 #ifdef MSG_NOSIGNAL
@@ -306,7 +313,7 @@ static long bt_socket_send(bt_sock socket, const unsigned char *buf,
         } while (n < 0 && errno == EINTR);
 
         return (long)n;
-#elif defined(OS_WINDOWS) 
+#elif defined(OS_WINDOWS)
         int n;
 
         do {
@@ -316,7 +323,7 @@ static long bt_socket_send(bt_sock socket, const unsigned char *buf,
         if (n == SOCKET_ERROR) {
                 return -1;
         }
-        
+
         return (long)n;
 #else
         (void)socket;
@@ -338,7 +345,7 @@ static long bt_socket_recv(bt_sock socket, unsigned char *buf, size_t len) {
         return (long)n;
 #elif defined(OS_WINDOWS)
         int n;
-        
+
         do {
                 n = recv(socket, (char *)buf, (int)len, 0);
         } while (n == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
@@ -545,6 +552,7 @@ static int parse_options(const char *options, unsigned char *role,
                          unsigned int *channel) {
         const char *rest;
         const char *colon;
+        size_t len;
 
         if (options == NULL) {
                 return -1;
@@ -571,13 +579,13 @@ static int parse_options(const char *options, unsigned char *role,
                 return parse_channel(rest, strlen(rest), channel);
         }
 
-        size_t len = (size_t)(colon - rest);
+        len = (size_t)(colon - rest);
         if (len == 0 || len >= 18) {
                 return -1;
         }
         memcpy(addr_text, rest, len);
         addr_text[len] = '\0';
-        
+
         *have_addr = 1;
 
         return parse_channel(colon + 1, strlen(colon + 1), channel);
@@ -592,6 +600,10 @@ int init_conn_bluetooth(void *conn, const char *options) {
         bt_sock fd;
         bt_sock listener;
         int r;
+#if defined(OS_LINUX)
+        bdaddr_t addr;
+        bdaddr_t any = {0};
+#endif
 
         if (conn == NULL) {
                 return BT_ERR_ARG;
@@ -602,7 +614,8 @@ int init_conn_bluetooth(void *conn, const char *options) {
                 return BT_ERR_STATE;
         }
 
-        if (parse_options(options, &role, addr_text, &have_addr, &channel) != 0) {
+        if (parse_options(options, &role, addr_text, &have_addr, &channel) !=
+            0) {
                 return BT_ERR_OPTIONS;
         }
 
@@ -619,9 +632,6 @@ int init_conn_bluetooth(void *conn, const char *options) {
         bt_socket_nosigpipe(fd);
 
 #if defined(OS_LINUX)
-        bdaddr_t addr;
-        bdaddr_t any = {0};
-
         if (have_addr) {
                 if (str2ba(addr_text, &addr) != 0) {
                         bt_socket_close(fd);
@@ -692,7 +702,7 @@ int init_conn_bluetooth(void *conn, const char *options) {
                         if (fd == BT_INVALID_SOCK) {
                                 return BT_ERR_ACCEPT;
                         }
-                        
+
                         bt_socket_nosigpipe(fd);
                 } else {
                         if (bt_socket_connect(fd, &baddr, channel) != 0) {
@@ -819,9 +829,9 @@ int recv_chunk_bluetooth(void *conn, struct chunk *chunk) {
         return BT_ERR_PLATFORM;
 }
 
-int close_conn_bluetooth(void *conn) { 
+int close_conn_bluetooth(void *conn) {
         (void)conn;
-        return BT_ERR_PLATFORM; 
+        return BT_ERR_PLATFORM;
 }
 
 #endif

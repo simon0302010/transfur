@@ -1,9 +1,11 @@
 #include "bt_discover.h"
 
-#if (defined(OS_LINUX) && defined(HAVE_BLUETOOTH)) || defined(OS_WINDOWS) /* Supported systems */
+#if (defined(OS_LINUX) && defined(HAS_BLUETOOTH)) ||                           \
+    defined(OS_WINDOWS) /* Supported systems */
 
 #if defined(OS_LINUX)
 #include <pthread.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,17 +24,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <bluetoothapis.h>
 #include <winsock2.h>
 #include <ws2bth.h>
-#include <bluetoothapis.h>
+
 #endif
 
 /* Service UUID for scanning/advertising */
-static const uint8_t bt_service_uuid[16] =
-    {
-        0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x75, 0x72, /* "transfur" */
-        0x2d, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x31  /* "-discov1" */
-}
+static const uint8_t bt_service_uuid[16] = {
+    0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x75, 0x72, /* "transfur" */
+    0x2d, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x31  /* "-discov1" */
+};
 
 #define BT_DISCOVER_MAX_DEVICES 16
 #define BT_DISCOVER_INQUIRY_SECONDS 6
@@ -70,14 +72,15 @@ static int bt_advertise_start(unsigned int channel);
 static void bt_advertise_stop(void);
 #if defined(OS_LINUX)
 static void *bt_scan_worker(void *arg);
-#elif defined(OS_WINDOWS) 
+#elif defined(OS_WINDOWS)
 static DWORD WINAPI bt_scan_worker(LPVOID arg);
 #endif
 static void bt_scan_once(void);
 #if defined(OS_LINUX)
 static int bt_browse_channel(const bdaddr_t *remote, unsigned int *out);
 #elif defined(OS_WINDOWS)
-static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote, unsigned int *out);
+static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote,
+                             unsigned int *out);
 static void bt_addr_from_str(const BLUETOOTH_ADDRESS *ba, char out[18]);
 #endif
 static void bt_set_peers(char addrs[][18], unsigned int *channels, int count);
@@ -92,6 +95,7 @@ int bt_discover_init(void) {
                 return init_ok;
         }
         init_done = 1;
+#endif
 
 #if defined(OS_LINUX)
         dev_id = hci_get_route(NULL);
@@ -100,7 +104,7 @@ int bt_discover_init(void) {
                 return 0;
         }
 #elif defined(OS_WINDOWS)
-        if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
+        if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
                 init_ok = 0;
                 return 0;
         }
@@ -193,6 +197,8 @@ static void *bt_scan_worker(void *arg) {
 
         scanning = 0;
         scan_running = 0;
+
+        return NULL; /* void* must return something */
 }
 #elif defined(OS_WINDOWS)
 static DWORD WINAPI bt_scan_worker(LPVOID arg) {
@@ -235,7 +241,7 @@ void bt_discover_scan(void) {
 #elif defined(OS_WINDOWS)
         scan_thread = CreateThread(NULL, 0, bt_scan_worker, NULL, 0, NULL);
         if (scan_thread == NULL) {
-                scanning= 0;
+                scanning = 0;
                 scan_running = 0;
                 return;
         }
@@ -492,28 +498,31 @@ static void bt_addr_from_str(const BLUETOOTH_ADDRESS *ba, char out[18]) {
                 val >>= 8;
         }
 
-        sprintf(out, "%02X:%02X:%02X:%02X:%02X:%02X", b[0], b[1], b[2], b[3], b[4], b[5]);
+        sprintf(out, "%02X:%02X:%02X:%02X:%02X:%02X", b[0], b[1], b[2], b[3],
+                b[4], b[5]);
 }
 
-static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote, unsigned int *out) {
+static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote,
+                             unsigned int *out) {
         WSAQUERYSETW query_set;
         HANDLE lookup_handle = NULL;
         GUID service_guid;
         int found = -1;
         unsigned int j;
-        
+
         if (remote == NULL || out == NULL) {
                 return -1;
         }
 
         memcpy(&service_guid, bt_service_uuid, sizeof(GUID));
-        
+
         memset(&query_set, 0, sizeof(query_set));
         query_set.dwSize = sizeof(query_set);
         query_set.dwNameSpace = NS_BTH;
         query_set.lpServiceClassId = &service_guid;
 
-        if (WSALookupServiceBeginW(&query_set, LUP_FLUSHCACHE | LUP_RETURN_ADDR, &lookup_handle) != 0) {
+        if (WSALookupServiceBeginW(&query_set, LUP_FLUSHCACHE | LUP_RETURN_ADDR,
+                                   &lookup_handle) != 0) {
                 return -1;
         }
 
@@ -524,8 +533,10 @@ static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote, unsigned int *out)
 
                 memset(buf, 0, sizeof(buf));
                 p->dwSize = sizeof(WSAQUERYSETW);
-                
-                if (WSALookupServiceNextW(lookup_handle, LUP_FLUSHCACHE | LUP_RETURN_ADDR, &size, p) != 0) {
+
+                if (WSALookupServiceNextW(lookup_handle,
+                                          LUP_FLUSHCACHE | LUP_RETURN_ADDR,
+                                          &size, p) != 0) {
                         break;
                 }
 
@@ -534,22 +545,24 @@ static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote, unsigned int *out)
                 }
 
                 for (j = 0; j < p->dwNumberOfCsAddrs; j++) {
-                        LPSOCKADDR addr = p->lpcsaBuffer[j].RemoteAddr.lpSockaddr;
+                        LPSOCKADDR addr =
+                            p->lpcsaBuffer[j].RemoteAddr.lpSockaddr;
                         SOCKADDR_BTH *sa_bth;
 
                         if (addr == NULL || addr->sa_family != AF_BTH) {
                                 continue;
-                        } 
-                        
+                        }
+
                         sa_bth = (SOCKADDR_BTH *)addr;
 
                         if (sa_bth->btAddr != remote->ullLong) {
                                 continue;
                         }
 
-                        if (sa_bth->port < BT_DISCOVER_CHANNEL_MIN || sa_bth->port > BT_DISCOVER_CHANNEL_MAX) {
+                        if (sa_bth->port < BT_DISCOVER_CHANNEL_MIN ||
+                            sa_bth->port > BT_DISCOVER_CHANNEL_MAX) {
                                 continue;
-                        } 
+                        }
 
                         *out = (unsigned int)sa_bth->port;
                         found = 0;
@@ -560,25 +573,25 @@ static int bt_browse_channel(const BLUETOOTH_ADDRESS *remote, unsigned int *out)
                         break;
                 }
         }
-        
+
         WSALookupServiceEnd(lookup_handle);
         return found;
 }
 #endif
 
 static int bt_advertise_start(unsigned int channel) {
+#if defined(OS_LINUX)
         uuid_t root_uuid;
+        sdp_list_t *root_list = NULL;
         uuid_t l2cap_uuid;
         uuid_t rfcomm_uuid;
         uuid_t svc_uuid;
-        sdp_list_t *root_list = NULL;
         sdp_list_t *l2cap_list = NULL;
         sdp_list_t *rfcomm_list = NULL;
         sdp_list_t *proto_list = NULL;
-#if defined(OS_LINUX)
         sdp_list_t *access_proto_list = NULL;
         sdp_list_t *svc_class_list = NULL;
-        sdp_data_t *record = NULL;
+        sdp_data_t *channel_data = NULL;
         sdp_record_t *record = NULL;
         unsigned char ch = (unsigned char)channel;
         int err = 0;
@@ -620,10 +633,6 @@ static int bt_advertise_start(unsigned int channel) {
                         sdp_close(adv_session);
                         adv_session = NULL;
                 }
-#elif defined(OS_WINDOWS)
-                (void)channel;
-                return 0;
-#endif
         }
 
         sdp_list_free(root_list, NULL);
@@ -642,6 +651,8 @@ static int bt_advertise_start(unsigned int channel) {
         }
 
         adv_record = record;
+#endif
+
         return 0;
 }
 
