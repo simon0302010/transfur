@@ -20,6 +20,9 @@
 #define SAND_PARTICLE_SPAWN_ABOVE_BY                                           \
         14 /* Spawn particles this far above the current highest surface */
 
+#define SAND_MIN_SCALE 2
+#define SAND_MAX_SCALE 4
+
 struct color sand_colors[] = {
     {255, 243, 214}, {226, 182, 126}, {198, 137, 88},  {138, 72, 36},
     {255, 45, 128},  {220, 20, 95},   {255, 95, 31},   {255, 200, 0},
@@ -64,6 +67,11 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
 
         unsigned int x, y, i;
 
+        unsigned int scale =
+            (unsigned int)(SAND_MIN_SCALE +
+                           basic_wallpaper_get_random() *
+                               (SAND_MAX_SCALE - SAND_MIN_SCALE));
+
         tbool goal_met = false;
 
         /* Reset wallpaper_pixels to black */
@@ -77,7 +85,8 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
 
         while (!goal_met) {
                 unsigned int point_x =
-                    (unsigned int)(basic_wallpaper_get_random() * width);
+                    (unsigned int)(basic_wallpaper_get_random() * width) *
+                    scale;
 
                 unsigned int point_pixels =
                     (unsigned int)(SAND_MIN_PARTICLES_PER_POINT +
@@ -104,6 +113,8 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
                                   2) -
                             SAND_PARTICLE_COLOR_BRIGHTNESS_VARIATION;
 
+                        unsigned int dx, dy;
+
                         pixel_color.r = (unsigned char)fmax(
                             0, fmin(255, pixel_color.r +
                                              color_brightness_variation));
@@ -118,44 +129,49 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
                         if (min_y < SAND_PARTICLE_SPAWN_ABOVE_BY) {
                                 y = 0;
                         } else {
-                                y = min_y - SAND_PARTICLE_SPAWN_ABOVE_BY;
+                                y = min_y -
+                                    SAND_PARTICLE_SPAWN_ABOVE_BY * scale;
                         }
 
                         /* Main falling */
                         while (!pixel_at_point(wallpaper_pixels, width, height,
                                                x, y) &&
                                y < height - 1) {
-                                y++;
+                                y += scale;
                                 if (basic_wallpaper_get_random() <
                                     SAND_PARTICLE_MOVE_CHANCE) {
                                         if (basic_wallpaper_get_random() <
                                             0.5f) {
                                                 if (x > 0)
-                                                        x--;
+                                                        x -= scale;
                                         } else {
-                                                if (x < width - 1)
-                                                        x++;
+                                                if (x < width - scale)
+                                                        x += scale;
                                         }
                                 }
                         }
-                        y--;
+                        y -= scale;
 
                         /* Slope falling */
                         /* left */
                         if (x > 0) {
                                 while (!pixel_at_point(wallpaper_pixels, width,
-                                                       height, x - 1,
-                                                       y + left_max_drop) &&
-                                       (y + left_max_drop) < height - 1) {
+                                                       height, x - scale,
+                                                       y + left_max_drop *
+                                                               scale) &&
+                                       (y + left_max_drop * scale) <
+                                           height - scale) {
                                         left_max_drop++;
                                 }
                         }
                         /* right */
-                        if (x < width - 1) {
+                        if (x < width - scale) {
                                 while (!pixel_at_point(wallpaper_pixels, width,
-                                                       height, x + 1,
-                                                       y + right_max_drop) &&
-                                       (y + right_max_drop) < height - 1) {
+                                                       height, x + scale,
+                                                       y + right_max_drop *
+                                                               scale) &&
+                                       (y + right_max_drop * scale) <
+                                           height - scale) {
                                         right_max_drop++;
                                 }
                         }
@@ -172,26 +188,35 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
                         if (basic_wallpaper_get_random() > 0.5f) {
                                 if (basic_wallpaper_get_random() <
                                     left_drop_chance) {
-                                        x--;
-                                        y += left_max_drop;
+                                        x -= scale;
+                                        y += left_max_drop * scale;
                                 } else if (basic_wallpaper_get_random() <
                                            right_drop_chance) {
-                                        x++;
-                                        y += right_max_drop;
+                                        x += scale;
+                                        y += right_max_drop * scale;
                                 }
                         } else {
                                 if (basic_wallpaper_get_random() <
                                     right_drop_chance) {
-                                        x++;
-                                        y += right_max_drop;
+                                        x += scale;
+                                        y += right_max_drop * scale;
                                 } else if (basic_wallpaper_get_random() <
                                            left_drop_chance) {
-                                        x--;
-                                        y += left_max_drop;
+                                        x -= scale;
+                                        y += left_max_drop * scale;
                                 }
                         }
 
-                        wallpaper_pixels[y * width + x] = pixel_color;
+                        for (dy = 0; dy < scale; dy++) {
+                                for (dx = 0; dx < scale; dx++) {
+                                        if (x + dx < width && y + dy < height) {
+                                                wallpaper_pixels[(y + dy) *
+                                                                     width +
+                                                                 (x + dx)] =
+                                                    pixel_color;
+                                        }
+                                }
+                        }
 
                         if (y < min_y) {
                                 min_y = y;
