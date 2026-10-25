@@ -10,6 +10,8 @@
 #include "../../misc/be32.h"
 #include "../../misc/bool.h"
 
+#include "minfft/minfft.h"
+
 #if defined(OS_LINUX)
 #include <ao/ao.h>
 #include <portaudio.h>
@@ -89,9 +91,9 @@ int init_conn_audio(void *conn, const char *options) {
                         return AUDIO_ERR_INIT;
                 }
 
-                err = Pa_OpenDefaultStream(
-                    &receiver_stream, 1, 0, paFloat32, FREQUENCY, 1024,
-                    input_stream_callback, receiver_user_data_ptr);
+                err = Pa_OpenDefaultStream(&receiver_stream, 1, 0, paFloat32,
+                                           48000, 1920, input_stream_callback,
+                                           receiver_user_data_ptr);
                 if (err != paNoError) {
                         fprintf(stderr,
                                 "error opening audio input stream: %s\n",
