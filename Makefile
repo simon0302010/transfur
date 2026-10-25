@@ -86,6 +86,7 @@ BASIC_SRC = $(COMMON_SRC) \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
 	src/gui/basic/assets.c \
+	src/gui/basic/music.c \
 	src/gui/basic/text.c \
 	src/gui/basic/widgets/loading_bar.c \
 	src/gui/basic/widgets/progress_bar.c \
@@ -114,12 +115,12 @@ endif
 
 ifeq ($(shell uname -s),Linux)
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
-	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2)
-	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
+	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2 SDL2_mixer)
+	BASIC_LDLIBS += $(shell pkg-config --libs sdl2 SDL2_mixer)
 else ifeq ($(shell uname -s),Darwin)
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
-	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2)
-	BASIC_LDLIBS += $(shell pkg-config --libs sdl2)
+	BASIC_CFLAGS += $(shell pkg-config --cflags sdl2 SDL2_mixer)
+	BASIC_LDLIBS += $(shell pkg-config --libs sdl2 SDL2_mixer)
 else
 	BASIC_SRC += src/gui/basic/wrappers/sdl2.c
 	BASIC_LDLIBS += -lSDL2main -lSDL2
