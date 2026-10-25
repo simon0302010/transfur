@@ -1,6 +1,5 @@
 #include "images.h"
 #include "../../misc/bool.h"
-#include <stdint.h>
 
 #ifdef ENABLE_THEMES
 
@@ -9,16 +8,6 @@
         extern const unsigned int name##_bmp_size;
 IMAGE_LIST(X_EXTERN)
 #undef X_EXTERN
-
-struct image_entry {
-        const unsigned char *raw_data;
-        const unsigned int *raw_size;
-        tbool loaded;
-        uint32_t offset;
-        int width;
-        int height;
-        uint16_t bpp;
-};
 
 #define X_ENTRY(id, name)                                                      \
         {name##_bmp_data, &name##_bmp_size, false, 0, 0, 0, 0},
@@ -179,6 +168,25 @@ void draw_image_tiled(basic_image_id_t id, int x, int y, int w, int h,
                                                   y + h);
                 }
         }
+}
+
+tbool get_image_data(basic_image_id_t id, struct image_entry *out_data) {
+        struct image_entry *img;
+
+        if (id < 0 || id >= IMAGE_COUNT)
+                return false;
+
+        img = &image_registry[id];
+
+        if (!img->loaded)
+                load_image(id);
+
+        if (!img->loaded)
+                return false;
+
+        *out_data = *img;
+
+        return true;
 }
 
 #endif

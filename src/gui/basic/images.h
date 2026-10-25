@@ -2,6 +2,7 @@
 #define BASIC_IMAGES_H
 
 #include "wrappers/basic_wrapper.h"
+#include <stdint.h>
 
 #ifdef ENABLE_THEMES
 
@@ -74,11 +75,22 @@
         X(CATPPUCCIN_MACCHIATO_ICON, catppuccin_macchiato_icon)                \
         X(CATPPUCCIN_MOCHA_ICON, catppuccin_mocha_icon)                        \
         X(GRUVBOX_DARK_ICON, gruvbox_dark_icon)                                \
-        X(GRUVBOX_LIGHT_ICON, gruvbox_light_icon)
+        X(GRUVBOX_LIGHT_ICON, gruvbox_light_icon)                              \
+        X(TEXTURES_STRIP, textures_strip)
 
 #define X_ENUM(id, name) IMAGE_##id,
 typedef enum { IMAGE_LIST(X_ENUM) IMAGE_COUNT } basic_image_id_t;
 #undef X_ENUM
+
+struct image_entry {
+        const unsigned char *raw_data;
+        const unsigned int *raw_size;
+        tbool loaded;
+        uint32_t offset;
+        int width;
+        int height;
+        uint16_t bpp;
+};
 
 void draw_image(basic_image_id_t id, int x, int y);
 void draw_image_scaled(basic_image_id_t id, int x, int y, int w, int h);
@@ -90,6 +102,7 @@ void draw_image_tiled(basic_image_id_t id, int x, int y, int w, int h,
                       int tile_w, int tile_h);
 int get_image_width(basic_image_id_t id);
 int get_image_height(basic_image_id_t id);
+tbool get_image_data(basic_image_id_t id, struct image_entry *out_data);
 
 #else
 
