@@ -35,6 +35,12 @@ static tbool sender_busy = false;
 static tbool sender_inited = false;
 static float sender_phase = 0.0;
 
+#if defined(OS_LINUX)
+PaStream *stream = NULL;
+#endif
+static tbool receiver_inited = false;
+static tbool receiver_busy = false;
+
 int init_conn_audio(void *conn, const char *options) {
         struct audio_state *state = (struct audio_state *)conn;
 
