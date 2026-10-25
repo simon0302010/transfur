@@ -12,22 +12,25 @@ extern const unsigned int font_bmp_size;
 __asm__(".section " ASM_SEC "\n"
         ".balign 4\n"
         ".globl " ASM_PREFIX "font_bmp_data\n"
+        ".globl " ASM_PREFIX "font_bmp_size\n"
         ASM_PREFIX "font_bmp_data:\n"
         ".incbin \"font.bmp\"\n"
         ASM_PREFIX "font_bmp_end:\n"
+        ASM_PREFIX "font_bmp_size:\n"
         ".long " ASM_PREFIX "font_bmp_end - " ASM_PREFIX "font_bmp_data\n");
         
 #ifdef ENABLE_THEMES
 
 #define EMBED(name, file)                                                       \
         ".globl " ASM_PREFIX #name "_bmp_data\n"                                \
+        ".globl " ASM_PREFIX #name "_bmp_size\n"                                \
         ASM_PREFIX #name "_bmp_data:\n"                                         \
         ".incbin \"" file "\"\n"                                                \
         ASM_PREFIX #name "_bmp_end:\n"                                          \
         ASM_PREFIX #name "_bmp_size:\n"                                         \
         ".long " ASM_PREFIX #name "_bmp_end - " ASM_PREFIX #name "_bmp_data\n"
 
-__asm__(".section" ASM_SEC "\n" 
+__asm__(".section " ASM_SEC "\n" 
         ".balign 4\n"
         EMBED(coffee_background, "assets/coffee_background.bmp")
         EMBED(coffee_button_primary, "assets/coffee_button_primary.bmp")
@@ -42,7 +45,7 @@ __asm__(".section" ASM_SEC "\n"
         EMBED(coffee_progress_bar_end, "assets/coffee_progress_bar_end.bmp")
         EMBED(pastel_background, "assets/pastel_background.bmp")
         EMBED(pastel_button_primary, "assets/pastel_button_primary.bmp")
-        EMBED(pastel_button_disabled, "assset/pastel_button_disabled.bmp")
+        EMBED(pastel_button_disabled, "assets/pastel_button_disabled.bmp")
         EMBED(pastel_button_success, "assets/pastel_button_success.bmp")
         EMBED(pastel_button_failure, "assets/pastel_button_failure.bmp")
         EMBED(pastel_borders_horizontal, "assets/pastel_borders_horizontal.bmp")
@@ -50,6 +53,7 @@ __asm__(".section" ASM_SEC "\n"
         EMBED(pastel_input, "assets/pastel_input.bmp")
         EMBED(pastel_progress_bar_background, "assets/pastel_progress_bar_background.bmp")
         EMBED(pastel_progress_bar_segment, "assets/pastel_progress_bar_segment.bmp")
+        EMBED(pastel_progress_bar_end, "assets/pastel_progress_bar_end.bmp")
         EMBED(german_background, "assets/german_background.bmp")
         EMBED(german_button_primary, "assets/german_button_primary.bmp")
         EMBED(german_button_disabled, "assets/german_button_disabled.bmp")
@@ -60,15 +64,16 @@ __asm__(".section" ASM_SEC "\n"
         EMBED(german_progress_bar_background, "assets/german_progress_bar_background.bmp")
         EMBED(german_progress_bar_segment, "assets/german_progress_bar_segment.bmp")
         EMBED(german_progress_bar_end, "assets/german_progress_bar_end.bmp")
+        EMBED(german_input, "assets/german_input.bmp")
         EMBED(classic_icon, "assets/classic_icon.bmp")
         EMBED(classic_light_icon, "assets/classic_light_icon.bmp")
         EMBED(coffee_icon, "assets/coffee_icon.bmp")
         EMBED(pastel_icon, "assets/pastel_icon.bmp")
-        EMBED(german_icon, "assets/german_icon.bmp")
+        EMBED(german_icon, "assets/german_button_failure.bmp")
         EMBED(american_background, "assets/american_background.bmp")
         EMBED(american_button_primary, "assets/american_button_primary.bmp")
         EMBED(american_button_disabled, "assets/american_button_disabled.bmp")
-        EMBED(american_button_success, "assetes/american_button_success.bmp")
+        EMBED(american_button_success, "assets/american_button_success.bmp")
         EMBED(american_button_failure, "assets/american_button_failure.bmp")
         EMBED(american_borders_horizontal, "assets/american_borders_horizontal.bmp")
         EMBED(american_borders_vertical, "assets/american_borders_vertical.bmp")
