@@ -1,0 +1,20 @@
+[project]
+name = "quilt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Jeremiah Saunders", email = "jeremiahsaunders5@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "pillow>=13.0.0",
+    "pywikibot>=11.9.0",
+]
+
+[project.scripts]
+quilt = "quilt:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"

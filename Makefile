@@ -39,12 +39,9 @@ COMMON_SRC = src/main.c \
 	src/interfaces/lan/lan.c \
 	src/interfaces/wan/wan.c \
 	src/interfaces/audio/audio.c \
-	src/interfaces/lan/lan_discover.c \
 	src/interfaces/discovery.c \
 	src/interfaces/lan/pip.c \
 	src/interfaces/serial/serial.c \
-	src/interfaces/bluetooth/bluetooth.c \
-	src/interfaces/bluetooth/bt_discover.c \
 	src/misc/console.c \
 	src/misc/debug.c \
 	src/misc/ttime.c \
@@ -103,7 +100,8 @@ ifeq ($(ENABLE_THEMES), 1)
 	BASIC_CFLAGS += -DENABLE_THEMES
 	BASIC_SRC += src/gui/basic/images.c src/gui/basic/theme.c src/gui/basic/theme_switcher.c \
 		src/gui/basic/wallpaper.c \
-		src/gui/basic/wallpapers/colors.c
+		src/gui/basic/wallpapers/colors.c \
+		src/gui/basic/wallpapers/quilt.c
 	BASIC_ASM_SRC += src/gui/basic/image_assets.S
 endif
 

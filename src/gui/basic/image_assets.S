@@ -93,6 +93,6 @@ EMBED_IMAGE catppuccin_macchiato_icon, "assets/catppuccin_macchiato_icon.bmp"
 EMBED_IMAGE catppuccin_mocha_icon, "assets/catppuccin_mocha_icon.bmp"
 EMBED_IMAGE gruvbox_dark_icon, "assets/gruvbox_dark_icon.bmp"
 EMBED_IMAGE gruvbox_light_icon, "assets/gruvbox_light_icon.bmp"
-
+EMBED_IMAGE textures_strip, "assets/textures_strip.bmp"
 
 #endif
