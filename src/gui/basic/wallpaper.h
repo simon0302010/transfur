@@ -10,6 +10,7 @@ typedef enum {
         WALLPAPER_QUILT,
         WALLPAPER_SAND,
         WALLPAPER_TRIG,
+        WALLPAPER_WAR,
         WALLPAPER_COUNT
 } basic_wallpaper_type_t;
 
