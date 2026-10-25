@@ -84,6 +84,7 @@ BASIC_SRC = $(COMMON_SRC) \
 	src/gui/basic/basic.c \
 	src/gui/basic/render.c \
 	src/gui/basic/event.c \
+	src/gui/basic/assets.c \
 	src/gui/basic/text.c \
 	src/gui/basic/widgets/loading_bar.c \
 	src/gui/basic/widgets/progress_bar.c \
@@ -94,8 +95,6 @@ BASIC_SRC = $(COMMON_SRC) \
 	src/gui/basic/drawing.c \
 	src/gui/basic/widgets/split.c \
 	src/gui/basic/widgets/group.c
-
-BASIC_ASM_SRC = src/gui/basic/font.S
 
 ENABLE_THEMES ?= 0
 
@@ -146,7 +145,7 @@ BIN_TUI = build/$(OS_NAME)/transfur-tui$(EXE)
 TARGET = build/$(OS_NAME)/transfur$(EXE)
 
 NUKLEAR_OBJ = $(NUKLEAR_SRC:src/%.c=build/$(OS_NAME)/nuklear/%.o)
-BASIC_OBJ = $(BASIC_SRC:src/%.c=build/$(OS_NAME)/basic/%.o) $(BASIC_ASM_SRC:src/%.S=build/$(OS_NAME)/basic/%.o)
+BASIC_OBJ = $(BASIC_SRC:src/%.c=build/$(OS_NAME)/basic/%.o)
 TUI_OBJ = $(TUI_SRC:src/%.c=build/$(OS_NAME)/tui/%.o)
 
 ifeq ($(GUI),basic)
@@ -184,10 +183,6 @@ $(BIN_TUI): $(TUI_OBJ)
 build/$(OS_NAME)/nuklear/%.o: src/%.c
 	mkdir -p $(dir $@)
 	$(CC) $(NUKLEAR_CFLAGS) -c $< -o $@
-
-build/$(OS_NAME)/basic/%.o: src/%.S
-	mkdir -p $(dir $@)
-	$(CC) $(BASIC_CFLAGS) -c $< -o $@
 
 build/$(OS_NAME)/basic/%.o: src/%.c
 	mkdir -p $(dir $@)

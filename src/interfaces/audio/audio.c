@@ -36,10 +36,18 @@ static tbool sender_inited = false;
 static float sender_phase = 0.0;
 
 #if defined(OS_LINUX)
-PaStream *stream = NULL;
+PaStream *receiver_stream = NULL;
+char receiver_buffer[sizeof(struct chunk)];
+void *receiver_user_data_ptr = NULL;
 #endif
 static tbool receiver_inited = false;
 static tbool receiver_busy = false;
+
+static int input_stream_callback(const void *input_buffer, void *output_buffer,
+                                 unsigned long frames_per_buffer,
+                                 const PaStreamCallbackTimeInfo *time_info,
+                                 PaStreamCallbackFlags status_flags,
+                                 void *user_data);
 
 int init_conn_audio(void *conn, const char *options) {
         struct audio_state *state = (struct audio_state *)conn;
@@ -66,9 +74,35 @@ int init_conn_audio(void *conn, const char *options) {
                         return AUDIO_ERR_INIT;
                 }
 #endif
+
+                sender_inited = true;
         }
 
-        sender_inited = true;
+        if (!receiver_inited) {
+#if defined(OS_LINUX)
+                PaError err;
+
+                err = Pa_Initialize();
+                if (err != paNoError) {
+                        fprintf(stderr, "error initializing audio input: %s\n",
+                                Pa_GetErrorText(err));
+                        return AUDIO_ERR_INIT;
+                }
+
+                err = Pa_OpenDefaultStream(
+                    &receiver_stream, 1, 0, paFloat32, FREQUENCY, 1024,
+                    input_stream_callback, receiver_user_data_ptr);
+                if (err != paNoError) {
+                        fprintf(stderr,
+                                "error opening audio input stream: %s\n",
+                                Pa_GetErrorText(err));
+                        Pa_Terminate();
+                        return AUDIO_ERR_INIT;
+                }
+#endif
+
+                receiver_inited = true;
+        }
 
         return AUDIO_OK;
 }
@@ -183,9 +217,39 @@ int send_chunk_audio(void *conn, const struct chunk *chunk) {
         return AUDIO_OK;
 }
 
-int recv_chunk_audio(void *conn, struct chunk *chunk) { return AUDIO_OK; }
+static int input_stream_callback(const void *input_buffer, void *output_buffer,
+                                 unsigned long frames_per_buffer,
+                                 const PaStreamCallbackTimeInfo *time_info,
+                                 PaStreamCallbackFlags status_flags,
+                                 void *user_data) {
+        int i;
+        const float *inp = (const float *)input_buffer;
+
+        for (i = 0; i < frames_per_buffer; i++) {
+                printf("%f ", inp[i]);
+        }
+
+        return paContinue;
+}
+
+int recv_chunk_audio(void *conn, struct chunk *chunk) {
+        PaError err;
+
+        err = Pa_StartStream(receiver_stream);
+        if (err != paNoError) {
+                fprintf(stderr, "error starting audio input stream: %s",
+                        Pa_GetErrorText(err));
+                /* Not closing the stream because it might work again (unlikely
+                 * though) */
+                return AUDIO_ERR_CAP;
+        }
+
+        return AUDIO_OK;
+}
 
 int close_conn_audio(void *conn, tbool is_last) {
+        /* We'll ignore errors here */
+
         if (is_last) {
                 sender_busy = false;
                 sender_inited = false;
@@ -194,6 +258,14 @@ int close_conn_audio(void *conn, tbool is_last) {
                 sender_device = NULL;
                 ao_shutdown();
 #endif
+
+                receiver_busy = false;
+                receiver_inited = false;
+                /* Shouldn't be open anymore but doesn't hurt to try stopping it
+                 */
+                Pa_StopStream(receiver_stream);
+                Pa_CloseStream(receiver_stream);
+                Pa_Terminate();
         }
 
         return AUDIO_OK;
