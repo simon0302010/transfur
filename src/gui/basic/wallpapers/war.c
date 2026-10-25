@@ -230,6 +230,11 @@ void basic_draw_war_wallpaper(struct color *wallpaper_pixels,
                                                 new_color =
                                                     war_colors[team - 1];
                                         }
+                                        if (new_color.r == existing_color.r &&
+                                            new_color.g == existing_color.g &&
+                                            new_color.b == existing_color.b) {
+                                                continue;
+                                        }
                                         new_color.r =
                                             (existing_color.r + new_color.r) /
                                             2;
