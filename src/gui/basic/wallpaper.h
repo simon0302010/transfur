@@ -9,6 +9,7 @@ typedef enum {
         WALLPAPER_RANDOM_THEMATIC_COLORS,
         WALLPAPER_QUILT,
         WALLPAPER_SAND,
+        WALLPAPER_TRIG,
         WALLPAPER_COUNT
 } basic_wallpaper_type_t;
 

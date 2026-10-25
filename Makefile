@@ -105,7 +105,8 @@ ifeq ($(ENABLE_THEMES), 1)
 		src/gui/basic/wallpaper.c \
 		src/gui/basic/wallpapers/colors.c \
 		src/gui/basic/wallpapers/quilt.c \
-		src/gui/basic/wallpapers/sand.c
+		src/gui/basic/wallpapers/sand.c \
+		src/gui/basic/wallpapers/trig.c
 	BASIC_ASM_SRC += src/gui/basic/image_assets.S
 endif
 
