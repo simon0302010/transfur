@@ -8,9 +8,9 @@
 
 #define NUM_QUILT_LINES 10
 #define NUM_QUILT_LINE_JAGS 25
-#define QUILT_RESOLUTION 80
+#define QUILT_RESOLUTION 70
 #define QUILT_STITCHES_PER_RESOLUTION 1
-#define QUILT_STITCH_RADIUS 4
+#define QUILT_STITCH_RADIUS 5
 
 #define QUILT_ACCEL_FORCE 1.2f
 #define QUILT_DAMPING 0.85f
@@ -112,9 +112,9 @@ static struct color sample_tile_pixel(const struct image_entry *img,
 /* TODO: perhaps make a way for wallpaper functions and rendering functions to
  * interact? */
 
-void draw_line_low(struct color *wallpaper_pixels, unsigned int width,
-                   unsigned int height, int x1, int y1, int x2, int y2,
-                   struct color color) {
+static void draw_line_low(struct color *wallpaper_pixels, unsigned int width,
+                          unsigned int height, int x1, int y1, int x2, int y2,
+                          struct color color) {
         int dx = x2 - x1;
         int dy = y2 - y1;
         int yi = 1;
@@ -142,9 +142,9 @@ void draw_line_low(struct color *wallpaper_pixels, unsigned int width,
         }
 }
 
-void draw_line_high(struct color *wallpaper_pixels, unsigned int width,
-                    unsigned int height, int x1, int y1, int x2, int y2,
-                    struct color color) {
+static void draw_line_high(struct color *wallpaper_pixels, unsigned int width,
+                           unsigned int height, int x1, int y1, int x2, int y2,
+                           struct color color) {
         int dx = x2 - x1;
         int dy = y2 - y1;
         int xi = 1;
@@ -172,9 +172,9 @@ void draw_line_high(struct color *wallpaper_pixels, unsigned int width,
         }
 }
 
-void draw_line(struct color *wallpaper_pixels, unsigned int width,
-               unsigned int height, unsigned int thickness, int x1, int y1,
-               int x2, int y2, struct color color) {
+static void draw_line(struct color *wallpaper_pixels, unsigned int width,
+                      unsigned int height, unsigned int thickness, int x1,
+                      int y1, int x2, int y2, struct color color) {
         int offset;
         int start;
         int end;
@@ -209,6 +209,7 @@ void draw_line(struct color *wallpaper_pixels, unsigned int width,
 }
 
 static struct color stitch_color = {220, 220, 200};
+static struct color outline_color = {20, 20, 20};
 
 void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                                 unsigned int width, unsigned int height) {
@@ -234,7 +235,7 @@ void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
         unsigned int resolutions_per_jag =
             QUILT_RESOLUTION / NUM_QUILT_LINE_JAGS;
 
-        size_t i, j, k;
+        size_t i, j;
 
         if (!get_image_data(IMAGE_TEXTURES_STRIP, &img_data)) {
                 free(horizontal_lines);
@@ -359,18 +360,9 @@ void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                         float seg_len =
                             (float)sqrt((double)(dx * dx + dy * dy));
 
-                        for (k = 0; k < pixels_per_resolution_y; k++) {
-                                float progress =
-                                    (float)k / (float)pixels_per_resolution_y;
-                                int y = start_y + k;
-                                int x = line_x + start_offset + dx * progress;
-                                if (x >= 0 && x < (int)width && y >= 0 &&
-                                    y < (int)height) {
-                                        wallpaper_pixels[y * width + x].r = 20;
-                                        wallpaper_pixels[y * width + x].g = 20;
-                                        wallpaper_pixels[y * width + x].b = 20;
-                                }
-                        }
+                        draw_line(wallpaper_pixels, width, height, 5,
+                                  line_x + start_offset, start_y,
+                                  line_x + end_offset, end_y, outline_color);
 
                         if (seg_len > 0.001f) {
                                 float nx = -dy / seg_len;
@@ -382,7 +374,7 @@ void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                                      stitch_i < QUILT_STITCHES_PER_RESOLUTION;
                                      stitch_i++) {
                                         float t =
-                                            (float)stitch_i /
+                                            (stitch_i + 0.5f) /
                                             (float)
                                                 QUILT_STITCHES_PER_RESOLUTION;
                                         float cx =
@@ -425,18 +417,9 @@ void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                         float seg_len =
                             (float)sqrt((double)(dx * dx + dy * dy));
 
-                        for (k = 0; k < pixels_per_resolution_x; k++) {
-                                float progress =
-                                    (float)k / (float)pixels_per_resolution_x;
-                                int x = start_x + k;
-                                int y = line_y + start_offset + dy * progress;
-                                if (x >= 0 && x < (int)width && y >= 0 &&
-                                    y < (int)height) {
-                                        wallpaper_pixels[y * width + x].r = 20;
-                                        wallpaper_pixels[y * width + x].g = 20;
-                                        wallpaper_pixels[y * width + x].b = 20;
-                                }
-                        }
+                        draw_line(wallpaper_pixels, width, height, 5, start_x,
+                                  line_y + start_offset, end_x,
+                                  line_y + end_offset, outline_color);
 
                         if (seg_len > 0.001f) {
                                 float nx = -dy / seg_len;
@@ -471,230 +454,6 @@ void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                                         draw_line(wallpaper_pixels, width,
                                                   height, 2, x0, y0, x1, y1,
                                                   stitch_color);
-                                }
-                        }
-                }
-        }
-
-        free(horizontal_lines);
-}
-
-void basic_draw_debug_quilt_wallpaper(struct color *wallpaper_pixels,
-                                      unsigned int width, unsigned int height) {
-        unsigned int horizontal_spacing =
-            width / NUM_QUILT_LINES; /* these lines are vertical, but go along
-                                        the horizon */
-        unsigned int vertical_spacing = horizontal_spacing;
-
-        unsigned int num_horizontal_lines =
-            (height + vertical_spacing - 1) / vertical_spacing;
-
-        int vertical_lines[QUILT_RESOLUTION][NUM_QUILT_LINES];
-        int *horizontal_lines = (int *)malloc(
-            QUILT_RESOLUTION * num_horizontal_lines * sizeof(int));
-
-        unsigned int pixels_per_resolution_y = height / QUILT_RESOLUTION;
-        unsigned int pixels_per_resolution_x = width / QUILT_RESOLUTION;
-        unsigned int resolutions_per_jag =
-            QUILT_RESOLUTION / NUM_QUILT_LINE_JAGS;
-
-        size_t i, j, k;
-
-        for (i = 0; i < NUM_QUILT_LINES; i++) {
-                float offset = 0.0f;
-                float velocity = 0.0f;
-                float acceleration = 0.0f;
-                for (j = 0; j < QUILT_RESOLUTION; j++) {
-                        if (j % resolutions_per_jag == 0) {
-                                acceleration =
-                                    (float)(basic_wallpaper_get_random() * 2.0 -
-                                            1.0) *
-                                    QUILT_ACCEL_FORCE;
-                        }
-
-                        acceleration -= offset * QUILT_SPRING;
-
-                        velocity += acceleration;
-                        velocity *= QUILT_DAMPING;
-                        offset += velocity;
-
-                        vertical_lines[j][i] = (int)offset;
-                }
-        }
-
-        for (i = 0; i < num_horizontal_lines; i++) {
-                float offset = 0.0f;
-                float velocity = 0.0f;
-                float acceleration = 0.0f;
-                for (j = 0; j < QUILT_RESOLUTION; j++) {
-                        if (j % resolutions_per_jag == 0) {
-                                acceleration =
-                                    (float)(basic_wallpaper_get_random() * 2.0 -
-                                            1.0) *
-                                    QUILT_ACCEL_FORCE;
-                        }
-
-                        acceleration -= offset * QUILT_SPRING;
-
-                        velocity += acceleration;
-                        velocity *= QUILT_DAMPING;
-                        offset += velocity;
-
-                        horizontal_lines[j + i * QUILT_RESOLUTION] = offset;
-                }
-        }
-
-        /* Debug- draw red vertical lines and blue horizontal lines atop a black
-         * background */
-
-        for (i = 0; i < height; i++) {
-                for (j = 0; j < width; j++) {
-                        wallpaper_pixels[i * width + j].r = 0;
-                        wallpaper_pixels[i * width + j].g = 0;
-                        wallpaper_pixels[i * width + j].b = 0;
-                }
-        }
-
-        for (i = 0; i < NUM_QUILT_LINES; i++) {
-                unsigned int line_x = i * horizontal_spacing;
-                for (j = 0; j < QUILT_RESOLUTION - 1; j++) {
-                        int start_y = j * pixels_per_resolution_y;
-                        int end_y = (j + 1) * pixels_per_resolution_y;
-                        int start_offset = vertical_lines[j][i];
-                        int end_offset = vertical_lines[j + 1][i];
-                        int dy = end_y - start_y;
-                        int dx = end_offset - start_offset;
-
-                        float seg_len =
-                            (float)sqrt((double)(dx * dx + dy * dy));
-                        if (seg_len > 0.001f) {
-                                float nx = -dy / seg_len;
-                                float ny = dx / seg_len;
-                                int stitch_i;
-                                int s;
-
-                                for (stitch_i = 0;
-                                     stitch_i < QUILT_STITCHES_PER_RESOLUTION;
-                                     stitch_i++) {
-                                        float t =
-                                            (float)stitch_i /
-                                            (float)
-                                                QUILT_STITCHES_PER_RESOLUTION;
-                                        float cx =
-                                            line_x + start_offset + dx * t;
-                                        float cy = start_y + dy * t;
-
-                                        for (s = -QUILT_STITCH_RADIUS;
-                                             s <= QUILT_STITCH_RADIUS; s++) {
-                                                int stitch_x =
-                                                    (int)(cx + nx * s);
-                                                int stitch_y =
-                                                    (int)(cy + ny * s);
-                                                if (stitch_x >= 0 &&
-                                                    stitch_x < (int)width &&
-                                                    stitch_y >= 0 &&
-                                                    stitch_y < (int)height) {
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .r = 0;
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .g = 255;
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .b = 0;
-                                                }
-                                        }
-                                }
-                        }
-
-                        for (k = 0; k < pixels_per_resolution_y; k++) {
-                                float progress =
-                                    (float)k / (float)pixels_per_resolution_y;
-                                int y = start_y + k;
-                                int x = line_x + start_offset + dx * progress;
-                                if (x >= 0 && x < (int)width && y >= 0 &&
-                                    y < (int)height) {
-                                        wallpaper_pixels[y * width + x].r = 255;
-                                        wallpaper_pixels[y * width + x].g = 0;
-                                        wallpaper_pixels[y * width + x].b = 0;
-                                }
-                        }
-                }
-        }
-
-        for (i = 0; i < num_horizontal_lines; i++) {
-                unsigned int line_y = i * vertical_spacing;
-                for (j = 0; j < QUILT_RESOLUTION - 1; j++) {
-                        int start_x = j * pixels_per_resolution_x;
-                        int end_x = (j + 1) * pixels_per_resolution_x;
-                        int start_offset =
-                            horizontal_lines[j + i * QUILT_RESOLUTION];
-                        int end_offset =
-                            horizontal_lines[j + 1 + i * QUILT_RESOLUTION];
-                        int dx = end_x - start_x;
-                        int dy = end_offset - start_offset;
-
-                        float seg_len =
-                            (float)sqrt((double)(dx * dx + dy * dy));
-                        if (seg_len > 0.001f) {
-                                float nx = -dy / seg_len;
-                                float ny = dx / seg_len;
-                                int stitch_i;
-                                int s;
-
-                                for (stitch_i = 0;
-                                     stitch_i < QUILT_STITCHES_PER_RESOLUTION;
-                                     stitch_i++) {
-                                        float t =
-                                            (float)stitch_i /
-                                            (float)
-                                                QUILT_STITCHES_PER_RESOLUTION;
-                                        float cx =
-                                            start_x + start_offset + dx * t;
-                                        float cy =
-                                            line_y + start_offset + dy * t;
-
-                                        for (s = -QUILT_STITCH_RADIUS;
-                                             s <= QUILT_STITCH_RADIUS; s++) {
-                                                int stitch_x =
-                                                    (int)(cx + nx * s);
-                                                int stitch_y =
-                                                    (int)(cy + ny * s);
-                                                if (stitch_x >= 0 &&
-                                                    stitch_x < (int)width &&
-                                                    stitch_y >= 0 &&
-                                                    stitch_y < (int)height) {
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .r = 0;
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .g = 255;
-                                                        wallpaper_pixels
-                                                            [stitch_y * width +
-                                                             stitch_x]
-                                                                .b = 0;
-                                                }
-                                        }
-                                }
-                        }
-
-                        for (k = 0; k < pixels_per_resolution_x; k++) {
-                                float progress =
-                                    (float)k / (float)pixels_per_resolution_x;
-                                int x = start_x + k;
-                                int y = line_y + start_offset + dy * progress;
-                                if (x >= 0 && x < (int)width && y >= 0 &&
-                                    y < (int)height) {
-                                        wallpaper_pixels[y * width + x].r = 0;
-                                        wallpaper_pixels[y * width + x].g = 0;
-                                        wallpaper_pixels[y * width + x].b = 255;
                                 }
                         }
                 }

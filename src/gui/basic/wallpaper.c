@@ -66,10 +66,6 @@ void basic_wallpaper_draw(void) {
                 basic_draw_thematic_colors_wallpaper(
                     wallpaper_pixels, wallpaper_width, wallpaper_height);
                 break;
-        case WALLPAPER_QUILT_DEBUG:
-                basic_draw_debug_quilt_wallpaper(
-                    wallpaper_pixels, wallpaper_width, wallpaper_height);
-                break;
         case WALLPAPER_QUILT:
                 basic_draw_quilt_wallpaper(wallpaper_pixels, wallpaper_width,
                                            wallpaper_height);

@@ -6,7 +6,4 @@
 void basic_draw_quilt_wallpaper(struct color *wallpaper_pixels,
                                 unsigned int width, unsigned int height);
 
-void basic_draw_debug_quilt_wallpaper(struct color *wallpaper_pixels,
-                                      unsigned int width, unsigned int height);
-
 #endif /* BASIC_WALLPAPER_QUILT_H */
