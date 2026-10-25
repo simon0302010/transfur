@@ -23,6 +23,8 @@
 #define FREQUENCY_FALSE 1100
 #define FREQUENCY_TRUE 2200
 
+#define FFT_SIZE 1920
+
 /* Plays a tone and returns if it failed */
 #define TONE(FREQ, T)                                                          \
         res = play_tone(FREQ, T);                                              \
@@ -44,6 +46,9 @@ void *receiver_user_data_ptr = NULL;
 #endif
 static tbool receiver_inited = false;
 static tbool receiver_busy = false;
+static minfft_aux *receiver_minfft_aux = NULL;
+static minfft_real receiver_samples[FFT_SIZE];
+static minfft_cmpl receiver_freq[FFT_SIZE];
 
 static int input_stream_callback(const void *input_buffer, void *output_buffer,
                                  unsigned long frames_per_buffer,
@@ -91,9 +96,9 @@ int init_conn_audio(void *conn, const char *options) {
                         return AUDIO_ERR_INIT;
                 }
 
-                err = Pa_OpenDefaultStream(&receiver_stream, 1, 0, paFloat32,
-                                           48000, 1920, input_stream_callback,
-                                           receiver_user_data_ptr);
+                err = Pa_OpenDefaultStream(
+                    &receiver_stream, 1, 0, paFloat32, 48000, FFT_SIZE,
+                    input_stream_callback, receiver_user_data_ptr);
                 if (err != paNoError) {
                         fprintf(stderr,
                                 "error opening audio input stream: %s\n",
@@ -102,6 +107,10 @@ int init_conn_audio(void *conn, const char *options) {
                         return AUDIO_ERR_INIT;
                 }
 #endif
+
+                receiver_minfft_aux = minfft_mkaux_dft_1d(FFT_SIZE);
+                if (receiver_minfft_aux == NULL)
+                        return AUDIO_ERR_INIT;
 
                 receiver_inited = true;
         }
@@ -228,7 +237,7 @@ static int input_stream_callback(const void *input_buffer, void *output_buffer,
         const float *inp = (const float *)input_buffer;
 
         for (i = 0; i < frames_per_buffer; i++) {
-                printf("%f ", inp[i]);
+                printf("%f ", inp[i]); /* fills the entire command line lol */
         }
 
         return paContinue;
@@ -268,6 +277,8 @@ int close_conn_audio(void *conn, tbool is_last) {
                 Pa_StopStream(receiver_stream);
                 Pa_CloseStream(receiver_stream);
                 Pa_Terminate();
+
+                minfft_free_aux(receiver_minfft_aux);
         }
 
         return AUDIO_OK;
