@@ -18,8 +18,8 @@ else
 	OS_NAME := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 	EXE :=
 	ifeq ($(shell uname -s),Linux)
-		CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags ao)
-		LDLIBS += -lpthread $(shell pkg-config --libs ao)
+		CFLAGS += -D_POSIX_C_SOURCE=199309 -D_DEFAULT_SOURCE $(shell pkg-config --cflags ao) $(shell pkg-config --cflags portaudio-2.0)
+		LDLIBS += -lpthread $(shell pkg-config --libs ao) $(shell pkg-config --libs portaudio-2.0)
 		COMMON_SRC_EXTRA = src/relay/relay.c
 		ifeq ($(shell pkg-config --exists bluez || test -f /usr/include/bluetooth/bluetooth.h && echo 1 || echo 0),1)
 			CFLAGS += -DHAS_BLUETOOTH
