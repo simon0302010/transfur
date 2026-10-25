@@ -17,8 +17,9 @@
 #define AUDIO_ERR_INIT 7  /* Failed to initialize device */
 #define AUDIO_ERR_ALLOC 8 /* Failed to allocate memory */
 #define AUDIO_ERR_PLAY                                                         \
-        9 /* Unknown error occurred while trying to play sound                 \
-           */
+        9                /* Unknown error occurred while trying to play sound  \
+                          */
+#define AUDIO_ERR_CAP 10 /* Failed to capture audio */
 
 struct audio_state {
         char unused;
