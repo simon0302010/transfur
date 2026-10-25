@@ -58,8 +58,8 @@ void basic_music_play(const char *path, int volume) {
         if (volume < 0) {
                 volume = 0;
         }
-        if (volume > MIN_MAX_VOLUME) {
-                volume = MIN_MAX_VOLUME;
+        if (volume > MIX_MAX_VOLUME) {
+                volume = MIX_MAX_VOLUME;
         }
 
         Mix_VolumeMusic(volume);
