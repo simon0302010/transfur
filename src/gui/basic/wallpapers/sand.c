@@ -85,14 +85,15 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
 
         while (!goal_met) {
                 unsigned int point_x =
-                    (unsigned int)(basic_wallpaper_get_random() * width) *
+                    (unsigned int)(basic_wallpaper_get_random() * width) /
                     scale;
 
                 unsigned int point_pixels =
                     (unsigned int)(SAND_MIN_PARTICLES_PER_POINT +
                                    basic_wallpaper_get_random() *
                                        (SAND_MAX_PARTICLES_PER_POINT -
-                                        SAND_MIN_PARTICLES_PER_POINT));
+                                        SAND_MIN_PARTICLES_PER_POINT)) /
+                    scale;
 
                 unsigned int min_y = height;
 
@@ -125,7 +126,7 @@ void basic_draw_sand_wallpaper(struct color *wallpaper_pixels,
                             0, fmin(255, pixel_color.b +
                                              color_brightness_variation));
 
-                        x = point_x;
+                        x = point_x * scale;
                         if (min_y < SAND_PARTICLE_SPAWN_ABOVE_BY) {
                                 y = 0;
                         } else {
