@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include <SDL2/SDL.h>
+#include "../../basic/music.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_USE_FIXED_TYPES
@@ -123,6 +124,8 @@ int run_gui_nuklear(const char *title,
                 /*nk_style_load_all_cursors(ctx, atlas->cursors);*/
                 nk_style_set_font(ctx, &font->handle);
         }
+        
+        basic_music_play(MUSIC_DEFAULT_PATH, MUSIC_DEFAULT_VOLUME);
 
         bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
         while (running) {
@@ -157,6 +160,7 @@ int run_gui_nuklear(const char *title,
         }
 
 cleanup:
+        basic_music_cleanup();
         nk_sdl_shutdown();
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(win);
