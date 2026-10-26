@@ -9,6 +9,7 @@
 #include "wallpapers/quilt.h"
 #include "wallpapers/sand.h"
 #include "wallpapers/space.h"
+#include "wallpapers/water.h"
 #include "wallpapers/trig.h"
 #include "wallpapers/war.h"
 #include "wrappers/basic_wrapper.h"
@@ -79,6 +80,9 @@ void basic_wallpaper_draw(void) {
                 basic_draw_sand_wallpaper(wallpaper_pixels, wallpaper_width,
                                           wallpaper_height);
                 break;
+        case WALLPAPER_WATER:
+                basic_draw_water_wallpaper(wallpaper_pixels, wallpaper_width,
+                                          wallpaper_height);
         case WALLPAPER_TRIG:
                 basic_draw_trig_wallpaper(wallpaper_pixels, wallpaper_width,
                                           wallpaper_height);
