@@ -34,7 +34,7 @@ The TUI is the most simple GUI for Transfur.
 Background Music is supported by Nuklear GUI and Basic GUI.
 
 Currently there's no music bundled yet, but you can pop one in named bg.mp3 into `assets/`.
-There's no way to control the volume right now, but a mute key is WIP.
+You can mute the music on Basic GUI currently, but not Nuklear GUI for now.
 
 ## Information Transfer
 
@@ -141,3 +141,8 @@ Here's what goes as input for each interface:
 - Read/Send from File: File path for your operation
 - Read/Send over LAN: `<port>` if this is running via loopback, `<ip>:<port>` if it is over a network
 - Read/Send over Serial: `<serial_path>[:<baud>]` if you do not specify baud, it will default to a value of 38400
+
+## TODO
+- Add mute key for Nuklear for background music
+- Add volume keys for background music
+- Draw Mute/Unmute icons and show them on GUI
