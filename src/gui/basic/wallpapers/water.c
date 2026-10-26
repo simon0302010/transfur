@@ -1,6 +1,6 @@
 #include "water.h"
 #include "../wallpaper.h"
-#include "../wrappers/basic_wrappers.h"
+#include "../wrappers/basic_wrapper.h"
 #include <math.h>
 
 #define PI 3.14159265358979323846
@@ -18,7 +18,7 @@ static struct color lerp_color(struct color from, struct color to, double t) {
 }
 
 static unsigned char clamp_channel(double value) {
-        if (vaue < 0.0) {
+        if (value < 0.0) {
                 return 0;
         }
         if (value > 255.0) {
@@ -37,7 +37,7 @@ void basic_draw_water_wallpaper(struct color *wallpaper_pixels, unsigned int wid
         int i;
 
         surface_color.r = 18;
-        surface_color,g = 84;
+        surface_color.g = 84;
         surface_color.b = 120;
 
         deep_color.r = 2;
@@ -54,7 +54,7 @@ void basic_draw_water_wallpaper(struct color *wallpaper_pixels, unsigned int wid
                 double row_sway = sin((double)y * 0.012 + phase[0]) * 22.0;
                 double warp_y = sin((double)y * 0.031 + phase[1]) * 9.0;
                 double glow = exp(-depth * 5.0) * 0.28;
-                struct color base = lerp_color(surface_color, deep_color depth);
+                struct color base = lerp_color(surface_color, deep_color, depth);
 
                 for (x = 0; x < width; x++) {
                         double px = (double)x + row_sway + warp_y;
