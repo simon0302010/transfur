@@ -8,6 +8,7 @@
 #include "wallpapers/conway.h"
 #include "wallpapers/quilt.h"
 #include "wallpapers/sand.h"
+#include "wallpapers/space.h"
 #include "wallpapers/trig.h"
 #include "wallpapers/war.h"
 #include "wrappers/basic_wrapper.h"
@@ -93,6 +94,10 @@ void basic_wallpaper_draw(void) {
         case WALLPAPER_CONWAY:
                 basic_draw_conway_wallpaper(wallpaper_pixels, wallpaper_width,
                                             wallpaper_height);
+                break;
+        case WALLPAPER_SPACE:
+                basic_draw_space_wallpaper(wallpaper_pixels, wallpaper_width,
+                                           wallpaper_height);
                 break;
         default:
                 break;

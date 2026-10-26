@@ -13,6 +13,7 @@ typedef enum {
         WALLPAPER_WAR,
         WALLPAPER_WAR_LASERS,
         WALLPAPER_CONWAY,
+        WALLPAPER_SPACE,
         WALLPAPER_COUNT
 } basic_wallpaper_type_t;
 
