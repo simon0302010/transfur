@@ -12,6 +12,7 @@
 #include <windows.h>
 
 #include "../../gui.h"
+#include "../../basic/music.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_USE_FIXED_TYPES
@@ -199,6 +200,8 @@ int run_gui_nuklear(const char *title,
                 /*nk_style_set_font(ctx, &droid->handle)*/;
         }
 
+        basic_music_play(MUSIC_DEFAULT_PATH, MUSIC_DEFAULT_VOLUME);
+
         bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
         while (running) {
                 /* Input */
@@ -264,6 +267,7 @@ int run_gui_nuklear(const char *title,
                         NK_ASSERT(SUCCEEDED(hr));
                 }
         }
+        basic_music_cleanup();
         nk_d3d9_shutdown();
         if (deviceEx)
                 IDirect3DDevice9Ex_Release(deviceEx);
