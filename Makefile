@@ -107,6 +107,7 @@ ifeq ($(ENABLE_THEMES), 1)
 		src/gui/basic/wallpapers/colors.c \
 		src/gui/basic/wallpapers/quilt.c \
 		src/gui/basic/wallpapers/sand.c \
+		src/gui/basic/wallpapers/water.c \
 		src/gui/basic/wallpapers/trig.c \
 		src/gui/basic/wallpapers/war.c \
 		src/gui/basic/wallpapers/conway.c \
