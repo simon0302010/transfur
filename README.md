@@ -20,6 +20,8 @@ This GUI is designed to run on devices with very basic drawing functions.
 
 While in the basic GUI, you can press Q to quit and T to toggle themes.
 
+Press W to change the wallpaper, and R to regenerate the current wallpaper.
+
 These controls will not work while you are focusing a text input.
 
 ### TUI
@@ -79,7 +81,7 @@ make basic
 make run-basic
 ```
 
-To enable themes (highly recommended):
+To enable themes & wallpapers (highly recommended):
 
 ```bash
 ENABLE_THEMES=1 make basic
