@@ -12,6 +12,7 @@ typedef enum {
         WALLPAPER_TRIG,
         WALLPAPER_WAR,
         WALLPAPER_WAR_LASERS,
+        WALLPAPER_CONWAY,
         WALLPAPER_COUNT
 } basic_wallpaper_type_t;
 

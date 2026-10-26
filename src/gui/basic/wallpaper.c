@@ -5,6 +5,7 @@
 #include "stddef.h"
 #include "stdlib.h"
 #include "wallpapers/colors.h"
+#include "wallpapers/conway.h"
 #include "wallpapers/quilt.h"
 #include "wallpapers/sand.h"
 #include "wallpapers/trig.h"
@@ -88,6 +89,10 @@ void basic_wallpaper_draw(void) {
         case WALLPAPER_WAR_LASERS:
                 basic_draw_war_wallpaper(wallpaper_pixels, wallpaper_width,
                                          wallpaper_height, true);
+                break;
+        case WALLPAPER_CONWAY:
+                basic_draw_conway_wallpaper(wallpaper_pixels, wallpaper_width,
+                                            wallpaper_height);
                 break;
         default:
                 break;
