@@ -5,6 +5,7 @@
 #include "../core/ui_core.h"
 #include "../gui.h"
 #include "event.h"
+#include "music.h"
 #include "render.h"
 #include "theme.h"
 #include "theme_switcher.h"
@@ -24,6 +25,8 @@ int run_basic(char *title) {
         prev_time = basic_get_time();
 
         basic_init(title, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        basic_music_play(MUSIC_DEFAULT_PATH, MUSIC_DEFAULT_VOLUME);
 
         basic_wallpaper_init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -87,6 +90,8 @@ int run_basic(char *title) {
         }
 
         basic_cleanup();
+
+        basic_music_cleanup();
 
         basic_wallpaper_cleanup();
 
