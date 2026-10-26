@@ -11,6 +11,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "../../basic/music.h"
+
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_USE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -106,6 +108,8 @@ int run_gui_nuklear(const char *title,
         xw.font = nk_xfont_create(xw.dpy, "fixed");
         ctx = nk_xlib_init(xw.font, xw.dpy, xw.screen, xw.win, xw.width,
                            xw.height);
+        
+        basic_music_play(MUSIC_DEFAULT_PATH, MUSIC_DEFAULT_VOLUME);
 
         while (running) {
                 /* Input */
@@ -152,6 +156,7 @@ int run_gui_nuklear(const char *title,
         }
 
 cleanup:
+        basic_music_cleanup();
         nk_xfont_del(xw.dpy, xw.font);
         nk_xlib_shutdown();
         XUnmapWindow(xw.dpy, xw.win);
