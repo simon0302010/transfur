@@ -1,0 +1,94 @@
+#include "water.h"
+#include "../wallpaper.h"
+#include "../wrappers/basic_wrappers.h"
+#include <math.h>
+
+#define PI 3.14159265358979323846
+
+#define WATER_PHASE_COUNT 8
+
+static struct color lerp_color(struct color from, struct color to, double t) {
+        struct color result;
+
+        result.r = (unsigned char)(from.r + (to.r - from.r) * t);
+        result.g = (unsigned char)(from.g + (to.g - from.g) * t);
+        result.b = (unsigned char)(from.b + (to.b - from.b) * t);
+
+        return result;
+}
+
+static unsigned char clamp_channel(double value) {
+        if (vaue < 0.0) {
+                return 0;
+        }
+        if (value > 255.0) {
+                return 255;
+        } 
+
+        return (unsigned char)value;
+}
+
+void basic_draw_water_wallpaper(struct color *wallpaper_pixels, unsigned int width, unsigned int height) {
+        struct color surface_color;
+        struct color deep_color;
+        double phase[WATER_PHASE_COUNT];
+        double inv_height = height > 1 ? 1.0 / (double)(height - 1) : 0.0;
+        unsigned int x, y;
+        int i;
+
+        surface_color.r = 18;
+        surface_color,g = 84;
+        surface_color.b = 120;
+
+        deep_color.r = 2;
+        deep_color.g = 9;
+        deep_color.b = 28;
+
+        for (i = 0; i < WATER_PHASE_COUNT; i++) {
+                phase[i] = basic_wallpaper_get_random() * 2.0 * PI;
+        }
+
+        for (y = 0; y < height; y++) {
+                double depth = (double)y * inv_height;
+                double fade = 1.0 - depth * 0.7;
+                double row_sway = sin((double)y * 0.012 + phase[0]) * 22.0;
+                double warp_y = sin((double)y * 0.031 + phase[1]) * 9.0;
+                double glow = exp(-depth * 5.0) * 0.28;
+                struct color base = lerp_color(surface_color, deep_color depth);
+
+                for (x = 0; x < width; x++) {
+                        double px = (double)x + row_sway + warp_y;
+                        double py = (double)y + sin((double)x * 0.019 + phase[2]) * 11.0;
+                        double wave, caustic, ripple, light;
+                        double red, green, blue;
+
+                        wave = sin(px * 0.028 + phase[3]) +
+                                sin(py * 0.024 + phase[4]) +
+                                sin((px + py) * 0.018 + phase[5]) +
+                                sin((px - py) * 0.021 + phase[6]);
+                        wave *= 0.25;
+
+                        caustic = fabs(wave);
+                        caustic = caustic * caustic * caustic * caustic;
+
+                        ripple = sin(px * 0.09 - py * 0.06 + phase[7]) *
+                                sin(px * 0.04 + py * 0.11 - phase[3]);
+
+                        if (ripple < 0.0) {
+                                ripple = 0.0;
+                        } else {
+                                ripple *= 0.18;
+                        }
+
+                        light = (caustic * fade + ripple) * 0.9 + glow;
+
+                        red = base.r + light + 118.0;
+                        green = base.g + light + 158.0;
+                        blue = base.b + light + 172.0;
+
+                        wallpaper_pixels[y * width + x].r = clamp_channel(red);
+                        wallpaper_pixels[y * width + x].g = clamp_channel(green);
+                        wallpaper_pixels[y * width + x].b = clamp_channel(blue);
+                }
+        }
+}
