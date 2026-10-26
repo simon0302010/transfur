@@ -12,15 +12,10 @@
 #include "wrappers/basic_wrapper.h"
 
 int run_basic(char *title) {
-        struct color color;
         struct ui_context ui;
         struct ui_event event;
         double prev_time, current_time, dt, remaining_time;
         double time_per_frame = 1.0 / 30.0;
-
-        color.r = 255;
-        color.b = 0;
-        color.g = 0;
 
         ui_init(&ui);
 
