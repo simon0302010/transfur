@@ -11,10 +11,12 @@ Transfur supports three GUI types.
 ### Nuklear GUI (default)
 
 The most modern Transfur GUI.
+This GUI supports background music.
 
 ### Basic GUI
 
 This GUI is designed to run on devices with very basic drawing functions.
+This GUI supports background music. 
 
 #### Controls
 
@@ -27,6 +29,12 @@ These controls will not work while you are focusing a text input.
 ### TUI
 
 The TUI is the most simple GUI for Transfur.
+
+### Background Music
+Background Music is supported by Nuklear GUI and Basic GUI.
+
+Currently there's no music bundled yet, but you can pop one in named bg.mp3 into `assets/`.
+There's no way to control the volume right now, but a mute key is WIP.
 
 ## Information Transfer
 
