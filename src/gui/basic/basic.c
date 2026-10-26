@@ -58,6 +58,9 @@ int run_basic(char *title) {
                                                 case 'r':
                                                         basic_wallpaper_regenerate();
                                                         break;
+                                                case 'm':
+                                                        basic_music_toggle_mute();
+                                                        break;
                                                 }
                                         }
                                 }
