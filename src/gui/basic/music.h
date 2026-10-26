@@ -15,6 +15,9 @@ Stops and unloads current track
 */
 void basic_music_stop(void);
 
+/* Mute track */
+void basic_music_toggle_mute(void);
+
 /* Release audio device */
 void basic_music_cleanup(void);
 

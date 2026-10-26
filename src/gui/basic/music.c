@@ -5,6 +5,8 @@
 
 static Mix_Music *s_music = NULL;
 static int s_audio_open = 0;
+static int s_muted = 0;
+static int s_saved_volume = MUSIC_DEFAULT_VOLUME;
 
 static void music_free(void) {
         if (!s_music) {
@@ -72,6 +74,22 @@ void basic_music_play(const char *path, int volume) {
 
 void basic_music_stop(void) {
         music_free();
+}
+
+void basic_music_toggle_mute(void) {
+        if (!s_audio_open) {
+                return;
+        }
+
+        if (s_muted) {
+                Mix_VolumeMusic(s_saved_volume);
+                s_muted = 0;
+        } else {
+                /* -1 queries current volume */
+                s_saved_volume = Mix_VolumeMusic(-1);
+                Mix_VolumeMusic(0);
+                s_muted = 1;
+        }
 }
 
 void basic_music_cleanup(void) {
