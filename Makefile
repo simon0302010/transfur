@@ -64,18 +64,19 @@ COMMON_SRC = src/main.c \
 # NUKLEAR GUI
 NUKLEAR_CFLAGS = $(CFLAGS)
 NUKLEAR_LDLIBS = $(LDLIBS)
-NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c src/interfaces/file/browser.c
+NUKLEAR_SRC = $(COMMON_SRC) src/gui/nuklear/gui_nuklear.c src/interfaces/file/browser.c \
+				src/gui/basic/music.c
 
 ifeq ($(OS),Windows_NT)
 	NUKLEAR_SRC += src/gui/nuklear/windows/nuklear_windows.c
-	NUKLEAR_LDLIBS += -ld3d9
+	NUKLEAR_LDLIBS += -ld3d9 -lSDL2 -lSDL2_mixer
 else ifeq ($(shell uname -s),Linux)
 	NUKLEAR_SRC += src/gui/nuklear/linux/nuklear_linux.c
-	NUKLEAR_LDLIBS += -lX11
+	NUKLEAR_LDLIBS += -lX11 $(shell pkg-config --libs sdl2 SDL2_mixer)
 else ifeq ($(shell uname -s),Darwin)
 	NUKLEAR_SRC += src/gui/nuklear/macos/nuklear_macos.c
-	NUKLEAR_CFLAGS += $(shell pkg-config --cflags sdl2)
-	NUKLEAR_LDLIBS += $(shell pkg-config --libs sdl2)
+	NUKLEAR_CFLAGS += $(shell pkg-config --cflags sdl2 SDL2_mixer)
+	NUKLEAR_LDLIBS += $(shell pkg-config --libs sdl2 SDL2_mixer)
 endif
 
 # BASIC GUI
